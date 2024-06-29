@@ -1,0 +1,22 @@
+---
+title: Intro
+description: How to install ecosystem.Ai locally
+---
+
+import { DockerIcon, NpmIcon } from '@/components/svg/'
+
+# Install ecosystem.Ai Locally
+
+**We recommend using `Docker Compose{:hack}` to install ecosystem.Ai**, as it is the easiest, simplest, and most reliable method for getting started. With Docker, you can quickly spin up a container that includes everything you need to run ecosystem.Ai, including MongoDB, Jupyter Notebooks, Postgres, Workbench, Prediction Server, Client Pulse Responder Runtime, as well as all storage mapping needed to persist your data. This approach ensures consistency across different environments and eliminates the need for manual setup of dependencies, making it ideal for most use cases.
+
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+  <Cards num={2} style={{ display: 'flex', flexDirection: 'row' }}>
+    <Cards.Card
+      icon={<DockerIcon />}
+      title="Docker Install"
+      image
+      arrow
+      href="/docs/local/docker"
+    />
+  </Cards>
+</div>

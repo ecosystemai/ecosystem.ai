@@ -1,0 +1,59 @@
+import AdditionalLinks from '@/components/repeated/AdditionalLinks.mdx';
+
+# Marketplace Apps
+
+ecosystem.Ai is available on Microsoft Azure and Amazon's AWS. There are a number of install options available depending on your requirements.
+
+This guide assists with your cloud install. If you require a local install follow this: **[Local Setup Guide](/docs/quick_start/local_setup).**
+
+## Step 1. Decide on your install preference
+
+- There are three types of install options available namely; base platform single instance, cluster (Kubernetes) option and module apps.
+- Search for the App's in the marketplace search on Azure and AWS.
+
+
+## Step 2. Configure install
+
+- **Select Install** and select options.
+- **Read Access Instructions** where you can access the installed app from your browser [AI Endpoints section](/docs/configuration/).
+  - Each component in the ecosystem.Ai stack have a separate port that can be mapped to different web paths.
+  - Use the default username and password to access the various components.
+- Here are the **Marketplace** app for AWS:
+
+![image](/images/install/aws.png)
+
+- Here are the **Marketplace** app for Azure:
+
+![image](/images/install/azure.png)
+
+
+## Step 3. Review configuration
+
+- **Edit your existing configuration**
+    - Access your installed container and navigate to:
+    ```bash
+    cd /opt/ecosystem
+    ```
+    - Review `.env` file and change the OpenAI key if needed.
+
+- **Edit startup parameters**
+    - Review the `.yaml` files for update any settings for example loading more runtime instances.
+    - Use `start.sh` to restart all services.
+
+**Notes:**
+- Please take care when changing anny configuration files.
+- Make backups before changing settings.
+
+## Step 4. Run the App
+
+- Now that your files are configured, you can run the app:
+
+```web
+http://127.0.0.1
+```
+
+## Conclusion
+
+**That's it!** You have now configured **Marketplace Apps** for your ecosystem.Ai instance.
+
+<AdditionalLinks />

@@ -1,0 +1,68 @@
+---
+title: Azure Marketplace
+description: Setup ecosystem.Ai Platform in Azure
+---
+
+# Guide to Setting up ecosystem.Ai Platform in Azure
+
+<Cards>
+    <Cards.Card href="https://portal.azure.com/#view/Microsoft_Azure_Marketplace/GalleryItemDetailsBladeNopdl/id/ecogeneticllc1676924558438.ecosystemai-platform" title="Platform Option" image arrow>
+        ![image](/images/install/azure-platform-vm.png)
+    </Cards.Card>
+    <Cards.Card href="https://portal.azure.com/#view/Microsoft_Azure_Marketplace/GalleryItemDetailsBladeNopdl/id/ecogeneticllc1676924558438.ecosystemai" title="Full Option" image arrow>
+        ![image](/images/install/azure-platform-full.png)
+    </Cards.Card>
+    <Cards.Card href="https://portal.azure.com/#view/Microsoft_Azure_Marketplace/GalleryItemDetailsBladeNopdl/id/ecogeneticllc1676924558438.ecosystem-spend-personality" title="Spend Personality Option" image arrow>
+        ![image](/images/install/azure-platform-personality.png)
+    </Cards.Card>
+</Cards>
+
+## ecosystem.Ai Platform (VM)
+
+### Step 1: Find the App in Marketplace
+- Select the App to install and review your dependencies.
+- Review base functionality and start install by clicking "Create".
+
+![image](/images/install/azure-install-01.png)
+
+
+### Step 2: Setup Basic Settings
+- Select the correct subscription and ensure that you have app install rights.
+- Either use an existing group or create a new one.
+- Virtual machines in Azure have two distinct names: virtual machine name used as the Azure resource identifier, and in guest host name. When you create a VM in the portal, the same name is used for both the virtual machine name and the host name. The virtual machine name cannot be changed after the VM is created. You can change the host name when you log into the virtual machine.
+- Choose the Azure region that's right for you and your customers. Not all VM sizes are available in all regions.
+- The administrator username for the VM as azureuser. Use the security credentials to access the VM.
+
+![image](/images/install/azure-install-02.png)
+
+- Additional settings for security and availability.
+
+![image](/images/install/azure-install-03.png)
+
+
+### Step 3: Setup Networking
+- Use default networking settings when possible.
+- Ensure that security group allows for access to ports: 80, 3001, 3000, etc.
+
+![image](/images/install/azure-install-04.png)
+
+
+### Step 4: Review Install Results
+- During install, all results can be reviewed.
+- When completed review the public IP address created and access via http://ip
+
+
+## ecosystem.Ai Platform (Kubernetes)
+
+### Step 1: Find the App in Marketplace
+- Select the App to install and review your dependencies.
+- Review base functionality and start install by clicking "Create".
+
+
+<Callout type="tip" title="Tip">
+- Ensure that you update your algorithm from the ecosystem.Ai website when needed.
+</Callout>
+
+
+## Conclusion
+These options focus entirely on the cloud implementation. We also have other cloud types and on premise installations that can be done using various technologies.

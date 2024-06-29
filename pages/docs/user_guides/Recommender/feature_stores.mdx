@@ -1,0 +1,44 @@
+---
+title: Feature Stores
+description: Feature Stores is where you store, manage, and retrieve precomputed features, ensuring consistency and reusability across various machine learning models and applications.
+---
+
+## Feature Stores is where you store, manage, and retrieve precomputed features, ensuring consistency and reusability across various machine learning models and applications.
+
+Using the collection you have just exported, you will need to create a feature store to be used in your recommender. 
+
+In the <u>Recommenders</u> section of the Workbench, you will find <u>Feature Stores</u>.
+
+***image (featue 1)***
+
+Here, you will be able to add, view, delete all the feature stores.
+
+To create a feature store from your exported data set, select **+ Feature Store.**
+
+***image (feature 2)***
+
+The input fields will be where you set the configuration settings for your final Feature Store.
+
+You will need to provide a unique name in Feature Store ID and a good Description.
+
+***image (feature small 1)***
+
+The feature store can also be allocated to an existing project to help ease your project creation journey. 
+
+Specify the characteristics of the file you will be building the feature store on, and select **Check Data**.
+
+***image (feature small 2)***
+
+Clicking **Check Data** will create a table of all of the columns in your data set. You can change the automatically allocated type of each column on the right. You can also add descriptions to those columns if you wish.
+
+Once you have correctly typed and described the details, the Destination Frame will be pre-populated with your feature store name .hex file.
+
+***image (feature small 3)***
+
+If you want your feature store to have a different name, you can change it here. This .hex file will be used in the next step when configuring your predictions.
+
+To trigger the creation of your feature store with all these details, click **Parse Data**.
+
+***image (feature small 4)***
+
+There is no need to use the small Parse button when configuring a recommender feature store. Make sure to always **Save** your feature store definition as you progress through the steps.

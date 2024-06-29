@@ -1,0 +1,1169 @@
+---
+title: Project / Module
+description: The project definition is at the core of describing and configuring your use-case for deployment. Deployment configurations and related properties are used to drive your pipelines and can be exported as assets for deployment to different environments.
+---
+
+# Project Definition
+
+**Project Name and Description**
+
+Describing and naming your project is essential for version tracking, .
+
+**Setup**
+
+Project description and core documentation.
+![image](/images/configuration/project/project-description.png)
+
+Project assets that are used to create a module.
+![image](/images/configuration/project/project-assets.png)
+
+Importing modules as projects.
+![image](/images/configuration/project/project-import.png)
+
+
+**Properties**
+
+## Settings
+
+Here's a snapshot of what a comprehensive project configuration might look like, including many of the options and features to be discussed.
+
+```json
+{
+    "project_collections": [
+        {
+            "database": "master",
+            "collection": "bank_customer"
+        },
+        {
+            "database": "master",
+            "collection": "bank_transactions"
+        },
+        {
+            "database": "master",
+            "collection": "bank_transactions_personality"
+        },
+        {
+            "database": "master",
+            "collection": "bank_transactions_personality_bydate"
+        },
+        {
+            "database": "master",
+            "collection": "bank_transactions_personality_options"
+        },
+        {
+            "database": "master",
+            "collection": "bank_transactions_money"
+        },
+        {
+            "database": "master",
+            "collection": "spend_personality__network"
+        },
+        {
+            "database": "master",
+            "collection": "spend_personality__network_config"
+        },
+        {
+            "database": "master",
+            "collection": "spend_personality__network_selector"
+        },
+        {
+            "database": "master",
+            "collection": "spend_personality__network_selector_options"
+        },
+        {
+            "database": "master",
+            "collection": "bank_transactions_reliability"
+        }
+    ],
+    "project_files": [
+        {
+            "name": "bank_transactions.csv",
+            "absolutePath": "/data/bank_transactions.csv",
+            "lastModified": 1711192602491,
+            "size": 121.429,
+            "canRead": true,
+            "isDirectory": false
+        },
+        {
+            "name": "bank_customer.csv",
+            "absolutePath": "/data/bank_customer.csv",
+            "lastModified": 1711192601868,
+            "size": 0.18,
+            "canRead": true,
+            "isDirectory": false
+        },
+        {
+            "name": "spend_personality.txt",
+            "absolutePath": "/data/spend_personality.txt"
+        },
+        {
+            "name": "money_personality.txt",
+            "absolutePath": "/data/money_personality.txt"
+        },
+        {
+            "name": "config",
+            "date": "2024-04-28",
+            "absolutePath": "/data/config"
+        },
+        {
+            "name": "bank_customer__list.csv",
+            "date": "2024-04-28",
+            "absolutePath": "/data/bank_customer__list.csv"
+        }
+    ],
+    "project_networks": [
+        {
+            "date": "2023-06-15",
+            "uuid": "ab823cdf-9ddd-404a-90f8-19d5fe68639c",
+            "description": "bank_customer"
+        },
+        {
+            "date": "2024-03-19",
+            "uuid": "0acb461e-ceb6-45fc-b097-719ce415a5a1",
+            "description": "bank_transactions"
+        }
+    ],
+    "purpose": "intervention",
+    "configuration": "\"Spend personality\" refers to the characterization of an individual's spending habits based on their bank transactions. This type of analysis, leveraging AI and Machine Learning, provides valuable insights into customer behavior, preferences, and spending patterns over time. By analyzing the frequency, amount, and type of purchases, a bank can categorize their customers into different spending personality types. \n\nFor \"Money Personality\" analyzing customer transaction patterns against profiles, banks can better understand their customers’ money habits and financial management strategies. This can then drive personalized product recommendations, improve customer engagement, and help in more effectively managing financial risks.\n\nFor example, some customers may be identified as big spenders, frequent shoppers, savers, or even impulse buyers based on their demonstrated spending behaviors. These spending personalities can then be utilized for developing personalized marketing strategies, providing tailored financial advice, or enhancing customer service. It can help banks understand their customers better, predict their needs, and build stronger, more profitable relationships with them.\n\nProcess spending personality using Feature Engineering enrichment option:\n1. Use customer transaction data and perform category enrichment.\n2. Then run Ecosystem Spending Personality to generate new collections with scores assigned to customers.\n3. API returns scores per customer.\n\nNotes on 0.09.3:\n1. Network selector configured to allow for different usage options.\n2. Updated Text to SQL engine.\n3. Updates across all configurations for consistency.",
+    "project_notebooks": [
+        {
+            "name": "Spend Personality 0.09",
+            "date": "2024-04-15"
+        }
+    ],
+    "project_calendars": [
+        {
+            "name": "master",
+            "date": "NA"
+        }
+    ],
+    "project_data_wizards": [
+        {
+            "title": "Spend Personality",
+            "date": "NA"
+        }
+    ],
+    "project_predictors": [
+        {
+            "date": "2024-03-20",
+            "predict_id": "bank_customer__personality_auto"
+        },
+        {
+            "date": "2024-03-23",
+            "predict_id": "bank_transactions__personality_auto"
+        }
+    ],
+    "userid": "ecosystem",
+    "uuid": "20bdf5c6-be30-4fdd-8c43-4ec1663e6571",
+    "project_end_date": "2026-05-02",
+    "undefined": [
+        {
+            "name": "Spend Personality 0.09.1",
+            "date": "2024-04-15"
+        }
+    ],
+    "project_cpr_client_analytics": [
+        {
+            "name": "spend_personality_590",
+            "date": "2024-04-16"
+        }
+    ],
+    "project_id": "Spend Personality 0.09.4",
+    "project_owner": "ecosystem",
+    "presto_connections": [
+        {
+            "name": "Postgres-bank_transactions-select",
+            "date": "2024-03-30"
+        },
+        {
+            "name": "Postgres-bank_transactions",
+            "date": "2024-03-30"
+        },
+        {
+            "name": "Postgres-bank_transactions-drop",
+            "date": "2024-03-30"
+        }
+    ],
+    "project_models": [
+        {
+            "parameters[21].actual_value": "---",
+            "output.validation_metrics.model_category": "Multinomial",
+            "output.validation_metrics.logloss": 0.4969054048712993,
+            "output.validation_metrics.RMSE": 0.3961064072904806,
+            "response_column_name": "personality",
+            "output.validation_metrics.mean_per_class_error": 0.4,
+            "output.end_time": 1710851747225,
+            "model_id.name": "GLM_1_AutoML_2_20240319_123546",
+            "output.validation_metrics.MSE": 0.15690028589657207,
+            "data_frame.name": "AutoML_2_20240319_123546_training_bank_customer0_8.hex",
+            "output.model_summary.data[3][0]": "Ridge ( lambda = 0.01456 )",
+            "algo": "glm",
+            "parameters[22].actual_value": "---",
+            "output.validation_metrics.r2": 0.04324034294718049
+        },
+        {
+            "parameters[21].actual_value": 20,
+            "output.validation_metrics.model_category": "Multinomial",
+            "output.validation_metrics.logloss": 0.5139734681851796,
+            "output.validation_metrics.RMSE": 0.4038291760955808,
+            "response_column_name": "personality",
+            "output.validation_metrics.mean_per_class_error": 0.3984280701754386,
+            "output.end_time": 1710851749153,
+            "model_id.name": "XRT_1_AutoML_2_20240319_123546",
+            "output.validation_metrics.MSE": 0.16307800346603557,
+            "data_frame.name": "AutoML_2_20240319_123546_training_bank_customer0_8.hex",
+            "output.model_summary.data[3][0]": 163134,
+            "algo": "drf",
+            "parameters[22].actual_value": 1,
+            "output.validation_metrics.r2": 0.0055693412064614645
+        },
+        {
+            "parameters[21].actual_value": 15,
+            "output.validation_metrics.model_category": "Multinomial",
+            "output.validation_metrics.logloss": 0.00504091424119842,
+            "output.validation_metrics.RMSE": 0.03350626288016139,
+            "response_column_name": "personality_description",
+            "output.validation_metrics.mean_per_class_error": 0.0012288059914334056,
+            "output.end_time": 1711196621263,
+            "model_id.name": "GBM_1_AutoML_1_20240323_121956",
+            "output.validation_metrics.MSE": 0.001122669652194481,
+            "data_frame.name": "AutoML_1_20240323_121956_training_bank_transactions__enriched.hex",
+            "output.model_summary.data[3][0]": 1591898,
+            "algo": "gbm",
+            "parameters[22].actual_value": 100,
+            "output.validation_metrics.r2": 0.9987902818019092
+        },
+        {
+            "parameters[21].actual_value": true,
+            "output.validation_metrics.model_category": "Multinomial",
+            "output.validation_metrics.logloss": 0.5281917248961325,
+            "output.validation_metrics.RMSE": 0.4061316271799821,
+            "response_column_name": "personality",
+            "output.validation_metrics.mean_per_class_error": 0.39896140350877196,
+            "output.end_time": 1710851749497,
+            "model_id.name": "DeepLearning_1_AutoML_2_20240319_123546",
+            "output.validation_metrics.MSE": 0.16494289859585998,
+            "data_frame.name": "AutoML_2_20240319_123546_training_bank_customer0_8.hex",
+            "output.model_summary.data[3][0]": "Input",
+            "algo": "deeplearning",
+            "parameters[22].actual_value": true,
+            "output.validation_metrics.r2": -0.005802571946242674
+        },
+        {
+            "parameters[21].actual_value": 20,
+            "output.validation_metrics.model_category": "Multinomial",
+            "output.validation_metrics.logloss": 0.54451602038775,
+            "output.validation_metrics.RMSE": 0.4116196202612879,
+            "response_column_name": "personality",
+            "output.validation_metrics.mean_per_class_error": 0.3879578947368421,
+            "output.end_time": 1710851747910,
+            "model_id.name": "DRF_1_AutoML_2_20240319_123546",
+            "output.validation_metrics.MSE": 0.16943071178404687,
+            "data_frame.name": "AutoML_2_20240319_123546_training_bank_customer0_8.hex",
+            "output.model_summary.data[3][0]": 394707,
+            "algo": "drf",
+            "parameters[22].actual_value": 1,
+            "output.validation_metrics.r2": -0.033168733724158406
+        },
+        {
+            "parameters[21].actual_value": 16,
+            "output.validation_metrics.model_category": "Multinomial",
+            "output.validation_metrics.logloss": 0.509847958643211,
+            "output.validation_metrics.RMSE": 0.40153470072547653,
+            "response_column_name": "personality",
+            "output.validation_metrics.mean_per_class_error": 0.3989894736842105,
+            "output.end_time": 1710851749737,
+            "model_id.name": "GBM_grid_1_AutoML_2_20240319_123546_model_1",
+            "output.validation_metrics.MSE": 0.16123011588669803,
+            "data_frame.name": "AutoML_2_20240319_123546_training_bank_customer0_8.hex",
+            "output.model_summary.data[3][0]": 87275,
+            "algo": "gbm",
+            "parameters[22].actual_value": 100,
+            "output.validation_metrics.r2": 0.016837544298485163
+        }
+    ],
+    "project_start_date": "2024-05-02",
+    "module_metadata": {
+        "reviewed_by": "ecosystem.Ai",
+        "image_path": "https://ecosystem.ai/wp-content/uploads/2022/05/ecosystem_black-transparent.png",
+        "icon_path": "https://ecosystem.ai/wp-content/uploads/2022/05/ecosystem_black-transparent.png",
+        "name": "Spend_Personality_0.09.4",
+        "module_owner": "ecosystem.Ai",
+        "description": "\"Spend personality\" refers to the characterization of an individual's spending habits based on their bank transactions. This type of analysis, leveraging AI and Machine Learning, provides valuable insights into customer behavior, preferences, and spending patterns over time. By analyzing the frequency, amount, and type of purchases, a bank can categorize their customers into different spending personality types. \n\nFor \"Money Personality\" analyzing customer transaction patterns against profiles, banks can better understand their customers’ money habits and financial management strategies. This can then drive personalized product recommendations, improve customer engagement, and help in more effectively managing financial risks.\n\nFor example, some customers may be identified as big spenders, frequent shoppers, savers, or even impulse buyers based on their demonstrated spending behaviors. These spending personalities can then be utilized for developing personalized marketing strategies, providing tailored financial advice, or enhancing customer service. It can help banks understand their customers better, predict their needs, and build stronger, more profitable relationships with them.\n\nProcess spending personality using Feature Engineering enrichment option:\n1. Use customer transaction data and perform category enrichment.\n2. Then run Ecosystem Spending Personality to generate new collections with scores assigned to customers.\n3. API returns scores per customer.",
+        "categories": "banking, personality, spend, spending, money, transactions",
+        "created_by": "ecosystem.Ai",
+        "version": "0.09.4",
+        "fact_sheet_path": "https://ecosystem.ai/modules",
+        "contact_email": "amy@ecosystem.ai",
+        "status": "released"
+    },
+    "project_type": "predict",
+    "deployment_step": [
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2024-04-08",
+            "complexity": "medium",
+            "plugins": {
+                "post_score_class_text": "PostScoreBasic.java",
+                "post_score_class_code": "",
+                "api_endpoint_code": "",
+                "pre_score_class_text": "",
+                "pre_score_class_code": ""
+            },
+            "model_configuration": {
+                "model_note": "",
+                "models_load": "GBM_1_AutoML_1_20240323_121956.zip",
+                "model_outline": "predict"
+            },
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "Model driven personality detection: (http://ecosystem-runtime2:8092)",
+            "multi_armed_bandit": {
+                "epsilon": "",
+                "duration": 0,
+                "pulse_responder_uuid": ""
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "0.1",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "high",
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime3:8091",
+                "models_path": "/data/deployed/",
+                "mongo_connect": "mongodb://ecosystem_user:EcoEco321@ecosystem-server:54445/?authSource=admin",
+                "data_path": "/data/",
+                "build_server_path": "http://ecosystem:EcoEco321@build.ecosystem.ai:8080/job/ecosystem-runtime/buildWithParameters?token=114a827a8ada36685a1f3958a6059cd677&BRANCH=spendpersonality&EMAIL=user@ecosystem.ai&CONTAINER_NAME=ecosystem-runtime-spendpersonality",
+                "scoring_engine_path_dev": "http://ecosystem-runtime2:8092",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime2:8091",
+                "git_repo_path_branch": "spendpersonality",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": false,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": false,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": true
+            },
+            "corpora": {
+                "corpora": ""
+            },
+            "parameter_access": {
+                "lookup": {
+                    "value": 123,
+                    "key": "customer"
+                },
+                "create_virtual_variables": false,
+                "database": "master",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "age",
+                    "education",
+                    "gender",
+                    "language",
+                    "maritalStatus",
+                    "numberOfAddresses",
+                    "numberOfChildren",
+                    "numberOfProducts",
+                    "proprtyOwnership"
+                ],
+                "lookup_defaults": "",
+                "virtual_variables": [],
+                "table_collection": "bank_customer",
+                "fields": "proprtyOwnership,numberOfChildren,maritalStatus,language,numberOfProducts,age,numberOfAddresses,education,gender"
+            },
+            "updated_date": "2024-06-10T13:19:34.099Z",
+            "deployment_id": "spend_personality_model"
+        },
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2024-04-15",
+            "complexity": "low",
+            "plugins": {
+                "post_score_class_text": "PostScoreMoneyPersonality.java",
+                "post_score_class_code": "",
+                "api_endpoint_code": "",
+                "pre_score_class_text": "",
+                "pre_score_class_code": ""
+            },
+            "model_configuration": {},
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "Money personality detection.",
+            "multi_armed_bandit": {
+                "epsilon": "",
+                "duration": 0,
+                "pulse_responder_uuid": ""
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "0.04",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "high",
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime3:8091",
+                "models_path": "/data/deployed/",
+                "mongo_connect": "mongodb://ecosystem_user:EcoEco321@ecosystem-server:54445/?authSource=admin",
+                "data_path": "/data/",
+                "build_server_path": "http://ecosystem:EcoEco321@build.ecosystem.ai:8080/job/ecosystem-runtime/buildWithParameters?token=114a827a8ada36685a1f3958a6059cd677&BRANCH=spendpersonality&EMAIL=user@ecosystem.ai&CONTAINER_NAME=ecosystem-runtime-spendpersonality",
+                "scoring_engine_path_dev": "http://ecosystem-runtime2:8092",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime2:8091",
+                "git_repo_path_branch": "spendpersonality",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": false,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": false,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": false
+            },
+            "corpora": {
+                "corpora": ""
+            },
+            "parameter_access": {
+                "lookup": {
+                    "value": 123,
+                    "key": "customer"
+                },
+                "create_virtual_variables": false,
+                "database": "master",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "adventurer",
+                    "adventurous",
+                    "borrower",
+                    "carefree",
+                    "cautious",
+                    "conservative",
+                    "customer",
+                    "indulger",
+                    "item",
+                    "personality",
+                    "personality_score",
+                    "prudent",
+                    "total_spend",
+                    "trait"
+                ],
+                "lookup_defaults": "",
+                "virtual_variables": [],
+                "table_collection": "bank_transactions_money",
+                "fields": "customer,total_spend,conservative,indulger,adventurer,borrower,cautious,carefree,personality,personality_score,prudent,adventurous,trait,item"
+            },
+            "updated_date": "2024-06-10T10:51:57.726Z",
+            "deployment_id": "money_personality"
+        },
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2024-04-01",
+            "complexity": "medium",
+            "plugins": {
+                "post_score_class_text": "PlatformDynamicEngagement.java",
+                "post_score_class_code": "",
+                "api_endpoint_code": "",
+                "pre_score_class_text": "",
+                "pre_score_class_code": ""
+            },
+            "model_configuration": {},
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "Dynamic personality based on base behaviors: (http://ecosystem-runtime3:8093)",
+            "multi_armed_bandit": {
+                "epsilon": "0.20",
+                "duration": 0,
+                "pulse_responder_uuid": "2a4c537a-6e76-4383-aa4d-d7644e62fcfe"
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "0.2",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "high",
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime3:8093",
+                "models_path": "/data/deployed/",
+                "mongo_connect": "mongodb://ecosystem_user:EcoEco321@ecosystem-server:54445/?authSource=admin",
+                "data_path": "/data/",
+                "build_server_path": "http://ecosystem:EcoEco321@build.ecosystem.ai:8080/job/ecosystem-runtime/buildWithParameters?token=114a827a8ada36685a1f3958a6059cd677&BRANCH=spendpersonality&EMAIL=user@ecosystem.ai&CONTAINER_NAME=ecosystem-runtime-spendpersonality",
+                "scoring_engine_path_dev": "http://ecosystem-runtime3:8093",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime3:8093",
+                "git_repo_path_branch": "spendpersonality",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": true,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": false,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": false
+            },
+            "corpora": {
+                "corpora": ""
+            },
+            "parameter_access": {
+                "lookup": {
+                    "value": 123,
+                    "key": "customer"
+                },
+                "create_virtual_variables": false,
+                "database": "master",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "Extrovert",
+                    "Introvert",
+                    "segment_enum"
+                ],
+                "lookup_defaults": "{proprtyOwnership:1,numberOfChildren:1,maritalStatus:1,numberOfProducts:1,age:1,education:1,language:1}",
+                "virtual_variables": [],
+                "table_collection": "bank_customer",
+                "fields": "proprtyOwnership,numberOfChildren,maritalStatus,language,numberOfProducts,region,age,numberOfAddresses,education,gender,changeIndicatorThree,changeIndicatorSix,customer,segment_enum,segment,Extrovert,Introvert,personality,regiojn"
+            },
+            "updated_date": "2024-06-11T08:28:34.811Z",
+            "deployment_id": "spend_personality_dynamic"
+        },
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2024-04-15",
+            "complexity": "low",
+            "plugins": {
+                "post_score_class_text": "PostScoreSpendingPersonality.java",
+                "post_score_class_code": "",
+                "api_endpoint_code": "",
+                "pre_score_class_text": "",
+                "pre_score_class_code": ""
+            },
+            "model_configuration": {},
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "Determine spend personality for customer: (http://ecosystem-runtime4:8094)",
+            "multi_armed_bandit": {
+                "epsilon": "",
+                "duration": 0,
+                "pulse_responder_uuid": ""
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "0.04",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "high",
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime3:8091",
+                "models_path": "/data/deployed/",
+                "mongo_connect": "mongodb://ecosystem_user:EcoEco321@ecosystem-server:54445/?authSource=admin",
+                "data_path": "/data/",
+                "build_server_path": "http://ecosystem:EcoEco321@build.ecosystem.ai:8080/job/ecosystem-runtime/buildWithParameters?token=114a827a8ada36685a1f3958a6059cd677&BRANCH=spendpersonality0.08&EMAIL=user@ecosystem.ai&CONTAINER_NAME=ecosystem-runtime-spendpersonality0.08",
+                "scoring_engine_path_dev": "http://ecosystem-runtime4:8094",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime2:8091",
+                "git_repo_path_branch": "spendpersonality0.08",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": false,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": false,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": false
+            },
+            "corpora": {
+                "corpora": ""
+            },
+            "parameter_access": {
+                "create_virtual_variables": false,
+                "lookup": {
+                    "value": 123,
+                    "key": "customer"
+                },
+                "database": "master",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "Enthusiastic",
+                    "Experiential",
+                    "Extrovert",
+                    "Industrious",
+                    "Intentional",
+                    "Introvert",
+                    "count",
+                    "customer",
+                    "item",
+                    "personality",
+                    "personality_score",
+                    "trait",
+                    "trait_score"
+                ],
+                "lookup_defaults": "",
+                "virtual_variables": [],
+                "table_collection": "bank_transactions_personality",
+                "fields": "count,customer,Industrious,Intentional,Experiential,Enthusiastic,personality_score,personality,Extrovert,Introvert,trait_score,trait,item"
+            },
+            "updated_date": "2024-06-12T13:12:18.917Z",
+            "deployment_id": "spend_personality"
+        },
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2024-04-25",
+            "complexity": "low",
+            "plugins": {
+                "post_score_class_text": "PostScoreNetwork.java",
+                "post_score_class_code": ""
+            },
+            "model_configuration": {},
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "ENTRY: network selector (http://ecosystem-runtime:8091)",
+            "multi_armed_bandit": {
+                "epsilon": "0.05",
+                "duration": 0,
+                "pulse_responder_uuid": "1f758163-ee75-46c1-8187-8f6816da244d"
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "0.22",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "high",
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime3:8091",
+                "models_path": "/data/deployed/",
+                "mongo_connect": "mongodb://ecosystem_user:EcoEco321@ecosystem-server:54445/?authSource=admin",
+                "data_path": "/data/",
+                "build_server_path": "http://ecosystem:EcoEco321@build.ecosystem.ai:8080/job/ecosystem-runtime/buildWithParameters?token=114a827a8ada36685a1f3958a6059cd677&BRANCH=spendpersonality0.09.2&EMAIL=user@ecosystem.ai&CONTAINER_NAME=ecosystem-runtime-spendpersonality0.09.2",
+                "scoring_engine_path_dev": "http://ecosystem-runtime:8091",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime2:8091",
+                "git_repo_path_branch": "spendpersonality0.09.2",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": false,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": true,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": false
+            },
+            "corpora": {
+                "corpora": "[{name:'network',database:'mongodb',db:'master',table:'spend_personality__network', type:'static', key:'value' },{name:'network_config',database:'mongodb',db:'master',table:'spend_personality__network_config', type:'static', key:'name' }]"
+            },
+            "parameter_access": {
+                "lookup": {
+                    "value": 123,
+                    "key": "customer"
+                },
+                "create_virtual_variables": false,
+                "database": "master",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "Extrovert",
+                    "Introvert",
+                    "segment_enum"
+                ],
+                "lookup_defaults": "{personality:1,education:1,gender:1,numberOfProducts:1}",
+                "virtual_variables": [],
+                "table_collection": "bank_customer",
+                "fields": "Extrovert,education,gender,changeIndicatorThree,language,numberOfProducts,changeIndicatorSix,Introvert,numberOfChildren,numberOfAddresses,personality,segment_enum,segment,region,maritalStatus,age,proprtyOwnership,customer,name,address,email,mobile"
+            },
+            "updated_date": "2024-04-28T16:57:19.560Z",
+            "deployment_id": "spend_personality_master"
+        },
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2024-04-25",
+            "complexity": "low",
+            "plugins": {
+                "post_score_class_text": "PlatformDynamicEngagement.java",
+                "post_score_class_code": "",
+                "api_endpoint_code": "",
+                "pre_score_class_text": "",
+                "pre_score_class_code": ""
+            },
+            "model_configuration": {},
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "SELECTOR: select model to use (http://ecosystem-runtime5:8095)",
+            "multi_armed_bandit": {
+                "epsilon": "0.05",
+                "duration": 0,
+                "pulse_responder_uuid": "1f758163-ee75-46c1-8187-8f6816da244d"
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "0.1",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "high",
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime5:8095",
+                "models_path": "/data/deployed/",
+                "mongo_connect": "mongodb://ecosystem_user:EcoEco321@ecosystem-server:54445/?authSource=admin",
+                "data_path": "/data/",
+                "build_server_path": "http://ecosystem:EcoEco321@build.ecosystem.ai:8080/job/ecosystem-runtime/buildWithParameters?token=114a827a8ada36685a1f3958a6059cd677&BRANCH=spendpersonality0.09.2&EMAIL=user@ecosystem.ai&CONTAINER_NAME=ecosystem-runtime-spendpersonality0.09.2",
+                "scoring_engine_path_dev": "http://ecosystem-runtime5:8095",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime5:8095",
+                "git_repo_path_branch": "spendpersonality0.09.2",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": true,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": false,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": false
+            },
+            "corpora": {
+                "corpora": ""
+            },
+            "parameter_access": {
+                "lookup": {
+                    "value": 123,
+                    "key": "customer"
+                },
+                "create_virtual_variables": false,
+                "database": "master",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "Extrovert",
+                    "Introvert",
+                    "address",
+                    "age",
+                    "changeIndicatorSix",
+                    "changeIndicatorThree",
+                    "customer",
+                    "education",
+                    "email",
+                    "gender",
+                    "language",
+                    "maritalStatus",
+                    "mobile",
+                    "name",
+                    "numberOfAddresses",
+                    "numberOfChildren",
+                    "numberOfProducts",
+                    "personality",
+                    "proprtyOwnership",
+                    "region",
+                    "segment",
+                    "segment_enum"
+                ],
+                "lookup_defaults": "{personality:1}",
+                "virtual_variables": [],
+                "table_collection": "bank_customer",
+                "fields": "Extrovert,education,gender,changeIndicatorThree,language,numberOfProducts,changeIndicatorSix,Introvert,numberOfChildren,numberOfAddresses,personality,segment_enum,segment,region,maritalStatus,age,proprtyOwnership,customer,name,address,email,mobile"
+            },
+            "updated_date": "2024-04-28T16:57:32.294Z",
+            "deployment_id": "spend_personality_selector"
+        }
+    ],
+    "project_data": "ecosystem",
+    "project_dashboards": [
+        {
+            "name": "Customer Banking 005.1",
+            "date": "2024-04-25"
+        }
+    ],
+    "project_fact_injection_configs": [
+        {
+            "name": "bank_customer",
+            "date": "2024-03-30",
+            "description": "Chat with bank customer personality. Copy all transactions from MongoDB to PostgresQL using Feature Engineering tools. Use query: to see SQL statements. Example chat sequence:\nuse: bank_customer\nHow many customer transactions are there?\nquery: How many customer transactions are there?\nquery: How many female customer own homes?"
+        },
+        {
+            "name": "spend",
+            "date": "2024-04-09",
+            "description": "Use knowledge to contain the LLM chat performance."
+        },
+        {
+            "name": "customer_chat",
+            "date": "2024-04-09",
+            "description": "Agent chat about customer spend and money personalities. This config requires that you provide the customer number first and then can ask about the actions that are configured. Example chat sequence:\nuse: customer_chat\nUse number is 851\nObtain the spend personality\nObtain money personality"
+        },
+        {
+            "name": "customer_local",
+            "date": "2024-04-30",
+            "description": "Use Presto and the ecosystem.Ai text to sql engine."
+        }
+    ],
+    "created_by": "admin@ecosystem.ai",
+    "project_api_configs": [
+        {
+            "name": "spend_personality_selector",
+            "date": "2024-04-25"
+        },
+        {
+            "name": "spend_personality_model",
+            "date": "2024-04-25"
+        },
+        {
+            "name": "spend_personality_dynamic",
+            "date": "2024-04-25"
+        },
+        {
+            "name": "spend_personality_master",
+            "date": "2024-04-25"
+        }
+    ],
+    "preview_detail": {
+        "summary": "Generic predictors based on banking data.",
+        "image": "/data/xyz.png",
+        "active": true,
+        "detail": "intervention",
+        "heading": "Spend Personality"
+    },
+    "project_dynamic_interactions": [
+        {
+            "name": "spend_personality_dynamic",
+            "date": "2024-04-28"
+        },
+        {
+            "name": "spend_personality_selector",
+            "date": "2024-04-28"
+        }
+    ],
+    "project_description": "Extract customer spending and money personalities with Algorithm, Model and Dynamic options using the network selector.",
+    "project_simulations": [
+        {
+            "name": "spend_personality_master",
+            "date": "2024-04-28"
+        },
+        {
+            "name": "spend_personality_dynamic",
+            "date": "2024-04-28"
+        },
+        {
+            "name": "bank_customer__personality",
+            "date": "2024-05-02"
+        }
+    ],
+    "updated_by": "admin@ecosystem.ai",
+    "project_cpr_analytics": [
+        {
+            "name": "spend_personality",
+            "date": "2024-04-15"
+        },
+        {
+            "name": "spend_personality_dynamic",
+            "date": "2024-04-28"
+        }
+    ],
+    "_id": {
+        "date": "Wed Jun 12 13:12:18 UTC 2024",
+        "timestamp": 1718197938
+    },
+    "updated_date": "2024-06-12T13:12:18.000933Z",
+    "created_date": "2024-05-02T09:07:30.757Z",
+    "userid_login": "ecosystem",
+    "feature_stores": [
+        {
+            "date": "2024-03-19",
+            "frame_id": "bank_customer"
+        },
+        {
+            "date": "2024-03-23",
+            "frame_id": "bank_transactions"
+        }
+    ]
+}
+
+```
+

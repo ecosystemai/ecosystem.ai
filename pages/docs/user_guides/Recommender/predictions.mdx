@@ -1,0 +1,84 @@
+---
+title: Predictions
+description: Predictions is where you deploy, manage, and monitor machine learning models to generate real-time predictions, providing actionable insights and driving data-driven decisions.
+---
+
+## Predictions is where you deploy, manage, and monitor machine learning models to generate real-time predictions, providing actionable insights and driving data-driven decisions.
+
+The next step is to begin making the models for your project, using all the configurations you have set up in the previous steps.
+
+In the <u>Recommenders</u> section of the Workbench, you will find <u>Predictions</u>. This is where you will manage the models for your recommender. 
+
+***image (store 1)***
+
+You will see a list of all of previously configured models, as well as be able to create new models. Creating models using this interface is more suited to cases which use a small number of models. Cases where tens, or hundreds of models will need to be trained, are better handled in our <u>Jupyter Notebooks</u>.
+
+To create a new model for your recommender project, select **+ Create Model**. 
+
+***image (store 2)***
+
+The details you input here will be used to generate a number of models that can be tested and selected for your project.
+
+You will need to provide a unique Predict ID and Description. 
+
+***image (store small 1)
+
+You will refer back to this unique ID at any point in the process. You can also link the model to a previously created project in Allocated to projects.
+
+Specify the Model ID associated with this version of the model, and remember to add the version number to the ID. 
+
+***image (store small 2)***
+
+You will almost always have multiple versions. Assigning a version will ensure you can appropriately track changes, as you experiment with the parameters of your models.
+
+Choose a Model Type from the list of supported model and provide the Model Category. 
+
+***image (store small 3)***
+
+These details will allow you to more effectively organize your overall model training.
+
+Select the Primary Data Frame .hex file that you created in the <u>Feature Store</u> and update the Version number. 
+
+***image (store small 4)***
+
+Make sure the number in the Version field correlates with the version number in your Model ID.
+
+Specify the Model Parameters and add notes to be stored with the model that describe the purpose, parameters and other actions. 
+
+***image (store 3)***
+
+For the Model Parameters functionality: Clicking **Generate Default** will generate a list of the model parameters and their default values. 
+
+***image (store 4)***
+
+These can be modified to change the behaviour of the model. Examples of model parameter set ups can be found in the other pre-configured example projects. 
+- NOTE: Further details of all of the Model Parameters functionality can be found in the Prediction Workers documentation. Each worker has its own documentation
+    - H2O, PyTorch, Ludwig and Tensorflow.
+
+Notes should include the features you will be using in the model. All of which can be retrieved using **Retrieve Features.** 
+
+***image (store 5)***
+
+Notes should also include the model parameters, as well as a summary of the changes made, in each version of the model.
+
+**Save** your model configuration in the top right corner, then begin building out you model and viewing the **Result**, select **Generate Model**. 
+
+***image (store 6)***
+
+This will start the model training, which may take some time to complete. To view training progress, and any interim models being produced, click **Result** to show the models being trained.
+
+Once models have been trained they will appear in the table. 
+
+***image (store 7)***
+
+Selecting a model will show metrics on its effectiveness.
+
+***image (store 8)***
+
+This can be used to select the preferred model, should multiple models be available.
+
+Once a model has been selected save and deploy the model, to have it ready to use in the deployment step. 
+
+***image (store 9)***
+
+You can view all deployed models in the window below your trained models list.

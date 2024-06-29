@@ -1,0 +1,18 @@
+---
+title: Predictors
+description: Predictor hyperparameter settings..
+weight: -11
+---
+
+# Intro
+
+ecosystem.Ai uses a worker architecture to define and run predictions. The base configurations are stored in the `ecosystem_meta` database across many collections.
+
+## Key Features
+
+- **Meta-Data Driven**: All predictor configuration items are managed from the model meta-data.
+- **Broad Range of Parameters**: Parameters are model dependent and can be set in the model meta-data.
+- **Many Model Types**: Multiple model types are supported, including regression, classification, and clustering.
+- **Model Result**: The model result is stored in the `models` database.
+- **Easy Testing of Models**: Models can be tested using the `Test Model` option.
+- **Deploy**: Models are saved in the `models` database and can be deployed for predictions.

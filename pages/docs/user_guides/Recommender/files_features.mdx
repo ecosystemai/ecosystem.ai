@@ -1,0 +1,85 @@
+---
+title: Manage Files & Feature Engineering
+description: Files and Feature Engineering is where you import, manage, and transform raw data into valuable features to enhance machine learning models, enabling efficient data preparation and preprocessing.
+---
+
+## Files and Feature Engineering is where you import, manage, and transform raw data into valuable features to enhance machine learning models, enabling efficient data preparation and preprocessing.
+
+The data used to set up your recommender will likely consist of historical information. Whether offers that have been taken up by clients, and/or characteristics of the client at the point they were presented with the offer. Examples of different styles of recommender data sets can be found in the example projects. 
+
+### Add Data to the ecosystem.Ai Platform
+In the <u>Data and Features</u> section of the Workbench, you will find <u>Manage Files</u>.
+
+****image (manage files 1)****
+
+Here, you will be able to add, view, delete and download the data files available for you to build predictions with.
+
+To upload a file of your own, select **+ Upload File.**
+
+****image (manage files 2)****
+
+A section will open below the files list where you can input the details of your upload. Files must be uploaded in either CSV or JSON format.  Upload and then refresh, the file will appear in your files list.
+
+To download a file, click on the file name.
+
+****image (manage files 3)****
+
+A section will open up where you can view the details of your download. Click **Download** and select your download location.
+
+To delete a file, click **Delete** to the right of the file name.
+
+****image (manage files 4)****
+
+Deleting a file from here will remove the file from all projects whether active or inactive!
+
+### Connect a Database
+In the <u>Data and Features</u> section of the Workbench, you will find <u>Feature Engineering</u>. Add a database using connection strings with the <u>Presto Data Navigator</u>.
+
+****image (feature engineering 1)****
+
+If you have your own database, you can connect it here. This database access option uses the Presto Worker in the platform. Add a Connection path, similar to this example: <code>local/master?user=admin</code>. Then write a SQL statement to extract the data you want, similar to this example:<code>select * from master.bank_customer limit 2</code>. Then click **Execute**.
+
+- note: in order to add data using the presto functionality, you must first have your presto connection accurately set up.
+
+### Ingest Data into the Workbench
+Ingest data to be used in your projects with the <u>Ecosystem Data Navigator</u>. 
+
+****image (feature engineering 2)****
+
+Once data has been added to the Platform it must be ingested into a specified database and collection.
+
+You can either select a database and ingest your file into it. Or to create a new database, select **+ Add Database**. 
+
+****image (feature engineering 3)****
+
+Add a unique database name related to your project. Click the **Database** button to the left of the input field to create it. 
+
+****image (feature engineering 4)****
+
+Once your database has been created, refresh the database list and click into it.
+
+****image (feature engineering 5)****
+
+To ingest your file as a new collection inside your chosen database, select **+ Ingest Collection**. 
+
+****image (feature engineering 6)****
+
+Select your file from the file list. 
+
+****image (feature engineering 7)****
+
+You will see the file name appear above the ingest: input field. Either copy this name or choose a unique one related to your project, then click **Ingest** to the left of the input.
+
+- note: if the name of the collection you are ingesting already exists, the new data will be appended to the existing data. it will not replace the existing data
+
+Once data has been ingested, it must be put into a format in which it can be used by machine learning algorithms. In order to do this, export your Collection to the ecosystem platform. You can then create a feature store from the exported data. Refresh the page if your Collection has not yet appeared on the list. 
+
+Find your Collection. Using the Options dropdown to the right of your collection name, click **Export**. 
+
+****image (feature engineering 8)****
+
+View and edit the details of your export. 
+
+****image (feature engineering 9)****
+
+Most of the settings in this tab can remain default. If you are unsure of how much data to export, leave the Number to Export as 0 to export it all. Click **Export**.

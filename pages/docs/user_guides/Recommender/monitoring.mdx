@@ -1,0 +1,63 @@
+---
+title: Monitoring
+description: For monitoring, the ecosystem.Ai Prediction Platform has Grafana and Superset integrations.
+---
+
+## For monitoring, the ecosystem.Ai Prediction Platform has Grafana and Superset integrations.
+- Grafana is used for real-time scoring and operational metrics, ensuring your machine learning models are performing effectively.
+- Superset is for comprehensive business intelligence and data visualization, allowing you to track and analyze key performance indicators and business processes in detail.
+
+Once your recommender is running it is important to keep track of its behavior, and begin to examine the results. There are two dashboard softwares we have linked up to be accessible in your worker ecosystem
+
+##Real-Time Grafana Dashboard
+
+In the <u>Dashboard</u> of the Workbench, select the Real-Time Dashboard icon to go to Grafana, there you can set up and view the real-time results of your deployment.
+***image (grafana 1)***
+
+Access the Grafana Dashboards for a real-time view of your recommender
+
+Our Grafana Dashboards illustrate the behavior of the recommender in production. Showing which options are being recommended, and which are successful. As well as providing information on performance, and how the recommender is trading off between exploring and exploiting.
+
+To set up your Grafana Dashboard, and link it to your chosen deployment, you will need to login as an admin. We have already pre-built a dashboard for you to view all the most important elements of your real-time deployment. However, if you have experience with Grafana, or are looking to monitor something very specific, you can build your own dashboard: https://grafana.com/docs/grafana/next/getting-started/build-first-dashboard/.
+
+Now that you have logged in, Navigate to the left hand menu, click on the <u>'dashboards'</u> icon and select <u>Manage</u>.
+
+***image (grafana 2)***
+
+At this point, you will see a list of folders. Select the <u>Runtime2</u> folder and click on Scoring Dashboard: Client Pulse Responder.
+
+***image (grafana 3)***
+
+To view the pre-built dashboard configuration. The dropdown menu called Prediction case is where you can see all the deployments linked to this dashboard. Find your Deployment there if you have used one of the pre-configured solutions.
+
+To add a new deployment, go to the <u>Dashboard Settings</u> icon in the top right corner.
+
+***image (grafana 4)***
+
+This will take you to the settings page where you can manage elements of the dashboard.
+
+Go the Variables in the menu on the left, and then click on <u>Prediction</u>.
+
+***image (grafana 5)***
+
+You will notice in the Custom Options field that the deployments currently linked to this dashboard are listed, separated by commas.
+
+Simply add your deployment case name in this field.
+
+***image (grafana 6)***
+
+Then click **Update**. When this refreshes, click **Save Dashboard** on the left, this will link to a popup where you can specify the details of your changes. This is not a compulsory step, but it is good practice to document all changes. 
+
+Then click **Save**. Press the back button in the top left hand corner to go back to the dashboard, give it a minute to load and then you will be able to view your new deployment in the Prediction Case list.
+
+##Superset Business Dashboard
+
+In the <u>Dashboard</u> of the Workbench, select the Business Dashboard icon to go to Superset, to view more comprehensive results of your deployment.
+
+***image (superset 1)***
+
+Access the Superset Dashboard to view further illustrations of your recommender in production.
+
+***image (superset 2)***
+
+The superset dashboards allow you to view and analyze the results of the whole recommendation process. Including costing, counts, successes and fails.
