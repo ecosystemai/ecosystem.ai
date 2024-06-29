@@ -1,0 +1,7 @@
+export default {
+  index: 'Intro',
+  definition: 'Definition',
+  configuration: 'Configuration',
+  data: 'Data',
+  enrich: 'Process Algorithm',
+}
