@@ -33,7 +33,7 @@ export default {
   demo: {
     type: 'page',
     title: 'Demo',
-    href: 'https://demo.ecosystem.ai/',
+    href: 'http://customer.ecosystem.ai:85/',
     // display: 'hidden',
   },
   changelog: {

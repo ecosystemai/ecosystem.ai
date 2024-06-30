@@ -24,7 +24,7 @@ const menuItems: {
       },
       {
         name: 'Roadmap',
-        href: '/blog/2024-02-19_2024_roadmap',
+        href: '/blog/2024-06-30_2024_roadmap',
       },
       {
         name: 'Demo',
@@ -134,7 +134,7 @@ const FooterMenu = () => {
               fgColor="#9B9B9B80"
             />
             <SocialIcon
-              url="https://www.youtube.com/@ecosystemai"
+              url="https://www.youtube.com/@ecosystemai6786"
               className="absolute inset-0 w-full h-full transform scale-100 transition-transform opacity-100 hover:scale-90"
               style={{ height: 40, width: 40 }}
               bgColor="background"
