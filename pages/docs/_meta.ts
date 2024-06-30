@@ -10,6 +10,7 @@ export default {
   marketplace: 'Marketplace Apps',
   configuration: 'Configuration',
   user_guides: 'User Guides',
+  runtime: 'Runtime & Deployment',
   contributing0: {
     type: 'separator',
   },

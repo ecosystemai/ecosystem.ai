@@ -1,0 +1,339 @@
+---
+title: Logging
+description: Logging
+---
+
+import Image from 'next/image'
+
+# Logging
+
+Logging is the process of recording events that occur during the execution of a program. It is an essential part of the machine learning lifecycle as it helps you monitor the performance of your predictors, track errors, and debug issues. The ecosystem.Ai platform provides a set of tools and libraries that help you log events, monitor the performance of your predictors, and analyze the data generated during the execution of your predictors.
+
+## Why do you need logging?
+
+Logging is an essential part of the machine learning lifecycle. It helps you monitor the performance of your predictors, track errors, and debug issues. Logging allows you to record events that occur during the execution of your predictors, analyze the data generated during the execution, and make informed decisions about the performance of your predictors.
+
+You can use the logged data to track model and data drift over time, identify patterns in the data, and optimize the performance of your predictors. Logging also helps you debug issues, troubleshoot errors, and improve the accuracy of your predictors.
+
+## What is logging?
+
+Logging is the process of recording events that occur during the execution of a program. It involves capturing information about the execution of your predictors, such as input data, output data, errors, warnings, and other events. Logging allows you to monitor the performance of your predictors, track errors, and debug issues.
+
+### Logging on Contact
+
+Here is an example of a log message:
+
+```json
+{
+    "server": {
+        "hostname": "1267d1abfa6d",
+        "address": "172.19.0.10",
+        "port": "8093",
+        "version": "0.9.4.0"
+    },
+    "cache": 0,
+    "explore": 1,
+    "final_result": [
+        {
+            "result": {
+                "offer": "Enthusiastic",
+                "score": 0.983224112956522,
+                "final_score": 0.983224112956522,
+                "contextual_variable_two": "",
+                "cost": 0,
+                "price": 0,
+                "contextual_variable_one": "",
+                "offer_value": 0,
+                "uuid": "2096e0e2-5a18-493f-8c6d-571fd0711cb0",
+                "arm_reward": 0.983224112956522,
+                "modified_offer_score": 0,
+                "offer_name": "Enthusiastic"
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": -1,
+                "contextual_variable_one": "",
+                "offer_name_desc": "Recommended offer is Enthusiastic",
+                "weighting": 1,
+                "uuid": "2096e0e2-5a18-493f-8c6d-571fd0711cb0",
+                "offer_name": "Enthusiastic",
+                "modified_offer_score": 0,
+                "offer": "Enthusiastic",
+                "p": 0.983224112956522,
+                "score": 0.983224112956522,
+                "final_score": 0.983224112956522,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 0,
+                "offer_value": 0,
+                "beta": 0,
+                "arm_reward": 0.983224112956522
+            },
+            "rank": 1
+        }
+    ],
+    "whitelist": {},
+    "params": {
+        "value": 267,
+        "key": "customer"
+    },
+    "uuid": "2096e0e2-5a18-493f-8c6d-571fd0711cb0",
+    "userid": "test",
+    "in_params": {
+        "contextual_variable_two": "",
+        "contextual_variable_one": ""
+    },
+    "api_params": {
+        "resultcount": 1,
+        "mojo": "1",
+        "subname": "predict",
+        "name": "spend_personality_dynamic",
+        "subcampaign": "predict",
+        "channel": "simulation",
+        "campaign": "spend_personality_dynamic",
+        "uuid": "2096e0e2-5a18-493f-8c6d-571fd0711cb0",
+        "userid": "test",
+        "customer": "267"
+    },
+    "date_index": 202406,
+    "date_log": {
+        "$date": "2024-06-11T12:10:53.284Z"
+    },
+    "mojo": "1",
+    "stats": {
+        "end_date": "2024-06-11T12:10:53.000284Z",
+        "duration_paramsdb": 3.823583,
+        "runtime_version": "0.9.4.0",
+        "error": 0,
+        "userid": "test",
+        "epsilon": 0.2,
+        "duration": 7.336166,
+        "duration_whitelist": 0.0025,
+        "start_time": 35292507795082,
+        "duration_ns": 7336166,
+        "duration_cache": 0.001166,
+        "predictor": "spend_personality_dynamic",
+        "model": "No Model",
+        "start_date": "2024-06-11T12:10:53.000277Z"
+    },
+    "day_index": 11,
+    "predictor": "spend_personality_dynamic",
+    "_id": {
+        "$oid": "66683ecdcb4d977a27c0bf14"
+    },
+    "minute_index": 0,
+    "hour_index": 12,
+    "scoring_data": {
+        "Extrovert": 0.6059602649006622,
+        "education": "Grade12",
+        "gender": "M",
+        "changeIndicatorThree": "stable",
+        "language": "English",
+        "numberOfProducts": 5,
+        "changeIndicatorSix": "increase",
+        "Introvert": 0.3675496688741722,
+        "numberOfChildren": 4,
+        "numberOfAddresses": 1,
+        "personality": "Industrious",
+        "segment_enum": 2,
+        "segment": "Segment C",
+        "region": 104,
+        "maritalStatus": "Unmarried",
+        "age": 31,
+        "proprtyOwnership": "Tenant",
+        "customer": 267
+    }
+}
+```
+
+### Logging on Response
+
+On accepted return action this message will be logged in the system:
+
+```json
+{
+    "server": {
+        "hostname": "1267d1abfa6d",
+        "address": "172.19.0.10",
+        "port": "8093",
+        "version": "0.9.4.0"
+    },
+    "response_log": {
+        "server": {
+            "hostname": "1267d1abfa6d",
+            "address": "172.19.0.10",
+            "port": "8093",
+            "version": "0.9.4.0"
+        },
+        "cache": 0,
+        "explore": 0,
+        "final_result": [
+            {
+                "result": {
+                    "offer": "Industrious",
+                    "score": 0,
+                    "final_score": 0,
+                    "contextual_variable_two": "",
+                    "cost": 0,
+                    "price": 0,
+                    "contextual_variable_one": "",
+                    "offer_value": 0,
+                    "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9",
+                    "arm_reward": 0,
+                    "modified_offer_score": 0,
+                    "offer_name": "Industrious"
+                },
+                "result_full": {
+                    "expected_takeup": -1,
+                    "contextual_variable_two": "",
+                    "cost": 0,
+                    "explore": 0,
+                    "epsilon_nominated": 1,
+                    "contextual_variable_one": "",
+                    "offer_name_desc": "Recommended offer is Industrious",
+                    "weighting": 1,
+                    "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9",
+                    "offer_name": "Industrious",
+                    "modified_offer_score": 0,
+                    "offer": "Industrious",
+                    "p": 0,
+                    "score": 0,
+                    "final_score": 0,
+                    "propensity": 0,
+                    "price": 0,
+                    "alpha": 0,
+                    "offer_value": 0,
+                    "beta": 1,
+                    "arm_reward": 0
+                },
+                "rank": 1
+            }
+        ],
+        "whitelist": {},
+        "params": {
+            "value": 82,
+            "key": "customer"
+        },
+        "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9",
+        "userid": "test",
+        "in_params": {
+            "contextual_variable_two": "",
+            "contextual_variable_one": ""
+        },
+        "api_params": {
+            "resultcount": 1,
+            "mojo": "1",
+            "subname": "predict",
+            "name": "spend_personality_dynamic",
+            "subcampaign": "predict",
+            "channel": "simulation",
+            "campaign": "spend_personality_dynamic",
+            "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9",
+            "userid": "test",
+            "customer": "82"
+        },
+        "date_index": 202406,
+        "date_log": {
+            "$date": "2024-06-11T12:10:53.47Z"
+        },
+        "mojo": "1",
+        "stats": {
+            "end_date": "2024-06-11T12:10:53.000470Z",
+            "duration_paramsdb": 1.178917,
+            "runtime_version": "0.9.4.0",
+            "error": 0,
+            "userid": "test",
+            "epsilon": 0.2,
+            "duration": 6.389041,
+            "duration_whitelist": 0.000833,
+            "start_time": 35292694391582,
+            "duration_ns": 6389041,
+            "duration_cache": 0.001,
+            "predictor": "spend_personality_dynamic",
+            "model": "No Model",
+            "start_date": "2024-06-11T12:10:53.000463Z"
+        },
+        "day_index": 11,
+        "predictor": "spend_personality_dynamic",
+        "_id": {
+            "$oid": "66683ecdcb4d977a27c0bf19"
+        },
+        "minute_index": 0,
+        "hour_index": 12,
+        "scoring_data": {
+            "Extrovert": 0.5296052631578947,
+            "education": "Grade12",
+            "gender": "F",
+            "changeIndicatorThree": "stable",
+            "language": "English",
+            "numberOfProducts": 5,
+            "changeIndicatorSix": "increaseLarge",
+            "Introvert": 0.43256578947368424,
+            "numberOfChildren": 2,
+            "numberOfAddresses": 1,
+            "personality": "Industrious",
+            "segment_enum": 2,
+            "segment": "Segment C",
+            "region": 90,
+            "maritalStatus": "Unmarried",
+            "age": 35,
+            "proprtyOwnership": "Tenant",
+            "customer": 82
+        }
+    },
+    "response_uuid": "7d78f07e-2678-4ecc-90d1-04ecf4a48846",
+    "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9",
+    "date_index": 202406,
+    "date_log": {
+        "$date": "2024-06-11T12:10:53.485Z"
+    },
+    "stats": {
+        "end_date": "2024-06-11T12:10:53.000486Z",
+        "duration": 0.069833,
+        "start_time": 35292716547707,
+        "duration_ns": 69833,
+        "runtime_version": "0.9.4.0",
+        "error": 0,
+        "start_date": "2024-06-11T12:10:53.000485Z"
+    },
+    "response": {
+        "channel_name": "simulation",
+        "cache": 0,
+        "explore": 0,
+        "predictor": "spend_personality_dynamic",
+        "offers_accepted": [
+            {
+                "offer": "Industrious",
+                "score": 0,
+                "final_score": 0,
+                "contextual_variable_two": "",
+                "cost": 0,
+                "price": 0,
+                "contextual_variable_one": "",
+                "offer_value": 0,
+                "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9",
+                "arm_reward": 0,
+                "modified_offer_score": 0,
+                "offer_name": "Industrious"
+            }
+        ],
+        "whitelist": {},
+        "userid": "test",
+        "in_params": {
+            "contextual_variable_two": "",
+            "contextual_variable_one": ""
+        },
+        "uuid": "d9126376-bb1a-411d-8eb1-bb05233c52b9"
+    },
+    "day_index": 11,
+    "predictor": "spend_personality_dynamic",
+    "_id": {
+        "$oid": "66683ecdcb4d977a27c0bf1a"
+    },
+    "minute_index": 0,
+    "hour_index": 12
+}
+```

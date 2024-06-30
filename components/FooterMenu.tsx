@@ -141,7 +141,7 @@ const FooterMenu = () => {
               fgColor="#9B9B9B80"
             />
             <SocialIcon
-              url="mailto:contact@ecosystem.ai"
+              url="mailto:amy@ecosystem.ai"
               className="absolute inset-0 w-full h-full transform scale-100 transition-transform opacity-100 hover:scale-90"
               style={{ height: 40, width: 40 }}
               bgColor="background"
