@@ -4,4 +4,5 @@ export default {
   configuration: 'Configuration',
   data: 'Data',
   enrich: 'Process Algorithm',
+  access: 'API and Data Access',
 }

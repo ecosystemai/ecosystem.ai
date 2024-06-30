@@ -18,3 +18,18 @@ once scores have been generated from static models or generated from dynamic mod
 </video>
 
 API's can be used to access scores and use them in various situations.
+
+Score API Selected: In params, use {} for model based recommender, or for dynamic recommender use:
+```json
+{"input":["contextual_variable_one","contextual_variable_two"],"value":["",""]}
+```
+
+Tensorflow or PyTorch models:
+```json
+{"input":["text"],"value":["Place text here"], "type":"dense_1"}
+```
+
+QA approaches:
+```json
+{"input":["text","question"],"value":["BBC Japan was a general entertainment Channel. Which operated between December 2004 and April 2006.","When did BBC Japan start broadcasting?"], "type":"qa"}
+```
