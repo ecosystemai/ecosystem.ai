@@ -6,5 +6,5 @@ export default {
     // "title": "Contributing",
     type: 'separator',
   },
-  agent_framework: 'Journey Management'
+  agent_framework: 'Agent Framework'
 }

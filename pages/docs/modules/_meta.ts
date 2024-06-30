@@ -1,4 +1,4 @@
 export default {
-  index: 'Intro',
+  index: 'Overview',
   spend_personality: 'Spend Personality',
 }
