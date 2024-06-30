@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://ecosystem.ai
+Host: https://developer.ecosystem.ai
 
 # Sitemaps
-Sitemap: https://ecosystem.ai/sitemap.xml
+Sitemap: https://developer.ecosystem.ai/sitemap.xml
