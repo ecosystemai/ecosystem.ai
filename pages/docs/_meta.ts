@@ -19,6 +19,10 @@ export default {
     type: 'separator',
   },
   workers: 'Workers',
+  opensource: 'Open Source',
+  contributing2: {
+    type: 'separator',
+  },
   development: 'Development',
   documentation: 'Documentation',
   other: {
