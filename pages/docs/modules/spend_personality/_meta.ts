@@ -5,4 +5,5 @@ export default {
   data: 'Data',
   enrich: 'Process Algorithm',
   access: 'API and Data Access',
+  chatgpt: 'Custom GPTs',
 }

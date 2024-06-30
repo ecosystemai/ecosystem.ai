@@ -18,50 +18,76 @@ For most scenarios, Docker Compose is the recommended installation method due to
 
 Follow these steps to set up ecosystem.Ai with the default configuration:
 
-```bash filename="Clone the Repository"
-git clone https://github.com/ecosystemai/install_x86.git
-git clone https://github.com/ecosystemai/install_arm.git
+## Step 1. Download the Installation Files
+
+### Manual Download
+
+1. **Go to the Install Option for your Architecture**
+ - Project Install Page for x86**: Visit [docker-x86](https://github.com/ecosystemai/ecosystem/tree/main/docker-x86).
+ - Project Install Page for ARM64**: Visit [docker-arm](https://github.com/ecosystemai/ecosystem/tree/main/docker-arm).
+ - Project Install Page for Windows**: Visit [docker-windows](https://github.com/ecosystemai/ecosystem/tree/main/docker-windows).
+
+2. **Download the ZIP File**: Click the green "Code" button, then click "Download ZIP."
+
+3. **Extract the ZIP File**: Find the downloaded ZIP file, right-click, and select "Extract All...".
+
+### Using Git
+
+Run the following [git](https://git-scm.com/) command in your terminal, from the desired parent directory:
+
+```bash
+git clone https://github.com/ecosystemai/ecosystem.git
 ```
 
-```bash filename="Navigate to the ecosystem.Ai Directory"
-cd install_x86
-cd install_arm
-```
-
-```bash filename="Create a .env File from .env.example"
-cp .env.example .env
-```
-
-> **Note:** **If you're using Windows, you might need to use `copy` instead of `cp`.**
-
-```sh filename="Start ecosystem.Ai"
-start.bat
-```
-
-<Callout type="success" title="Access ecosystem.Ai!" emoji="🎉">
-  **Visit [http://localhost:80](http://localhost:80)**
-</Callout>
-
-## Update ecosystem.Ai
-
-The following commands will fetch the latest ecosystem.Ai project changes, including any necessary changes to the docker compose files, as well as the latest prebuilt images.
-
-> **Note:** you may need to prefix commands with sudo according to your environment permissions.
-
-```bash filename="Stop the running container(s)""
-stop.sh
-```
-
-```bash filename="Pull latest project changes"
+To update to the latest install options and files:
+```bash
 git pull
 ```
 
-```bash filename="Pull the latest ecosystem.Ai image""
-start.sh
+## Step 2. Install Docker
+
+1. **Download**: Go to [Docker Desktop Download Page](https://www.docker.com/products/docker-desktop) and download Docker Desktop.
+2. **Install**: Open the installer and follow the instructions.
+3. **Run**: Open Docker Desktop to ensure it is running.
+
+**Notes:**
+- Docker Desktop is recommended for most users. If you are looking for an advanced docker/container setup, especially for a remote server installation, see our [Ubuntu Docker Deployment Guide](/docs/remote/docker_linux).
+- You may need to restart your computer after installation.
+
+## Step 3. Run the App
+
+1. **Navigate to the Project Directory**
+
+2. **Create and Configure .env File**:
+ - Copy the contents of `ecosystem_env.txt` to a new file named `.env`.
+ - Fill in any necessary values.
+- For an in-depth environment configuration, see the [.env File Configuration Guide](/docs/configuration/dotenv).
+
+**Add your keys** for **OPENAI_API_KEY** and **ECOSYSTEM_API_KEY**.
+```
+DATA_PATH=./data
+OPENAI_API_KEY=
+ECOSYSTEM_API_KEY=
 ```
 
-```bash filename="Start ecosystem.Ai"
-start.sh
+3. **Start the Application**:
+Find your correct install folder. Run the following command from within the install directory:
+ - ARM64
+ ```bash
+ cd ecosystem/docker-arm
+ ./start.sh
+```
+
+ - x86
+ ```bash
+ cd ecosystem/docker-x86
+ ./start_x86.sh
+```
+
+ - Windows
+ ```bash
+ cd ecosystem\docker-windows
+ start.bat
 ```
 
 ## Additional Setup

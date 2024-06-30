@@ -1,0 +1,153 @@
+---
+title: Spend Personality
+description: Spend Personality
+---
+
+# Spend Personality
+
+### Custom ChatGPTs
+
+Custom ChatGPTs can be used to create a more personalized experience for users. This can be done by configuring access to the ecosystem.Ai spend Personality APIs. The API can be used to access scores and use them in various situations.
+
+<video
+    muted
+    playsInline
+    controls
+>
+    <source src="/images/modules/spend_personality/spend-personality-chatgpt.mp4" />
+</video>
+
+API's can be used to access scores and use them in various situations.
+
+### Specialized Knowledge
+
+We provide a set of specialized knowledge as part of the module install that can be used to enhance the user experience. This can be used to provide more accurate and relevant information to users.
+
+#### API Access
+
+Use the following OpenAI CustomGPT API to access the spend personality scores:
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Spending Personality API",
+    "description": "API that obtains spending personality and push response once customer values returned.",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://bank-score.ecosystem.ai"
+    }
+  ],
+  "paths": {
+    "/invocations": {
+      "post": {
+        "summary": "Obtain, generate, determine, calculate spending personality.",
+        "operationId": "invocations",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "campaign": {
+                    "type": "string",
+                    "default": "spending_personality",
+                  },
+                  "subcampaign": {
+                    "type": "string",
+                    "default": "openai",
+                    "description": "subcampaign",
+                    "example": "openai",
+                  },
+                  "channel": {
+                    "type": "string",
+                    "default": "chatgpt",
+                  },
+                  "customer": {
+                    "type": "string",
+                  },
+                  "numberoffers": {
+                    "type": "string",
+                    "default": "1",
+                  },
+                  "userid": {
+                    "type": "string",
+                    "default": "openai",
+                  },
+                  "params": {
+                    "type": "string",
+                    "default": "{}",
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+  "/response": {
+      "post": {
+        "summary": "Respond to spending personality when customer lookup happens.",
+        "operationId": "response",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                      },
+                      "offers_accepted": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "offer1"
+                        ]
+                      },
+                      "channel": {
+                        "type": "string",
+                        "default": "chatgpt"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "response from the custom API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "final_result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+  },
+  "components": {
+    "schemas": {}
+  }
+}
+```
