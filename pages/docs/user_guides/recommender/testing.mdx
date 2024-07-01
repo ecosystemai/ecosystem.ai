@@ -3,48 +3,52 @@ title: Testing
 description: Manage APIs is where you create, test, and manage APIs, ensuring they are robust and ready for integration with other systems.  Simulations is where you run and analyze simulations to validate the accuracy and performance of machine learning models before deployment.
 ---
 
-## Manage APIs is where you create, test, and manage APIs, ensuring they are robust and ready for integration with other systems.  Simulations is where you run and analyze simulations to validate the accuracy and performance of machine learning models before deployment.
+# Introduction 
+The Manage APIs section is where you create, test, and manage APIs, ensuring they are robust and ready for integration with other systems. The Simulations section is where you run and analyze simulations to validate the accuracy and performance of machine learning models before deployment.
 
 Once you have pushed your deployment configuration you should do some testing to see if the results align with your expectations. There are two ways to test your deployment:
 
-### 1. Test your API
+## 1. Test your API
 
 In the <u>Laboratory</u> section of the Workbench, you will find <u>Manage APIs</u>. Here you will find a list of all your deployments.
 
-***image (test 1)***
+![Manage APIs](/images/recommender/7_Testing/0_testing_api.png)
+If you have been going through this User Guide using one of the pre-configured examples, click on the relevant deployment to view the details. 
 
-If you have been going through this Get Started using one of the pre-configured examples, click on the relevant deployment to view the details. 
+![View API](/images/recommender/7_Testing/1_testing_api_configuration.png)
 
-***image (test 2)***
+### Create API
+If you have created your own <u>Project</u> and <u>Deployment</u>, click **Create New** to make a new API.
 
-If you have created your own Project and deployment, click **Create New** to make a new API.
+![Create API](/images/recommender/7_Testing/2_testing_api_create.png)
+Provide the *Unique Name* of your deployment and click **Next** to add it to the list.
 
-***image (test 3)*** 
+![List APIs](/images/recommender/7_Testing/3_testing_api_list.png)
 
-Provide the Unique Name of your deployment and click **Next** to add it to the list.
+Select the configuration to view and edit the details of your API. 
 
-***image (test 4)***
+### Configure API Test
+Go to the <u>Configuration</u> tab and select the one you want to test.
 
-Select the configuration to view and edit the details of your API. Go to the <u>Configuration</u> tab and select the one you want to test.
-
-***image (test 5)***
+![Configure API](/images/recommender/7_Testing/4_testing_api_edit.png)
 
 Fill in the relevant details of the campaign, then click on the campaign to bring down the API test window.
 
-***image (test 6)***
+![API Test](/images/recommender/7_Testing/5_testing_api_test.png)
 
 Click **Execute** to bring back the API results and ensure your deployment is functioning.
 
-***image (test 7)***
-
-Now that you have built, deployed and tested the configuration of your recommender, it’s time to watch it in action.
+![Execute API test](/images/recommender/7_Testing/5_testing_api_test.png)
 
 ### 2. Build a simulation
+<Callout type="banner" title="Coming soon!">
+Simulation documentation for the Workbench in progress, please check back again.
+</Callout>
 
-In your <u>Dashboard</u> you will find the worker ecosystem with links to various accompanying elements. 
+Now that you have built, deployed and tested the configuration of your recommender, it is time to watch it in action.
 
-***image (test 8)***
+In the <u>Dashboard</u> you will find the worker ecosystem with links to various accompanying elements. 
 
-*Simulation documentation for the Workbench coming soon* 
+![Simulations in Notebooks](/images/recommender/7_Testing/7_testing_dashboard_notebooks.png)
 
 Click on the Jupyter Notebooks to configure the simulation of your recommender deployment. The steps of how to complete this part of the journey is laid out in the Notebooks.
