@@ -1,0 +1,76 @@
+---
+title: Pre-Score Basic Plugin
+description: Pre-Score Basic Plugin
+---
+
+import Image from 'next/image'
+
+# Pre-Score Basic Plugin
+
+The Pre-Score Basic plugin is a plugin that is used to format the input of the predictor before it is returned to the client. The Pre-Score Basic plugin is a simple plugin that is designed to be used in conjunction with other pre-predict plugins to customize the input of the predictor.
+
+## How does it work?
+
+The Pre-Score Basic plugin is a simple plugin that is designed to be used in conjunction with other pre-predict plugins to customize the input of the predictor. The Pre-Score Basic plugin is a simple plugin that is designed to be used in conjunction with other pre-predict plugins to customize the input of the predictor.
+
+## Java Code
+
+This Java code represents a class named `PrePredictCustomer` residing in the package `com.ecosystem.plugin.customer`.
+
+This class imports several libraries:
+- `com.datastax.oss.driver.api.core.CqlSession` which is a Java driver from the Apache Cassandra database.
+- `org.json.JSONObject` used to work with JSON objects.
+- `java.util.List` used to work with lists.
+
+The class contains a default constructor `PrePredictCustomer()` and two methods.
+
+The first method `getPrePredict()` has no parameters and returns no value. According to the comments above the method, it's related to a pre-preprocess before certain operations and after the feature store is read. However, there is no implementation of this method in the code snippet you provided.
+
+The second method, `getPrePredict(JSONObject params, CqlSession session)`, is a static method that takes two parameters: a JSONObject `params` and a `CqlSession` session. The method return the same JSONObject `params` it receives and there is a comment indicating that this method is used to manipulate the params that will be used by scoring and post-scoring. Just like the previous method, there is no implementation of this in the code snippet you provided.
+
+The following is an example of the Post Score Basic plugin implemented in Java:
+
+```java
+package com.ecosystem.plugin.customer;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import org.json.JSONObject;
+
+import java.util.List;
+
+public class PrePredictCustomer {
+
+    public PrePredictCustomer() {
+    }
+
+    /**
+     * Pre-pre predict, after feature store is read and before dynamic and static corpora.
+     */
+    public void getPrePredict() {
+    }
+
+    /**
+     * getPostPredict
+     * @param params
+     * @param session
+     * @return
+     */
+    public static JSONObject getPrePredict(JSONObject params, CqlSession session) {
+
+        /*
+        Manipulate params that will be used by scoring and post-scoring
+         */
+
+        return params;
+    }
+
+}
+```
+
+## Python
+
+Coming Soon
+
+## C#
+
+Coming Soon
