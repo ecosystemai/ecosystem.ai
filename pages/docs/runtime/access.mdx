@@ -1,0 +1,58 @@
+---
+title: Access
+description: Access
+---
+
+import Image from 'next/image'
+
+# Access the API
+
+You can access tour deployed runtime API at the runtime URL. The API is a RESTful API that accepts POST requests. The API is secured with an API key that you will need to include in the header of your request.
+
+```bash
+curl -X POST https://api.ecosystem.ai/invocations \
+    -H "Content-Type: application/json" \
+    -d '{
+        "campaign": "spending_personality",
+        "subcampaign": "openai",
+        "channel": "chatgpt",
+        "customer": "1234",
+        "numberoffers": "1",
+        "userid": "openai",
+        "params": "{}"
+    }'
+```
+
+Here is another example payload with a in_param set that can later be used in the model.
+
+```json
+{
+    "campaign": "spending_personality",
+    "subcampaign": "openai",
+    "channel": "chatgpt",
+    "customer": "1234",
+    "numberoffers": "1",
+    "userid": "openai",
+    "params": "{}",
+    "in_param": {
+        "airtime_balance": 200,
+        "airtime_advance_limit": 30,
+        "api_payment_method": "p"
+    }
+}
+```
+
+URL Encoding is required for the in_param field.
+
+```json
+{
+    "campaign": "justforyou_nb",
+    "subcampaign": "justforyou_nb",
+    "channel": "app",
+    "customer": "1846573d-ac20-45df-a9f0-2fb14da6e7d1",
+    "userid": "ecosystem",
+    "numberoffers": "3",
+    "params": "%22%7B%5C%22airtime_balance%5C%22:%20200,%20%5C%22airtime_advance_limit%5C%22:%2030,%20%5C%22api_payment_method%5C%22:%20%5C%22p%5C%22%7D%22"
+}
+```
+Use the ```/response``` API to send the selected uuid as return for the model to convergen in real-time if it's configured to do so.
