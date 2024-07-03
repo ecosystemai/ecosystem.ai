@@ -1,5 +1,6 @@
 export default {
   index: 'Overview',
+  install: 'Installation',
   definition: 'Definition',
   configuration: 'Configuration',
   data: 'Data Management',
