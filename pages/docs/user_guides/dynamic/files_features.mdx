@@ -1,0 +1,83 @@
+---
+title: Manage Files & Feature Engineering
+description: Files and Feature Engineering is where you import, manage, and transform raw data into valuable features to enhance machine learning models, enabling efficient data preparation and preprocessing.
+---
+
+# Introduction 
+The <u>Files</u> section, and the <u>Feature Engineering</u> section of the Workbench is where you import, manage, and transform raw data into valuable features to enhance machine learning models, enabling efficient data preparation and preprocessing.
+
+The data used to configure your dynamic recommender can range from just a list of offers, to a full set of customer-level data with historical behavior. Examples of different styles of data sets can be found in the example projects. 
+
+## Add Data to the ecosystem.Ai Platform
+In the <u>Data and Features</u> section of the Workbench, you will find <u>Manage Files</u>.
+
+![Manage files](/images/dynamic_recommender/3_Files_Features/0_files_manage.png)
+
+Here, you will be able to add, view, delete and download the data files available for you to build predictions with.
+
+### Upload Data
+To upload a file of your own, select **+ Upload File.**
+
+![Upload files](/images/dynamic_recommender/3_Files_Features/1_files_upload.png)
+
+A section will open below the files list where you can input the details of your upload. Files must be uploaded in either CSV or JSON format.  Upload and then refresh, the file will appear in your files list.
+
+### Download Data
+To download a file, click on the file name.
+
+![Download files](/images/recommender/3_Files_Features/2_files_download.png)
+
+A section will open up where you can view the details of your download. Click **Download** and select your download location.
+
+### Delete Data
+To delete a file, click **Delete** to the right of the file name.
+
+![Delete files](/images/dynamic_recommender/3_Files_Features/3_files_delete.png)
+
+Deleting a file from here will remove the file from all projects whether active or inactive!
+
+## Connect a Database
+In the <u>Data and Features</u> section of the Workbench, you will find <u>Feature Engineering</u>. Add a database using connection strings with the <u>Presto Data Navigator</u>.
+
+![Presto navigator](/images/dynamic_recommender/3_Files_Features/4_features_presto.png)
+
+If you have your own database, you can connect it here. This database access option uses the Presto Worker in the platform. Add a Connection path, similar to this example: <code>local/master?user=admin</code>. Then write a SQL statement to extract the data you want, similar to this example:<code>select * from master.bank_customer limit 2</code>. Then click **Execute**.
+
+<Callout type="note" title="Using Presto in the Workbench"> In order to add data using the presto functionality, you must first have your presto connection accurately set up.</Callout>
+
+## Ingest Data into the Workbench
+Ingest data to be used in your projects with the <u>Ecosystem Data Navigator</u>. 
+
+![Ingest Data](/images/dynamic_recommender/3_Files_Features/5_features_data_ingest.png)
+
+Once data has been added to the Platform it must be ingested into a specified database and collection.
+
+## Add Database
+You can either select a database and ingest your file into it, or create a new database by selecting **+ Add Database**. 
+
+![Add database](/images/dynamic_recommender/3_Files_Features/6_features_database_add.png)
+
+Add a unique database name related to your project. Click the **Database** button to the left of the input field to create it. 
+
+![Create database](/images/dynamic_recommender/3_Files_Features/7_features_database_create.png)
+
+Once your database has been created, refresh the database list and click into it.
+
+![View database](/images/dynamic_recommender/3_Files_Features/8_features_database_view.png)
+
+## Ingest Collections
+To ingest your file as a new collection inside your chosen database, select **+ Ingest Collection**. 
+
+![Ingest collection](/images/dynamic_recommender/3_Files_Features/9_features_collection_ingest.png)
+
+Select your file from the file list. 
+
+![Select collection](/images/dynamic_recommender/3_Files_Features/10_features_collection_ingest_data.png)
+
+You will see the file name appear above the *Ingest: input field*. Either copy this name or choose a unique one related to your project, then click **Ingest** to the left of the input.
+
+<Callout type="warning" title="Check collection name before ingesting!"> If the name of the collection you are ingesting already exists, the new data will be appended to the existing data. It will not replace the existing data.</Callout>
+
+#### Now that you have consolidated your data, it's time to put it to work!
+
+[def]: 

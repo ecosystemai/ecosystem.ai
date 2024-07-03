@@ -4,10 +4,8 @@ export default {
   intro: 'Get Started',
   projects: 'Projects',
   files_features: 'Manage Files & Feature Engineering',
-  feature_stores: 'Feature Stores',
-  predictions: 'Predictions',
+  pulse_responder: 'Dynamic Pulse Resonder Configuration',
   deployment: 'Deployment',
   testing: 'Testing',
   monitoring: 'Monitoring',
-  example: 'Example - to delete',
 }

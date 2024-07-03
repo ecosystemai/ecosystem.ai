@@ -1,0 +1,112 @@
+---
+title: Dynamic Pulse Responder Configuration
+description: The Experiments section of the workbench is where you build, test, and optimize dynamic recommenders, allowing you to experiment with different strategies and algorithms to enhance personalization and improve model performance.
+---
+
+# Introduction
+The Experiments section of the workbench is where you build, test, and optimize dynamic recommenders, allowing you to experiment with different strategies and algorithms to enhance personalization and improve model performance.
+
+Dynamic Experimentation allows you to configure the specifications of your dynamic recommenders. This includes configuring the options you want to test and how you want to balance the exploring and exploiting in your learning approach. You can also configure how much detail from your data you are going to use, and how the recommender should handle changes in human behavior over time.
+<Callout style="note" title="Default settings are good!">
+Most of the settings in this section can remain default.
+</Callout>
+
+## Configurations and Settings
+In the <u>Experiments</u> section of the Workbench, you will find <u>Dynamic Experiments</u>.
+![List experiments](/images/dynamic_recommender/4_Dynamic_Experiments/0_experiment_list.png)
+Here you will find a list of all of the existing dynamic recommender Configurations. To view or edit the details, click on the name. 
+![Experiment settings](/images/dynamic_recommender/4_Dynamic_Experiments/1_experiment_settings.png)
+When you click into the name, you will notice a series of tabs along the top. These are your configuration tabs for that dynamic recommender.To create a new Dynamic recommender, select Create New. 
+![Create experiment](/images/dynamic_recommender/4_Dynamic_Experiments/2_experiment_create.png)
+In Settings is where you can view or create the Unique Name and Description. The UUID field will be populated automatically when you click Save. This UUID will be used in Deployments. 
+![Save experiment](/images/dynamic_recommender/4_Dynamic_Experiments/3_experiment_save.png)
+The Batch dropdown is where you can specify whether your recommender will be run in real-time or batch mode. When Batch is set to false, a real-time recommender will generate results for one customer interaction at a time. Feedback, in the form of an action, is fed into the system as soon as it is available. When Batch is set to True, it generates results for a number of customers at once. It does not incorporate feedback until the actions from those customers are loaded into the system at a later point.
+
+When choosing between batch and real-time approaches it is useful to know that real-time is the more effective approach. However, your ability to run a real-time recommender may be impacted by technical constraints within an organization.
+
+In the Feature Store: Training and Scoring dropdown you will need to specify the location of the data you will use to set up your dynamic recommender. 
+![Feature store: training and scoring](/images/dynamic_recommender/4_Dynamic_Experiments/3_experiment_save.png)
+Use the Feature Store Database dropdown to find the database you created in Feature Engineering, and then allocate the Feature Store Collection. You can leave the Feature Store Connection empty if you are unsure about what to input here.
+
+In the Options Store: Real-time Scoring dropdown you will specify the location where the options store will be created to. 
+![Options store: real-time scoring](/images/dynamic_recommender/4_Dynamic_Experiments/5_experiment_options.png)
+An options store is a list of offers, with information about the state of knowledge for each one.
+
+You should not need to do anything in the Advanced: Client Pulse Responder dropdown. 
+![Advanced: client pulse responder](/images/dynamic_recommender/4_Dynamic_Experiments/6_experiment_advanced.png)
+If you want to, you can click on the Properties file that has been populated to double check whether it has been successfully linked. But this is not essential.
+
+Save your Settings before continuing to Engagement. 
+
+## Add and configure your Engagement and Variables
+In Engagement you will be prompted through a series of configuration steps by the Setup Wizard.
+img
+
+Before going through the wizard, you will need to select which algorithm you wish to use. If you are unsure of which to choose, select the Ecosystem Rewards Algorithm. 
+
+Once you have chosen your Algorithm, Save your progress before continuing to the Wizard steps. 
+
+In the History step, you will need to use the toggle to specify whether you have decided to use historical data in your dynamic recommender.
+img
+
+If you are following our prompts to set up a test without data, click Next.
+
+In the Interactions step, you will need to provide some educated guesses reagrding the expected rate of interaction and offer take-up. 
+img
+
+The configurations you set in this part of the process are not set in stone. You can use these values to run simulations to explore the impact of your settings.
+
+Next, you will need to set up your Uncertainty parameters. 
+img
+
+Here you will set the learning windows of forgetfulness, the caching period of showing specific offers, and specifying the learning of interaction importance.
+
+In the last step, you will generate the Engagement configuration.
+img
+
+Click Generate to populate the advanced dropdowns with these settings, Save and then go to Variables.
+
+If you wish to toggle setting in the Advanced: Settings, see the 
+
+In Variables you will specify the data that will be used in your configuration options store setup.
+img
+
+In these fields, you will be able to extract and view the details of your vidget features (keys). Here you will need to specify the details (if any) on user context, such as demographic, behavioral, etc. and historical behavior.
+
+Click on the Key List field to automatically return a list of keys in your data. 
+img
+
+Then use the Offer Key dropdown to select the key you wish to use and Retrieve Offers to bring back a list of the Offer Key Values. 
+img
+
+The only required input is Offer Key. This is where you will specify the name of the vidgets to be ranked in your data set. In addition to the Offer Key you can add a Takeup Field.
+img
+
+You will only specify the details here, if your data includes historical behavior. A tracking key can be added if you want to track behavior and learn at an individual customer level. This will only be used if there are regular repeated engagements with individual customers.
+
+In the Contextual Variable One and Contextual Variable Two dropdowns, you will specify the data on user context. 
+img
+
+Contextual Variables allow you to set other layers of context for your offers. If you have segments in your data which interactions can be tracked and learned from, you will specify them here. For example, you can produce different rankings for different segments of people you want to display offers to.
+
+Once all of the Variables have been set, click Generate to create, store and display the Options Store. 
+
+When you click Generate you will be redirected to Options which is where you will find the Options Store. 
+img
+
+In the Options Store, you will be able to track the activity of your dynamic recommender as it ranks the offers and takeup in production, based on customer feedback.
+
+## Add and configure your dynamic recommenders Graph and JSON
+In Graph you will be able to view a graphical depiction of your options store set up. 
+img
+
+Use the various dropdowns to set the graph variables, in order to view factors such as Closeness, Cose, and more.
+
+In JSON you will be able to view your configuration as stored in the platform metadata. 
+img
+
+Once your dynamic recommender has been created and all the configurations set, be sure to Save before heading back to the Configuration tab.
+Take note of the UUID associated with your configuration. 
+img
+
+#### Now that your Dynamic recommender is set up, it is time to configure your Deployment details.
