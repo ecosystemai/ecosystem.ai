@@ -1,0 +1,21 @@
+---
+title: Environment Variables
+description: Environment Variables
+---
+
+import Image from 'next/image'
+
+# Environment Variables
+
+Environment varaibles are used to manage a number of runtime behaviors which cannot be changed once the runtime is live.
+
+The possible environment variables are:
+- **LOGGING_LEVEL_ROOT**: The level of logs that the runtime should produce. Valid values are OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL. The default value is INFO.
+- **NO_MONGODB**: Boolean variable indicating whether the runtime should start it's own MongoDB instance or if an external MongoDB instance will be used.
+- **MONITORING_DELAY**: The time period in seconds between updates of the options store when the runtime is configured to use the Ecosystem Rewards Dynamic Interaction algorithm.
+- **FEATURE_DELAY**: The time period in seconds between updates of the real time features.
+- **PORT**:The port exposed by the runtime.
+- **TZ**:The time zone that the runtime uses.
+- **ECOSYSTEM_PROP_FILE**:The location of the ecosystem.Ai properties file in the the runtime file structure.
+- **CASSANDRA_CONFIG**:The location of the Cassandra config file in the runtime file structure.
+- **ECOSYSTEM_XMX**:The amount of memory allocated to the runtime.

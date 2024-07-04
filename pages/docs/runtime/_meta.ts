@@ -8,4 +8,5 @@ export default {
   deployment: 'Deployment',
   access: 'API Access',
   logging: 'Logging & Reporting',
+  environment_variables: "Environment Variables"
 }
