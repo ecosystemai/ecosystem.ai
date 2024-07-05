@@ -35,6 +35,38 @@ Variables can be set in the Docker run command like so:
 docker run --rm -d -p 8091:8091 --env MASTER_KEY=<from ecosystem.Ai> --env LOGGING_LEVEL_ROOT=ERROR ecosystemai/ecosystem-runtime-solo
 ```
 
+## IntelliJ Run Configuration Example
+
+Environment variables can be set in the run configuration in IntelliJ IDEA. This is done by adding the variables to the Environment Variables section of the run configuration.
+
+![IntelliJ Environment Variables](/images/runtime/IntelliJ_environment_variables.png)
+
+## OpenShift Deployment Example
+
+Environment variables can be set in the OpenShift deployment configuration yaml file as shown below.
+
+```yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  ...
+spec:
+  replicas: 1
+  selector:
+    ...
+  template:
+    metadata:
+      ...
+    spec:
+      containers:
+        - name: ecosystem-runtime
+          env:
+            - name: NO_MONGODB
+              value: 'true'
+            - name: ECOSYSTEM_PROP_FILE
+              value: /config/ecosystem.properties
+```
+
 ## Security
 
 If the runtime engine is started with ```--security``` in CLI_SETTINGS then two additional variables can be set to define defaults:
