@@ -10,15 +10,15 @@ The YAML file is a Docker Compose configuration file which defines multiple Dock
 
 - All container services are part of the `ecosystem` network. This allows them to communicate with each other.
 
-- `ecosystem-workbench`: This service runs the Docker image `ecosystemai/ecosystem-workbench:arm64` and is named `ecosystem-workbench` on creation. It restarts unless manually stopped. It depends on other services which are specified in `depends_on`. Environment variables such as 'IP' and 'PORT' are set here - these are passed into the container on start-up. Note that arm64 is the architecture of the image, and `latest` is for x86 or AMD.
+- [`ecosystem-workbench`](https://hub.docker.com/r/ecosystemai/ecosystem-workbench): This service runs the Docker image `ecosystemai/ecosystem-workbench:arm64` and is named `ecosystem-workbench` on creation. It restarts unless manually stopped. It depends on other services which are specified in `depends_on`. Environment variables such as 'IP' and 'PORT' are set here - these are passed into the container on start-up. Note that arm64 is the architecture of the image, and `latest` is for x86 or AMD.
 
-- `ecosystem-server`: Runs the `ecosystemai/ecosystem-server:arm64` Docker image. This service exposes several ports, uses several environment variables, and mounts the local directory specified by `DATA_PATH` to `/data` inside the container. Database files and other accessible data files are stored in this directory.
+- [`ecosystem-server`](https://hub.docker.com/r/ecosystemai/ecosystem-server): Runs the `ecosystemai/ecosystem-server:arm64` Docker image. This service exposes several ports, uses several environment variables, and mounts the local directory specified by `DATA_PATH` to `/data` inside the container. Database files and other accessible data files are stored in this directory.
 
-- `ecosystem-runtime-solo`, `ecosystem-runtime-solo2`, `ecosystem-runtime-solo3`, `ecosystem-runtime-solo4`, `ecosystem-runtime-solo5`: These five services use the `ecosystemai/ecosystem-runtime-solo:arm64` Docker image. Each one runs on its own unique port, and each one depends on the `ecosystem-server` service. This allows for 'permanently in production' runtime services to be run alongside the server.
+- [`ecosystem-runtime-solo`](https://hub.docker.com/r/ecosystemai/ecosystem-runtime-solo), `ecosystem-runtime-solo2`, `ecosystem-runtime-solo3`, `ecosystem-runtime-solo4`, `ecosystem-runtime-solo5`: These five services use the `ecosystemai/ecosystem-runtime-solo:arm64` Docker image. Each one runs on its own unique port, and each one depends on the `ecosystem-server` service. This allows for 'permanently in production' runtime services to be run alongside the server.
 
-- `ecosystem-notebooks`: This service runs the `ecosystemai/ecosystem-notebooks:arm64` image, and mounts several directories from the host to the container.
+- [`ecosystem-notebooks`](https://hub.docker.com/r/ecosystemai/ecosystem-notebooks): This service runs the `ecosystemai/ecosystem-notebooks:arm64` image, and mounts several directories from the host to the container.
 
-- `ecosystem-grafana`: This service runs the `ecosystemai/ecosystem-grafana:arm64` Docker image. Grafana is a tool for visualizing data, and this service exposes port 3000.
+- [`ecosystem-grafana`](https://hub.docker.com/r/ecosystemai/ecosystem-grafana): This service runs the `ecosystemai/ecosystem-grafana:arm64` Docker image. Grafana is a tool for visualizing data, and this service exposes port 3000.
 
 All services use the environment variable `ECOSYSTEM_API_KEY`, which has to be provided when you start the Docker Compose stack. Other environment variables are contextual to each service.
 
@@ -210,3 +210,4 @@ networks:
     external: true
 ```
 
+[Additional variables](/docs/runtime/environment_variables) can be set for the runtime engine.

@@ -6,5 +6,6 @@ export default {
     // "title": "Contributing",
     type: 'separator',
   },
+  generative: 'Language Chat Models',
   agent_framework: 'Agent Framework'
 }
