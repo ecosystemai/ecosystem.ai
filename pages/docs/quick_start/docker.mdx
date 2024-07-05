@@ -1,0 +1,212 @@
+# Docker Compose
+
+## Docker Compose
+
+Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services. Then, with a single command, you create and start all the services from your configuration.
+
+## ecosystem.Ai Docker Compose
+
+The YAML file is a Docker Compose configuration file which defines multiple Docker services to be run together, connected by a common network named 'ecosystem'. Here is a breakdown of what each segment of code means:
+
+- All container services are part of the `ecosystem` network. This allows them to communicate with each other.
+
+- `ecosystem-workbench`: This service runs the Docker image `ecosystemai/ecosystem-workbench:arm64` and is named `ecosystem-workbench` on creation. It restarts unless manually stopped. It depends on other services which are specified in `depends_on`. Environment variables such as 'IP' and 'PORT' are set here - these are passed into the container on start-up. Note that arm64 is the architecture of the image, and `latest` is for x86 or AMD.
+
+- `ecosystem-server`: Runs the `ecosystemai/ecosystem-server:arm64` Docker image. This service exposes several ports, uses several environment variables, and mounts the local directory specified by `DATA_PATH` to `/data` inside the container. Database files and other accessible data files are stored in this directory.
+
+- `ecosystem-runtime-solo`, `ecosystem-runtime-solo2`, `ecosystem-runtime-solo3`, `ecosystem-runtime-solo4`, `ecosystem-runtime-solo5`: These five services use the `ecosystemai/ecosystem-runtime-solo:arm64` Docker image. Each one runs on its own unique port, and each one depends on the `ecosystem-server` service. This allows for 'permanently in production' runtime services to be run alongside the server.
+
+- `ecosystem-notebooks`: This service runs the `ecosystemai/ecosystem-notebooks:arm64` image, and mounts several directories from the host to the container.
+
+- `ecosystem-grafana`: This service runs the `ecosystemai/ecosystem-grafana:arm64` Docker image. Grafana is a tool for visualizing data, and this service exposes port 3000.
+
+All services use the environment variable `ECOSYSTEM_API_KEY`, which has to be provided when you start the Docker Compose stack. Other environment variables are contextual to each service.
+
+The `networks` field defines a network used by the services. In this case, the `ecosystem` network is marked as `external`, which indicates that the network has been created outside of this Docker Compose file and needs to already exist before the command docker-compose up is run. If other ecosystem.Ai services are running on the same network, they will be able to communicate with these services.
+
+The following environment variables have to be set before running the Docker Compose stack:
+```
+DATA_PATH=
+OPENAI_API_KEY=
+ECOSYSTEM_API_KEY=
+```
+
+An optional variable is used to assign an initial password on startup.
+```
+INITIAL_PASSWORD=
+```
+
+Here is an example of a Docker Compose file for ecosystem.Ai:
+```yaml
+services:
+  ecosystem-workbench:
+    image: ecosystemai/ecosystem-workbench:arm64
+    container_name: ecosystem-workbench
+    restart: unless-stopped
+    environment:
+      IP: ${SERVER}
+      PORT: 3001
+    networks:
+      - ecosystem
+    ports:
+      - "80:80"
+    depends_on:
+      - ecosystem-server
+      - ecosystem-runtime-solo
+      - ecosystem-runtime-solo2
+      - ecosystem-runtime-solo3
+      - ecosystem-notebooks
+      - ecosystem-grafana
+
+  ecosystem-server:
+    image: ecosystemai/ecosystem-server:arm64
+    container_name: ecosystem-server
+    restart: unless-stopped
+    environment:
+      CLOUD: "none"
+      MASTER_KEY: ${ECOSYSTEM_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      INITIAL_PASSWORD: ${INITIAL_PASSWORD}
+      IP: ${SERVER}
+      PORT: 3001
+      RESET_USER: "true"
+      NO_WORKBENCH: "true"
+    volumes:
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "3001:3001"
+      - "54445:54445"
+      - "54321:54321"
+
+  ecosystem-runtime-solo:
+    image: ecosystemai/ecosystem-runtime-solo:arm64
+    container_name: ecosystem-runtime
+    restart: unless-stopped
+    environment:
+      MASTER_KEY: ${ECOSYSTEM_API_KEY}
+      NO_MONGODB: 'true'
+      FEATURE_DELAY: 99999
+      MONITORING_DELAY: 120
+    volumes:
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "8091:8091"
+    depends_on:
+      - ecosystem-server
+
+  ecosystem-runtime-solo2:
+    image: ecosystemai/ecosystem-runtime-solo:arm64
+    container_name: ecosystem-runtime2
+    restart: unless-stopped
+    environment:
+      MASTER_KEY: ${ECOSYSTEM_API_KEY}
+      NO_MONGODB: 'true'
+      FEATURE_DELAY: 99999
+      MONITORING_DELAY: 240
+      PORT: 8092
+    volumes:
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "8092:8092"
+    depends_on:
+      - ecosystem-server
+
+  ecosystem-runtime-solo3:
+    image: ecosystemai/ecosystem-runtime-solo:arm64
+    container_name: ecosystem-runtime3
+    restart: unless-stopped
+    environment:
+      MASTER_KEY: ${ECOSYSTEM_API_KEY}
+      NO_MONGODB: 'true'
+      FEATURE_DELAY: 99999
+      MONITORING_DELAY: 240
+      PORT: 8093
+    volumes:
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "8093:8093"
+    depends_on:
+      - ecosystem-server
+
+  ecosystem-runtime-solo4:
+    image: ecosystemai/ecosystem-runtime-solo:arm64
+    container_name: ecosystem-runtime4
+    restart: unless-stopped
+    environment:
+      MASTER_KEY: ${ECOSYSTEM_API_KEY}
+      NO_MONGODB: 'true'
+      FEATURE_DELAY: 99999
+      MONITORING_DELAY: 240
+      PORT: 8094
+    volumes:
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "8094:8094"
+    depends_on:
+      - ecosystem-server
+
+  ecosystem-runtime-solo5:
+    image: ecosystemai/ecosystem-runtime-solo:arm64
+    container_name: ecosystem-runtime5
+    restart: unless-stopped
+    environment:
+      MASTER_KEY: ${ECOSYSTEM_API_KEY}
+      NO_MONGODB: 'true'
+      FEATURE_DELAY: 99999
+      MONITORING_DELAY: 240
+      PORT: 8095
+    volumes:
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "8095:8095"
+    depends_on:
+      - ecosystem-server
+
+  ecosystem-notebooks:
+    image: ecosystemai/ecosystem-notebooks:arm64
+    container_name: ecosystem-notebooks
+    restart: unless-stopped
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ${DATA_PATH}/notebooks-users/notebooks:/app/Shared Projects
+      - ${DATA_PATH}/notebooks-users:/home
+      - ${DATA_PATH}:/data
+    networks:
+      - ecosystem
+    ports:
+      - "5111:8000"
+      - "8010:8010"
+    depends_on:
+      - ecosystem-server
+
+  ecosystem-grafana:
+    image: ecosystemai/ecosystem-grafana:arm64
+    container_name: ecosystem-worker-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+    networks:
+      - ecosystem
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ecosystem-server
+
+networks:
+  ecosystem:
+    external: true
+```
+

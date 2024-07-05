@@ -2,6 +2,24 @@
 
 Follow the guides below to get up and running with ecosystem.Ai as quickly as possible.
 
+## Overview
+
+Platform contains the following:
+
+![image](/images/overview.png)
+
+The core of the platform is the Prediction Server which is responsible for running the models and making predictions. The Workbench is the user interface for the platform. The Workbench is where you can load modules, create and train models, and make predictions. Python can be used to create custom modules and models.
+
+- **Workbench**: The Workbench is the user interface for the platform. The Workbench is where you can load modules, create and train models, and make predictions.
+- **Prediction Server**: The core of the platform is the Prediction Server which is responsible for running the models and making predictions. The server is accessible via API's and can be called from various architectural topologies.
+- **Notebooks Server**: The Notebooks Server is where you can create and run Jupyter notebooks. The Notebooks Server is accessible via API's and can be called from various architectural topologies. We have core capabilities in Chat-to-SQL, Vector Stores, Fact-Injection for RAG and other generative capabilities.
+- **Python**: Python can be used to ingest data, create models, deploy models and other key functions.
+- **Runtime (Client Pulse Responder)**: The runtime is the core of the platform. It is responsible for running the models and making predictions. The runtime can be installed on a local machine or in the cloud. The runtime is accessible via API's and can be called from various architectural topologies.
+
+The prediction server focuses on a [worker architecture](/docs/workers/worker_arch) that allows us to implement and evolve the latest technology and make it accessible universally.
+
+## Install
+
 #### [Local Setup](./quick_start/local_setup)
 
 Use this easy setup guide and start using ecosystem.Ai Workbench and load a sample module.
