@@ -3,37 +3,34 @@ title: Predictions
 description: Predictions is where you deploy, manage, and monitor machine learning models to generate real-time predictions, providing actionable insights and driving data-driven decisions.
 ---
 
-# Introduction 
-The Predictions section of the Workbench is where you deploy, manage, and monitor machine learning models to generate real-time predictions, providing actionable insights and driving data-driven decisions.
-
-The next step is to begin making the models for your project, using all the configurations you have set up in the previous steps.
+# Create and Test Predictions 
+The Predictions section of the Workbench is where you deploy, manage, and monitor machine learning models to generate real-time predictions, providing actionable insights and driving data-driven decisions. The next step is to begin making the models for your project, using all the configurations you have set up in the previous steps.
 
 In the <u>Recommenders</u> section of the Workbench, you will find <u>Predictions</u>. This is where you will manage the models for your recommender. 
 
-You will see a list of all of previously configured models, as well as be able to create new models. Creating models using this interface is more suited to cases which use a small number of models. Cases where tens, or hundreds of models will need to be trained, are better handled in our <u>Jupyter Notebooks</u>.
+You will see a list of all of previously configured models, as well as being able to create new models. Creating models using this interface is more suited to cases which use a small number of models. Cases where tens or hundreds of models will need to be trained are better handled in our <u>Jupyter Notebooks</u>.
 
 ## Create Models
 To create a new model for your recommender project, select **+ Create Model**. 
-
-![Create model](/images/recommender/5_Predictions/0_predictions.png)
 The details you input here will be used to generate a number of models that can be tested and selected for your project.
 
-You will need to provide a unique *Predict ID* and *Description*. 
+![Create model](/images/recommender/5_Predictions/0_predictions.png)
+
+You will need to provide a unique *Predict ID* and *Description*. You will refer back to this *Unique ID* at any point in the process. You can also link the model to a previously created project in *Allocated to projects*.
 
 ![Model details](/images/recommender/5_Predictions/1_predictions_create.png)
-You will refer back to this *Unique ID* at any point in the process. You can also link the model to a previously created project in *Allocated to projects*.
 
 - Specify the *Model ID* associated with this version of the model, and remember to add the version number to the ID. 
 
 - You will almost always have multiple versions. Assigning a *Version* will ensure you can appropriately track changes, as you experiment with the parameters of your models.
 
-- Choose a *Model Type* from the list of supported model and provide the *Model Category*. 
-
-These details will allow you to more effectively organize your overall model training.
+- Choose a *Model Type* from the list of supported model and provide the *Model Category*. These details will allow you to more effectively organize your overall model training.
 
 - Select the Primary Data Frame .hex file that you created in the <u>Feature Store</u> and update the Version number. 
 
+<Callout style="warning" title="Please note"> 
 Make sure the number in the *Version* field correlates with the version number in your *Model ID*.
+</Callout>
 
 ## Generate & Specify Model Parameters
 In *Model Parameters* you can specify the details and add notes to be stored with the model. Use the *Describe model purpose, parameters and other actions* to take notes. 
@@ -41,10 +38,9 @@ In *Model Parameters* you can specify the details and add notes to be stored wit
 ![Model parameters](/images/recommender/5_Predictions/2_predictions_parameters.png)
 
 For the *Model Parameters* functionality, you can click **Generate Default** to generate a list of the model parameters and their default values. 
+These can be modified to change the behaviour of the model. Examples of model parameter set ups can be found in the other pre-configured example projects. 
 
 ![Generate parameters](/images/recommender/5_Predictions/3_predictions_parameters_generate.png)
-
-These can be modified to change the behaviour of the model. Examples of model parameter set ups can be found in the other pre-configured example projects. 
 
 <Callout type="note" title="Find documentation for accompanying technologies"> 
 Further details of all of the Model Parameters functionality can be found in the Prediction Workers documentation. Each worker has its own documentation:
@@ -53,36 +49,35 @@ Further details of all of the Model Parameters functionality can be found in the
 
 ## Taking Notes & Retrieving Features
 Notes should include the features you will be using in the model. All of which can be retrieved using the **Retrieve Features** button.
-
-![Retrieve features](/images/recommender/5_Predictions/4_predictions_parameters_retrieve.png)
-
 Notes should also include the model parameters, as well as a summary of the changes made, in each version of the model.
 
 **Save** your model configuration in the top right corner. 
 
+![Retrieve features](/images/recommender/5_Predictions/4_predictions_parameters_retrieve.png)
+
 ## Generate Models
-Begin building out your model and view the **Result**, by clicking the **Generate Model** button. 
+Begin building out your model and view the **Result**, by clicking the **Generate Model** button. This will start the model training process, which may take some time to complete. 
 
 ![Generate model](/images/recommender/5_Predictions/5_predictions_model_generate.png)
-This will start the model training process, which may take some time to complete. To view training progress, and any interim models being produced, continue to click the **Result** button. This will update the list and present the models being trained.
 
-Once the models have been trained they will appear in the table. 
+To view training progress, and any interim models being produced, continue to click the **Result** button. This will update the list and present the models being trained. Once the models have been trained they will appear in the table. 
 
 ![Trained models](/images/recommender/5_Predictions/6_predictions_model_list.png)
 
-Clicking on a model will show you the metrics and its effectiveness.
+Clicking on a model will show you the metrics and its effectiveness. This action is how you can select which of the models is the preferred one for your needs.
 
 ![Model metrics](/images/recommender/5_Predictions/7_predictions_model_metrics.png)
 
-This action is how you can select which of the models is the preferred one for your needs.
 <Callout type="warning" title="Please note"> 
 There may not always be multiple models generated.
 </Callout>
 
 ## Deploy Models
 Once a model has been selected, *Save* and *Deploy Model*, to have it ready to use in the next (deployment) step. 
-
-![Deploy models](/images/recommender/5_Predictions/8_predictions_model_deployment.png)
 You can view all deployed models in the window below your trained models list.
 
-#### You can go through this step as many times as you like in order to acheive your desired results. Be sure to select a model that suits your needs before progressing to deployments.
+![Deploy models](/images/recommender/5_Predictions/8_predictions_model_deployment.png)
+
+<Callout style="banner" title=""> 
+You can go through this step as many times as you like in order to acheive your desired results. Be sure to select a model that suits your needs before progressing to deployments.
+</Callout>

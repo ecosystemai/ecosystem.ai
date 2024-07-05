@@ -6,7 +6,7 @@ description: Deployment is where you deploy machine learning models into product
 # Introduction 
 The Deployment section of the Workbench is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
 
-Now that you have uploaded, ingested and viewed your data, built a feature store and generated and trained models, you will need to put your recommender into production. The deployment is where you will set your recommender to be used in the Production, Quality Assurance or Test environment. 
+Now that you have uploaded, ingested and viewed your data, and configured your dynamic recommender, you will need to put it into production. Deployment is where you will set your dynamic recommender to be used in the Production, Quality Assurance or Test environment. 
 
 In the <u>Deployment</u> section of the Workbench, you will find <u>Projects</u>. 
 
@@ -26,7 +26,7 @@ To view and edit a pre-existing deployment configuration, click on the deploymen
 A window will open up below where you can specify the details of your new deployment.
 
 ## Configure Deployment
-Set the case configuration for your recommender deployment. 
+Set the case configuration for your dynamic recommender deployment. 
 
 ![Configure deployment](/images/recommender/6_Deployment/2_deployments_details.png)
 
@@ -34,27 +34,29 @@ Create a unique *Prediction Case ID* name. Add a *Description* that is relevant 
 
 Input the properties details and set the *Version* of the deployment step. 
 
-This *Version* number should be updated every time you make changes to the deployment. Specify the *Environment Status* in which you will be deploying your configuration. Then input the *Performance Expectation* and *Complexity* settings for your set up.
+This *Version* number should be updated every time you make changes to the deployment. Specify the *Environment Status* in which you will be deploying your configuration. Then input the *Performance Expectation* and *Complexity* settings for your set up. **Update** your deployment before proceeding to selecting and filling in the details in the settings dropdowns.
 
 ## Deployment Settings
 Selecting any of the checkboxes on the right, will reveal the <u>Settings</u> sections relevant to that option, at the bottom of the page. 
 
 ![Deployment settings dropdowns](/images/recommender/6_Deployment/3_deployments_settings.png)
 
-### Prediction Model
-Select *Prediction Model* and specify the model that you want to use in your recommender. 
+### Plugins
+Select *Plugins* to use the pre-defined scoring class in your experiment. 
 
-Enter the names of the models that you have generated, trained and saved in <u>Predictions</u> for deployment.
+Use the dropdown to *Select a Predefined Post-score Class* and choose PlatformDynamicEngagement. You will see that this selection will populate the pre-score and post-score class windows.
 
-### Parameters from Data Source
-Select *Parameters from Data Source* to access a database. 
+### New Knowledge (explore/exploit)
+Select *New Knowledge (explore/exploit)* to assign the UUID you generated in <u>Dynamic Experiments</u>. 
 
-This is for when you want to get data for making predictions from a database that is accessible to your production environment. The alternative to this, is passing the data through the API. 
+In the *Dynamic Pulse Responder Reference* section, set the UUID of the configuration that you are going to push into production.
 
-Data uploaded to the platform and ingested, will be available to the recommender in production.
+Click on the UUID in the field and click out again to validate the dynamic parameter. 
+
+You don't need to worry about the rest of the fields, but it is suggested that you set the epsilon to 0 for most dynamic recommender setups.
 
 ## Prediction Activators
-There are a range of different Prediction Activators that can be selected to enhance the functionality of your models. 
+There are a range of different Prediction Activators that can be selected to enhance the functionality of your deployments. 
 <Callout type="note" title="Prediction Activators further documentation">
 Detailed documentation coming soon
 </Callout>
@@ -73,6 +75,7 @@ Detailed documentation coming soon
     - allows different patterns when when options are presented, through the scoring engine result.
 
 ## Push Configuration
+Remember to **Update**!
 When you are done with your deployment configuration, click **Push** to set the deployment up in your specified environment. No downtime is required!
 
 The **Generate** and **Build** buttons are not needed for now, they are designed for Enterprise and on-premise setups.
