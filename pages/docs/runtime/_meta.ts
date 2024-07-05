@@ -3,10 +3,10 @@ export default {
   architecture: 'Architecture',
   configuration: 'Configuration',
   plugins: 'Plugins',
-  postpredict: 'Plugins: Post-Predict',
   prepredict: 'Plugins: Pre-Predict',
+  postpredict: 'Plugins: Post-Predict',
   deployment: 'Deployment',
+  environment_variables: "Environment Variables",
   access: 'API Access',
   logging: 'Logging & Reporting',
-  environment_variables: "Environment Variables"
 }
