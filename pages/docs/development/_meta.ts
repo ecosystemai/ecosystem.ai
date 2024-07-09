@@ -5,6 +5,7 @@ export default {
   runtime_apis: 'Runtime API\'s',
   testing: 'Testing',
   debugging: 'Debugging (WIP)',
+  howtos: 'Development How-to Guides',
   technical_docs: {
     // "title": "Contributing",
     type: 'separator',
