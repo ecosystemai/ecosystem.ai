@@ -7,27 +7,21 @@ import Image from 'next/image'
 
 # Pre-Score Dynamic Plugin
 
-The Pre-Score Dynamic plugin is a plugin that is used to format the input of the predictor before it is returned to the client. The Pre-Score Dynamic plugin is a simple plugin that is designed to be used in conjunction with other pre-predict plugins to customize the input of the predictor.
+The Pre-Score Dynamic plugin is a plugin that is used to format the input to the predictor before when using Dynamic Interaction configurations. The Pre-Score Dynamic plugin is a default pre-predict plugin that is available in the ecosystem.Ai platform and can be extended to create custom pre-scoring logic plugins.
 
 ## How does it work?
 
-It is used to load dynamic and virtual parameters to the feature store. The Pre-Score Dynamic plugin is a simple plugin that is designed to be used in conjunction with other pre-predict plugins to customize the input of the predictor.
+The Pre-Score Dynamic plugin loads the Dynamic Interaction configurations. It then uses these configurations to set any Virtual Variables that have been configured and then adds the values of the contextual variables to the params object that is carried through the runtime process.
 
 ## Java Code
 
-This Java class named `PreScoreDynamic` extends `PreScoreSuper`.
-
-There is an empty constructor and empty function named 'getPrePredict()' that do not perform any operations currently.
+This Java class named `PreScoreDynamic` extends `PreScoreSuper`, which provides functionality that can be used across different pre-scoring plugins. 
 
 Then, there is a static method named `getPrePredict(MongoClient mongoClient, JSONObject params, CqlSession session)`. This function takes three parameters: a `MongoClient` object (which is used to interact with a MongoDB database), a `JSONObject` object `params` (which likely holds the parameter data needed for the method), and a `CqlSession` object `session` (which provides a session for executing CQL commands for DataStax database.)
 
-The function first checks if `lookupDatabase` is null, if it is then it returns the input params as is.
+The function first checks if `lookupDatabase` is null, if it is then it returns the input `params` as is.
 
-If `lookupDatabase` isn't null, then the function tries to do a dynamic lookup based on data from the MongoDB database and the data encapsulated in input JSONObject `params`.
-
-The comments suggest that it retrieves dynamic properties and adds them to a virtual feature store using the `getDynamicSettings` and `getVirtualVariables` methods, though the body of these methods is not provided in the code you've posted.
-
-Based on settings, it populates contextual variables using `getPrepopulateContextualVariables`.
+If `lookupDatabase` isn't null, then the function uses `getDynamicSettings` to get the Dynamic Interaction configuration from the MongoDB database using the locations for the configurations contained in `params`. It uses the configuration to populate the Virtual variables using `getVirtualVariables` and populate the contextual variables using `getPrepopulateContextualVariables`.
 
 If any exception occurs during the execution of the function, it logs the error message (`LOGGER.error()`) including the UUID from the params and specifics of the failed dynamic parameters, also prints the stack trace of the exception (`e.printStackTrace();`). The function then returns the params object.
 
