@@ -3,41 +3,37 @@ title: Feature Stores
 description: Feature Stores is where you store, manage, and retrieve precomputed features, ensuring consistency and reusability across various machine learning models and applications.
 ---
 
-# Introduction
+# Build Feature Stores for Predictions
 The Feature Stores section of the Workbench is where you store, manage, and retrieve precomputed features, ensuring consistency and reusability across various machine learning models and applications.
 
 Using the collection you have just exported, you will need to create a feature store to be used in your recommender. 
 
 ## Manage Feature Stores
 In the <u>Recommenders</u> section of the Workbench, you will find <u>Feature Stores</u>.
+Here, you will be able to add, view, and delete all the feature stores.
 
 ![Feature stores](/images/recommender/4_Feature_Stores/0_stores.png)
 
-Here, you will be able to add, view, delete all the feature stores.
-
-### Add a Feature Store
-To create a feature store from your exported data set, select **+ Feature Store.**
+## Add a Feature Store
+To create a feature store from your exported data set, click **+ Feature Store**.
+The input fields will be where you set the configuration settings for your final Feature Store. You will need to provide a unique name in *Feature Store ID* and a good *Description*.
+The feature store can also be allocated to an existing project to help ease your project creation journey. 
 
 ![Add feature store](/images/recommender/4_Feature_Stores/1_stores_add.png)
 
-The input fields will be where you set the configuration settings for your final Feature Store.
-
-You will need to provide a unique name in *Feature Store ID* and a good *Description*.
-
-The feature store can also be allocated to an existing project to help ease your project creation journey. 
-
-### Check Data
-Specify the characteristics of the file you will be building the feature store on, and select **Check Data**.
-
+## Check Data
+Specify the characteristics of the file you will be building the feature store on, and click **Check Data**.
 Clicking **Check Data** will create a table of all of the columns in your data set. You can change the automatically allocated type of each column on the right. You can also add descriptions to those columns if you wish.
-
 Once you have correctly typed and described the details, the *Destination Frame* will be pre-populated with your feature store name .hex file.
-
 If you want your feature store to have a different name, you can change it here. This .hex file will be used in the next step when configuring your predictions.
 
-### Create Feature Store
+![Check feature store data](/images/recommender/4_Feature_Stores/2_stores_check_data.png)
+
+## Parse Data
 To trigger the creation of your feature store with all these details, click **Parse Data**.
 
-There is no need to use the small Parse button when configuring a recommender feature store. 
+![Parse data](/images/recommender/4_Feature_Stores/3_stores_parse.png)
 
-#### Make sure to always **Save** your feature store definitions as you progress through the steps.
+<Callout style="" title=""> 
+Make sure to always **Save** your feature store definitions as you progress through the steps.
+</Callout>
