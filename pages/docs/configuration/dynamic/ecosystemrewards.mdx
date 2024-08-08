@@ -3,7 +3,7 @@ title: Ecosystem Rewards
 description: Ecosystem Rewards
 ---
 
-# Intro
+# Ecosystem Rewards
 
 The Ecosystem Rewards algorithm implements a version of the Thompson Sampling algorithm for solving multi-armed bandit style problem.
 
@@ -18,10 +18,13 @@ By default the algorith will assume initial values of one for both alpha and bet
 
 ## Parameters
 
-
 - **Processing Window**: Restricts the data used when the model updates based on a time period from the present going back a specified in milliseconds.
-- **Options Generated**: Options stores are generated from the data.
-- **Virtual Variables**: Virtual variables are created for the model.
-- **Model Training**: Model training is performed in real-time.
-- **Model Deployment**: Model deployment is performed in real-time and updated based on changing requirements.
-- **Model Monitoring**: Model monitoring is performed in real-time using dashboards.
+- **Historical Count**: Restricts the data used when the model updates based on a count of interactions. The count used is per offer and segment.
+- **Decay Parameter**: Used to treat repeated interactions from the same customer differently from one off interactions from individual customers. The weight of each interaction from a customer is reduced by a factor of one over the decay parameter, i.e. the latest interaction has a weight of one, the interaction before that has a weight of one over the decay parameter and the interaction before that has a weight of one over the decay parameter squared
+- **Max interactions**: Used to treat repeated interactions from the same customer differently from one off interactions from individual customers. Restricts the number of interactions from an individual customer that will be used when updating the model - the latest interactions will be used.
+- **Success Reward**: The size of the increment to the alpha parameter of the beta distributions used in the Thompson Sampling when an interaction is successful. This impacts the rate of convergence.
+- **Fail Reward**: The size of the increment to the beta parameter of the beta distributions used in the Thompson Sampling when an interaction is not successful. This impacts the rate of convergence.
+- **Prior Success Reward**: The size of the increment to the alpha parameter of the beta distributions used in the Thompson Sampling when an interaction is successful in the historical data. Used when historical data is used to train the algorithm before deployment.
+- **Prior Fail Reward**: The size of the increment to the beta parameter of the beta distributions used in the Thompson Sampling when an interaction is not successful in the historical data. Used when historical data is used to train the algorithm before deployment.
+- **Test options across segments**: If there are options that are configured to only be available for specific values of the contextual variables, electing to test options across segments will occasionally predict those options for contextual variable values where they are not available
+
