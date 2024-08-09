@@ -5,6 +5,7 @@ module.exports = {
   siteUrl: 'https://ecosystem.ai',
   generateRobotsTxt: true,
   changefreq: 'daily',
+  latex: true,
   exclude: ['*/_meta'],
   additionalPaths: async () => [
     {
