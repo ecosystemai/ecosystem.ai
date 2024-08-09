@@ -1,0 +1,78 @@
+---
+title: Dynamic Interactions Process
+description: Dynamic Interactions Process
+---
+
+## Dynamic Interactions Process
+
+The internal process functions as follows for real-time inference:
+- **Invocations API is called**: When api is called, the engine will have the configuration loaded from startup. On first load certain actions are performed to prepare environment. Housekeeping actions are also performed like [creating indexes](/docs/configuration/dynamic/process#indexes).
+- **Perform standard options**: All sequence based options that were set in the project deployment will execute for example data lookups, corpora loading.
+- **Call Pre-Score Plugin**: Pre-score plugin is called to perform any data or eligibility actions. The ```params``` JSON Object is carried throughout entire execution process and values can be added for later use.
+- **Determine algorithm**: Each algorithm has a difference treatment process that depends on the type of data needed.
+- **Generate score**: Score is generated based on input parameters or training features. Scores are added to ```params```.
+- **Call Post-Score Plugin**: Post-score plugin is called to perform any data or eligibility actions and access to ```params``` allow for full control over all actions.
+- **Logging**: Extensive logging of scores and related items, also logging/ecosystemruntime_history is populated by algorithms that do in-line and cyclical updates. This collection can be used to understand changing scores at a fine-grained leval.
+- **Payload**: Generate payload to return via API.
+
+
+## Dynamic Background Process
+
+The background process is controlled by the ```MONITORING_DELAY``` setting as outlined in [Runtime Settings](/docs/configuration/dynamic/runtime). This process functions as follows:
+- **Load configs**: Project and Dynamic configurations are loaded on first process cycle, and tested for change every subsequent cycle.
+- **Process per algorithm**: Each algorithm has its own process and uses dynamic config settings and update the options store with latest scores.
+
+
+## Indexes
+Also note that this process will create the needed indexes automatically to ensure training and scoring performance.
+
+#### Logging Collection Indexes
+
+1. **`uuid` index**:
+```json
+{ "uuid" : 1 }
+```
+
+2. **`date_log` index**:
+```json
+{ "date_log" : 1 }
+```
+
+3. **`stats.predictor`, `params.value`, `date_log`, and `cache` index**:
+
+```json
+{ "stats.predictor" : 1, "params.value" : 1, "date_log" : 1, "cache" : 1 }
+```
+
+4. **`predictor`, `params.value`, and `date_log` index**:
+
+```json
+{ "predictor" : 1, "params.value" : 1, "date_log" : 1 }
+```
+
+
+#### Response Collection Indexes
+
+1. **`uuid` index**:
+
+```json
+{ "uuid" : 1 }
+```
+
+2. **`date_log`, `response.offers_accepted.contextual_variable_one`, `response.offers_accepted.contextual_variable_two`, and `response.offers_accepted.offer_name` index**:
+
+```json
+{ "date_log" : 1, "response.offers_accepted.contextual_variable_one" : 1, "response.offers_accepted.contextual_variable_two" : 1, "response.offers_accepted.offer_name" : 1 }
+```
+
+3. **`predictor`, `date_log`, and `response.offers_accepted.offer_name` index**:
+
+```json
+{ "predictor" : 1, "date_log" : 1, "response.offers_accepted.offer_name" : 1 }
+```
+
+4. **`response.offers_accepted` index**:
+
+```json
+{ "response.offers_accepted" : 1 }
+```

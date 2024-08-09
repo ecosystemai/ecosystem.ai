@@ -5,4 +5,28 @@ description: Dynamic Interactions Options Store
 
 # Dynamic Interactions Options Store
 
-The Options Store is generated from data or manually created and updated.
+The Options Store is generated from data or manually created and updated. Follow the process in [parameters](/docs/configuration/dynamic/parameters) to configure the options store. This store will be updated during the background process cycle. The options are generated from a feature store or data set that contains the appropriate date for your use-case.
+
+Here's an example document from an options collection:
+```json
+{
+    "contextual_variable_two": "",
+    "beta_zero": 1,
+    "date_updated": "2024-06-11T08:30:39.000450Z",
+    "epsilon_nominated": 1,
+    "date_created": "2024-06-11T08:30:39.000450Z",
+    "contextual_variable_one": "",
+    "uuid": "2a4c537a-6e76-4383-aa4d-d7644e62fcfe",
+    "weighting": 1,
+    "alpha_zero": 1,
+    "propensity": 0.218988,
+    "optionKey": "Enthusiastic",
+    "date_time": "2024-08-09T01:23:19.000862Z",
+    "alpha": 0.218988,
+    "id": "spend_personality_dynamic",
+    "beta": 0.781012,
+    "arm_reward": 0.00218988,
+    "option": "Recommended offer is Enthusiastic",
+    "customer": "none"
+}
+```

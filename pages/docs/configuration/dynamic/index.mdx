@@ -5,7 +5,10 @@ description: Dynamic Interactions.
 
 # Intro
 
-Dynamic Interactions are used to implement a class of prediction problem where the rate of change is moderate to high and model convergence is required in very short intervals.
+Dynamic Interactions are used to implement a class of prediction problems where the rate of change is moderate to high and model convergence is required in very short intervals without training. The dynamic interaction capability can be used for a number of use-cases include recommendations, offers, banners, nudges. Models are trained when data drift and model drift are slowly changing. But, when you dealing with cases that require faster and in some cases near real-time convergence of scores, then classical batch or off-line models are not realy suited.
+
+This section will explain some of the key criteria to consider when deciding on using a dynamic interaction. To implement a [dynamic recommender](/docs/user_guides/dynamic) will require a number of steps. You would need a [project](/docs/configuration/project), [dynamic config](/docs/configuration/dynamic), [deployment](/docs/configuration/deployment) and [api configuration](/docs/configuration/api) to test your recommender.
+
 
 ## Key Features
 

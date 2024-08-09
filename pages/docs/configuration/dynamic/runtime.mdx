@@ -1,0 +1,24 @@
+---
+title: Dynamic Interactions Runtime Settings
+description: Dynamic Interactions Runtime Settings
+---
+
+# Runtime Settings
+
+There are a number of settings that relate to dynamic interactions. Certain algorithms will build models in real-time for example the Bayesian Probabilistic algorithm will train models in real-time if the customer level tracking is turned on.
+
+<Callout type="warning" title="Real-time Models">
+    Bayesian Probabilistic algorithm will train models in real-time if the customer level tracking is turned on.
+</Callout>
+
+## Processing Interval
+All algorithms have a background process that train models and update the options store. This process is controlled by an environmental variable:
+```text
+MONITORING_DELAY=120
+```
+The internal default is 240 seconds if the variable is not set. If you have multiple instances of a use-case running, only set the variable for one instance and disable for all others by setting the time to a very large number.
+
+## Considerations
+The background process will interrogate the priors as recorded in the runtime logs and responses. This means that the settings for time window and historical count can have a big impact on your processing time and cost. If you dynamic interactions are slow and infrequent then the settings will not be as impactful as a high-volume engagement environment.
+
+![image](/images/configuration/dynamic/dynamic-05.png)

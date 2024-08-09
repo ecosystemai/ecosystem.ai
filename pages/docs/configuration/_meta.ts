@@ -5,6 +5,7 @@ export default {
   predictors: 'Predictors',
   dynamic: 'Dynamic',
   experiments: 'Experiments',
+  api: 'APIs',
   deployment: 'Deployments',
   generative: 'Generative',
   logging: 'Logging',

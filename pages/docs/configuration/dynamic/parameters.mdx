@@ -5,5 +5,55 @@ description: Dynamic Parameters
 
 # Parameters
 
-Dynamic Interactions are used to implement a class of prediction problem where the rate of change is moderate to high and model convergence is required in very short intervals.
+Dynamic Interactions are used to implement a class of prediction problem where the rate of change is moderate to high and model convergence is required in very short intervals. Each algorithm has it's own approach and set of conditions under which it will operate.
 
+## Settings
+Name your dynamic model using the same name as the project deployment step. When you change the name it will create a copy of the configuration. The Feature Store Database with Feature Store Collection/Table is used to generate the options store (use Generate option in VARIABLE tab). The option store is used by the client pulse responder to update values in real-time.
+
+![image](/images/configuration/dynamic/dynamic-01-settings.png)
+
+Note that dynamic configurations are stored in ecosystem_meta.dynamic_engagement. The generated properties will be updated when project is pushed.
+
+## Engagement
+This is where you select the algorithm that is best for your use case.
+
+![image](/images/configuration/dynamic/dynamic-02-engagement.png)
+
+### Algorithms
+
+#### Epsilon Greedy
+Epsilon-Greedy is an algorithmic technique that strikes a balance between exploring new possibilities and exploiting known advantages by introducing a random element into the decision-making process. In this approach, a fixed probability of "epsilon" (0 < epsilon < 1) is used to randomly choose either the best-known option (exploitation) or a randomly selected alternative (exploration). With a high value of epsilon, exploration dominates and new possibilities are more frequently evaluated; conversely, with a low value, exploitation takes over and proven choices are favored. This hybrid strategy allows Epsilon-Greedy to adaptively explore the solution space while still leveraging existing knowledge, facilitating efficient learning and optimization in complex environments.
+
+#### Bayesian Probabilistic
+The Bayesian Probabilistic and Naive Bayes techniques for constructing classifiers: models that assign class labels to problem instances, represented as vectors of feature values, where the class labels are drawn from some finite set. This algorithm is integrated into the ecosystem.Ai Client Pulse Responder as it uses scoring history and update values (as defined in project deployment) and train models in real-time.
+
+#### Ecosystem Rewards Algorithm
+The Ecosystem Rewards Algorithm is a decision-making framework that harnesses the power of Thompson sampling, a probabilistic method, to balance exploration and exploitation in complex environments. By incorporating uncertainty into its decision-making process, this algorithm allows for optimal trade-offs between trying new options (exploration) and leveraging proven successes (exploitation), thereby maximizing cumulative rewards obtained by performing an action. The algorithm's unique approach takes into account not only immediate benefits but also the long-term impact on the ecosystem, enabling it to adapt and learn from its experiences in a dynamic environment, ultimately leading to improved performance and outcomes.
+
+#### Q-learning
+Q-learning is a powerful, model-free reinforcement learning algorithm that enables agents to learn the value of taking a specific action in a given state, thereby optimizing their behavior in complex environments. This approach doesn't rely on a pre-built model of the environment, which makes it particularly useful for solving problems with unpredictable transitions and rewards. By iteratively updating an estimate (Q-value) of the expected reward that can be obtained by performing a particular action in a specific state, Q-learning allows agents to learn from their experiences without requiring prior knowledge or adaptations for handling stochastic elements. This simplicity and robustness make Q-learning a widely-used and versatile technique for solving reinforcement learning problems.
+
+#### Human Behavioral Algorithm
+Human behavioral algorithms are computational frameworks that study and replicate human behavior through data-driven approaches, incorporating insights from psychology, sociology, and neuroscience. These models analyze past behaviors, cognitive processes, and social interactions to predict or simulate individual actions, often leveraging machine learning techniques. A key concept in this field is Loss Aversion, which suggests that people tend to be more motivated by avoiding losses than acquiring equivalent gains - a phenomenon where individuals are more willing to take risks to prevent losing something than they are to gain the same amount. This cognitive bias has significant implications for decision-making and risk assessment in various contexts, from finance to healthcare.
+
+#### Network Analysis
+Network analysis algorithms are computational tools used to uncover insights from complex networks or graphs by identifying patterns, relationships, and structures within them. These algorithms enable the measurement of key properties such as centrality (i.e., importance or influence), clustering (i.e., how densely connected a group is), and connectivity (i.e., the overall interconnectedness of the network). Techniques include shortest path algorithms that find the most efficient paths between nodes, community detection algorithms that identify groups of highly connected nodes, and ranking algorithms like PageRank that determine the relative importance or popularity of each node. By applying these methods, network analysis can reveal hidden dynamics, predict behavior, and inform decision-making in various domains, from social networks to transportation systems.
+
+
+## Variables
+There are a number of options when configuring variables. An offer/message/nudge/option/etc is needed from the feature store as configured in ```Settings```. If customer level tracking and model convergence is required then use ```params.value``` as it contains the customer number in the contact logs.
+
+![image](/images/configuration/dynamic/dynamic-03-variables.png)
+
+Use the ```Generate``` button to generate a new options store from the settings. Ensure that the initial feature store contains a fairly complete list of items for cold-start to be effective. Example data set: customer (Tracking Key), product (Offer Key), category (Variable One), category (Variable Two). Defaults are extracted from defined Feature Store and the Options Store will be generated.
+
+Use ```Update``` capability if you have an existing options store that needs updating. It will not re-generate the options store, but only add or update the options that are out of date. All scores will be retained and defaults will be used for added options only.
+
+## Options
+Note that the Options table will change depending on the algorithm.
+
+This is the option store display for Bayesian Probabilistic Approach:
+![image](/images/configuration/dynamic/dynamic-04-options-nb.png)
+
+This is the option store display for Ecosystem Rewards Approach:
+![image](/images/configuration/dynamic/dynamic-04-options-reward.png)
