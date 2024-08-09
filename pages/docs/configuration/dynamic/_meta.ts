@@ -7,4 +7,4 @@ export default {
   ecosystemrewards: 'Ecosystem Rewards',
   baysianprobabilistic: 'Bayesian Probabilistic',
   qlearning: 'Q-Learning'
-}
+};

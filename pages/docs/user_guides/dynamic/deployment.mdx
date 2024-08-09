@@ -3,60 +3,60 @@ title: Deployment
 description: Deployment is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
 ---
 
-# Introduction 
+# Introduction
 The Deployment section of the Workbench is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
 
-Now that you have uploaded, ingested and viewed your data, and configured your dynamic recommender, you will need to put it into production. Deployment is where you will set your dynamic recommender to be used in the Production, Quality Assurance or Test environment. 
+Now that you have uploaded, ingested and viewed your data, and configured your dynamic recommender, you will need to put it into production. Deployment is where you will set your dynamic recommender to be used in the Production, Quality Assurance or Test environment.
 
-In the <u>Deployment</u> section of the Workbench, you will find <u>Projects</u>. 
+In the <u>Deployment</u> section of the Workbench, you will find <u>Projects</u>.
 
-This is where you will be able to configure the parameters of your deployment, and push it to the desired environment. 
-<Callout type="warning" title="Default settings are good!"> 
+This is where you will be able to configure the parameters of your deployment, and push it to the desired environment.
+<Callout type="warning" title="Default settings are good!">
 Most of the settings in this step can be left at their default values.
 </Callout>
 
-Find your project in the list of projects and click on it to view or create the deployments for it. 
+Find your project in the list of projects and click on it to view or create the deployments for it.
 
 ![deployments list](/images/recommender/6_Deployment/0_deployments.png)
 
 ## Add Deployment
-To view and edit a pre-existing deployment configuration, click on the deployment name. In order to create a new deployment, select **+ Add Deployment**. 
+To view and edit a pre-existing deployment configuration, click on the deployment name. In order to create a new deployment, select **+ Add Deployment**.
 
 ![Add deployment](/images/recommender/6_Deployment/1_deployments_add.png)
 A window will open up below where you can specify the details of your new deployment.
 
 ## Configure Deployment
-Set the case configuration for your dynamic recommender deployment. 
+Set the case configuration for your dynamic recommender deployment.
 
 ![Configure deployment](/images/recommender/6_Deployment/2_deployments_details.png)
 
 Create a unique *Prediction Case ID* name. Add a *Description* that is relevant to the specific deployment you are configuring. Add the *Type* and the *Purpose* of your deployment. You can leave the *Type* and *Purpose* blank if you are unsure of what to put there.
 
-Input the properties details and set the *Version* of the deployment step. 
+Input the properties details and set the *Version* of the deployment step.
 
 This *Version* number should be updated every time you make changes to the deployment. Specify the *Environment Status* in which you will be deploying your configuration. Then input the *Performance Expectation* and *Complexity* settings for your set up. **Update** your deployment before proceeding to selecting and filling in the details in the settings dropdowns.
 
 ## Deployment Settings
-Selecting any of the checkboxes on the right, will reveal the <u>Settings</u> sections relevant to that option, at the bottom of the page. 
+Selecting any of the checkboxes on the right, will reveal the <u>Settings</u> sections relevant to that option, at the bottom of the page.
 
 ![Deployment settings dropdowns](/images/recommender/6_Deployment/3_deployments_settings.png)
 
 ### Plugins
-Select *Plugins* to use the pre-defined scoring class in your experiment. 
+Select *Plugins* to use the pre-defined scoring class in your experiment.
 
 Use the dropdown to *Select a Predefined Post-score Class* and choose PlatformDynamicEngagement. You will see that this selection will populate the pre-score and post-score class windows.
 
 ### New Knowledge (explore/exploit)
-Select *New Knowledge (explore/exploit)* to assign the UUID you generated in <u>Dynamic Experiments</u>. 
+Select *New Knowledge (explore/exploit)* to assign the UUID you generated in <u>Dynamic Experiments</u>.
 
 In the *Dynamic Pulse Responder Reference* section, set the UUID of the configuration that you are going to push into production.
 
-Click on the UUID in the field and click out again to validate the dynamic parameter. 
+Click on the UUID in the field and click out again to validate the dynamic parameter.
 
 You don't need to worry about the rest of the fields, but it is suggested that you set the epsilon to 0 for most dynamic recommender setups.
 
 ## Prediction Activators
-There are a range of different Prediction Activators that can be selected to enhance the functionality of your deployments. 
+There are a range of different Prediction Activators that can be selected to enhance the functionality of your deployments.
 <Callout type="note" title="Prediction Activators further documentation">
 Detailed documentation coming soon
 </Callout>
@@ -67,11 +67,11 @@ Detailed documentation coming soon
     - supports three primary areas: API definition, pre-score logic and post-score logic. There are a number of post-score templates.
 ### Budget Tracker
     - track offers and other items used through the scoring engine, and alter the behavior of the scoring system. Must include the post-score template for this option to work.
-### Whitelist 
+### Whitelist
     - allows you to test certain options with customers. The results will be obtained from a lookup table. Must include the post-score template for this option to work.
-### New knowledge 
+### New knowledge
     - allows you to add exploration to your recommender. This will happen by specifying the epsilon parameter. Epsilon% (eg. 0.3 = 30%) of the interactions will be selected at random, while the remaining ones will be selected using the model.
-### Pattern selector 
+### Pattern selector
     - allows different patterns when when options are presented, through the scoring engine result.
 
 ## Push Configuration
