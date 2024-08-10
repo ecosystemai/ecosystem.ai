@@ -5,15 +5,13 @@ description: Q-Learning
 
 # Q-Learning
 
-The Q-Learning algorithm
+The Q-learning algorithm uses the Q-learning reinforcement learning framework with actions being presenting offers to clients and states being whether the client accepted the offer. The algorithm works at a customer level, scoring is done per customer. Segment level implementations are planned for future releases.
 
 ## Algorithm
 
-The Ecosystem Rewards algorithm stores and updates a beta distribution for each offer in each segment in the system. When offers need to be scored for an entity in a given segment, the beta distributions for the offers in the segment are sampled and the samples are used as the scores for the offers. Segements can be specified using up to two discrete contextual variables or segmentation can be done at the entity level - i.e. each entity has it's own beta distribution for for each offer.
+The Q-learning algorithm represents offers as the set of actions $A$ and the states $S$ represent take up of an offer. The algorithm then uses a Q-table to score and rank offers using the Q value as this expresses the expected utility of the offer.
 
-The beta distributions are specified using an alpha and beta parameter. When an offer is presented and accetped then the alpha parameter for the relevant distribution is incremented. When and offer is presented and not accepted then the beta parameter for the relevant distribution is incremented. The size of the increment in each case is a parameter that can be set when configurating the algorithm. The historical data used for this updating of alpha and beta can be windowed by either time and or the number of events for each offer in a specific segment. It is stongly recommended that a window approach be configured, both for performance reasons and to prevent historical data from overwhelming changes in the current state of the system.
-
-By default the algorith will assume initial values of one for both alpha and beta for all of the distributions. This corresponds to a uniform distribution, which is a reasonable assumption when no data is available. However, it is possible to specify different initial values for alpha and beta for each offer in each segment. This can be useful when there is some prior knowledge about the performance of the offers in the system.
+The Q-table is updated using a policy function, which calculates the next action, and a reward function, which calculates the reward for a given action.
 
 ## Parameters
 
