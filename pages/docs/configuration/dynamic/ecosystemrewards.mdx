@@ -26,3 +26,67 @@ By default the algorith will assume initial values of one for both alpha and bet
 - **Prior Success Reward**: The size of the increment to the alpha parameter of the beta distributions used in the Thompson Sampling when an interaction is successful in the historical data. Used when historical data is used to train the algorithm before deployment.
 - **Prior Fail Reward**: The size of the increment to the beta parameter of the beta distributions used in the Thompson Sampling when an interaction is not successful in the historical data. Used when historical data is used to train the algorithm before deployment.
 - **Test options across segments**: If there are options that are configured to only be available for specific values of the contextual variables, electing to test options across segments will occasionally predict those options for contextual variable values where they are not available.
+
+## Example
+
+Below is an example configuration of the Ecosystem Rewards algorithm in python
+
+```python
+from prediction.apis import deployment_management as dm
+from prediction.apis import ecosystem_generation_engine as ge
+from prediction.apis import data_management_engine as dme
+from prediction.apis import online_learning_management as ol
+from prediction.apis import prediction_engine as pe
+from prediction.apis import worker_file_service as fs
+from prediction import jwt_access
+
+auth = jwt_access.Authenticate("http://localhost:3001/api", ecosystem_username, ecosystem_password)
+
+deployment_id = "demo-deployment"
+
+online_learning_uuid = ol.create_online_learning(
+        auth,
+        algorithm="ecosystem_rewards",
+        name=deployment_id,
+        description="Demo deployment for illustrating python configuration",
+        feature_store_collection="set_up_features",
+        feature_store_database="my_mongo_database",
+        options_store_database="my_mongo_database",
+        options_store_collection="demo-deployment_options",
+        randomisation_success_reward=0.5,
+        randomisation_fail_reward=0.05,
+        randomisation_processing_count=200,
+        randomisation_processing_window=604800000,
+        contextual_variables_offer_key="offer",
+        contextual_variables_contextual_variable_one_name="customer_segment",
+        contextual_variables_contextual_variable_one_from_data_source = True,
+        contextual_variables_contextual_variable_one_lookup = "customer_segment",
+        create_options_index=True,
+        create_covering_index=True
+)
+
+online_learning = dm.define_deployment_multi_armed_bandit(epsilon=0, dynamic_interaction_uuid=online_learning_uuid)
+
+parameter_access = dm.define_deployment_parameter_access(
+    auth,
+    lookup_key="customer_id",
+    lookup_type="string",
+    database="my_mongo_database",
+    table_collection="customer_feature_store",
+    datasource="mongodb"
+)
+
+deployment_step = dm.create_deployment(
+    auth,
+    project_id="demo-project",
+    deployment_id=deployment_id,
+    description="Demo project for illustrating python configuration",
+    version="001",
+    plugin_post_score_class="PlatformDynamicEngagement.java",
+    plugin_pre_score_class="PreScoreDynamic.java",
+    scoring_engine_path_dev="http://localhost:8091",
+    mongo_connect=f"mongodb://{mongo_user}:{mongo_password}@localhost:54445/?authSource=admin",
+    parameter_access=parameter_access,
+    multi_armed_bandit=online_learning
+)
+```
