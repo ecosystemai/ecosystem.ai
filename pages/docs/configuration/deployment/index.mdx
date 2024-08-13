@@ -5,11 +5,26 @@ description: Deployment Options
 
 # Deployment
 
-This section provides detailed configuration guides to help you set up various deployment options for ecosystem.Ai.
+This section provides detailed configuration guides to help you set up various deployment options for ecosystem.Ai. The AI/ML predictor deployment process (could have multiple models) is a comprehensive method that includes - data analysis, engineering features, creating algorithms, and model training and testing. This is followed by validation to ensure alignment with business goals. Depending on the target environment, the model may need conversion before proceeding with setting up the AI model serving architecture, which could be based either in the cloud or on-premise. Once the infrastructure is ready, models are deployed to start generating predictions.
+
+The model is integrated within business systems, technology processes and then continuously monitored for performance. The deployment process is streamlined and automated through MLOps, ensuring efficiency and reliability throughout the AI model lifecycle, from development to management in production.
 
 ## Architecture
 
+The "permanently in production" concept encapsulates a perpetually live state of ecosystem.Ai model serving runtime environments, functioning in seamless integration with the production environment to ensure unhindered operational dynamics. While in production certain parameters can be updated in a live environment, ensuring that the system is always up-to-date and ready to serve. This is achieved through the push functionality, which allows for the deployment of configurations in a non-disruptive manner, ensuring a constantly up-to-date production setup.
+
+This allows for undisturbed model serving, inclusive of data access, logging, and additional variable functionalities. This architecture enables constant system readiness, ensures immediate incorporation of updates, optimizes performance, and minimizes system latency or downtime. It results in an agile, resilient, and high-availability production environment that enhances overall operational efficiency.
+
+The architecture is designed for horizontal scalability, meaning it can manage an increase in workload by simply adding more machines or nodes in the system, enhancing its capacity and performance. Equally important is its compatibility with any load balancer. A load balancer helps distribute network or application traffic across a number of servers to increase efficiency and reliability.
+
 ## Deployment Stacks
+
+In order to ensure the ecosystem.Ai platform is fully operational, it is essential to have a well-defined deployment stack. The deployment stack is a set of tools and technologies that are used to deploy and manage the ecosystem.Ai platform. The stack includes the following components:
+- **Data Ingestion**: The process of importing data from various sources into the ecosystem.Ai platform. Feature engineering processes are applied to the data to extract relevant features for modeling. Options Stores are generated from the Feature Store Database.
+- **Model Training**: The process of building and training machine learning models using the ecosystem.Ai platform or any pipeline process that is integrated with the platform. There are differences across cloud providers and on-premise deployments.
+- **Dynamic Configuration**: The process of configuring dynamic models to adapt to changing conditions in real-time. This includes setting up algorithms, options, and variables for dynamic interactions.
+- **Model Deployment**: The process of deploying machine learning models into production environments. This includes setting up the deployment configuration, plugins, and prediction activators.
+- **Model Monitoring**: The process of monitoring the performance of deployed models to ensure they are functioning as expected. This includes setting up dashboards and alerts to track model performance.
 
 ## Setup and Parameters
 
