@@ -6,15 +6,16 @@ description: Dynamic Interactions Process
 ## Dynamic Interactions Process
 
 The internal process functions as follows for real-time inference:
-- **Invocations API is called**: When api is called, the engine will have the configuration loaded from startup. On first load certain actions are performed to prepare environment. Housekeeping actions are also performed like [creating indexes](/docs/configuration/dynamic/process#indexes).
-- **Perform standard options**: All sequence based options that were set in the project deployment will execute for example data lookups, corpora loading.
-- **Call Pre-Score Plugin**: Pre-score plugin is called to perform any data or eligibility actions. The ```params``` JSON Object is carried throughout entire execution process and values can be added for later use.
-- **Determine algorithm**: Each algorithm has a difference treatment process that depends on the type of data needed.
-- **Generate score**: Score is generated based on input parameters or training features. Scores are added to ```params```.
-- **Call Post-Score Plugin**: Post-score plugin is called to perform any data or eligibility actions and access to ```params``` allow for full control over all actions.
-- **Logging**: Extensive logging of scores and related items, also logging/ecosystemruntime_history is populated by algorithms that do in-line and cyclical updates. This collection can be used to understand changing scores at a fine-grained leval.
-- **Payload**: Generate payload to return via API.
+- **Invocations [API](/docs/runtime/access) is called**: When api is called, the engine will have the configuration loaded from startup. On first load certain actions are performed to prepare environment. Housekeeping actions are also performed like [creating indexes](/docs/configuration/dynamic/process#indexes).
+- **Setup [standard configuration options](/docs/runtime/configuration)**: All sequence based options that were set in the project deployment will execute for example data lookups, corpora loading.
+- **Call [Pre-Predict Plugin](/docs/runtime/plugins/prepredict)**: Pre-score plugin is called to perform any data or eligibility actions. The ```params``` JSON Object is carried throughout entire execution process and values can be added for later use.
+- **Determine [algorithm](/docs/configuration/dynamic/parameters)**: Each algorithm has a difference treatment process that depends on the type of data needed.
+- **Generate score via [API](/docs/configuration/api)**: Score is generated based on input parameters or training features. Scores are added to ```params```.
+- **Call [Post-Predict Plugin](/docs/runtime/plugins/postpredict)**: Post-score plugin is called to perform any data or eligibility actions and access to ```params``` allow for full control over all actions.
+- **[Logging](/docs/runtime/logging)**: Extensive logging of scores and related items, also logging/ecosystemruntime_history is populated by algorithms that do in-line and cyclical updates. This collection can be used to understand changing scores at a fine-grained leval.
+- **[Payload](/docs/runtime/apiconfiguration/productmaster)**: Generate payload to return via API.
 
+Use pre- and post-predict logic [plugins](/docs/runtime/plugins) to extend your use of the overall capability in the platform.
 
 ## Dynamic Background Process
 
