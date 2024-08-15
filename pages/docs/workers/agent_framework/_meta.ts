@@ -1,5 +1,5 @@
 export default {
-  index: 'Get Started',
+  index: 'Agent Management',
   contributing: {
     // "title": "Contributing",
     type: 'separator',
