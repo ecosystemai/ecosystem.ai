@@ -64,13 +64,13 @@ importers:
         version: 0.6.2
       '@vercel/speed-insights':
         specifier: ^1.0.10
-        version: 1.0.10(next@14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.16)(vue@3.4.27(typescript@5.4.5))
+        version: 1.0.10(next@14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)(vue@3.4.27(typescript@5.4.5))
       '@vidstack/react':
         specifier: ^0.6.14
         version: 0.6.15(@types/react@18.3.1)(maverick.js@0.37.0)(react@18.3.1)(vidstack@0.6.15)
       ai:
         specifier: ^3.1.5
-        version: 3.1.5(react@18.3.1)(solid-js@1.8.17)(svelte@4.2.16)(vue@3.4.27(typescript@5.4.5))(zod@3.23.8)
+        version: 3.1.5(react@18.3.1)(solid-js@1.8.17)(svelte@4.2.19)(vue@3.4.27(typescript@5.4.5))(zod@3.23.8)
       ajv:
         specifier: ^8.12.0
         version: 8.13.0
@@ -4912,8 +4912,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svelte@4.2.16:
-    resolution: {integrity: sha512-mQwHpqHD2PmFcCyHaZ7XiTqposaLvJ75WpYcyY5/ce3qxbYtwQpZ+M7ZKP+2CG5U6kfnBZBpPLyofhlE6ROrnQ==}
+  svelte@4.2.19:
+    resolution: {integrity: sha512-IY1rnGr6izd10B0A8LqsBfmlT5OILVuZ7XsI0vdGPEvuonFV7NYEUK4dAkm9Zg2q0Um92kYjTpS1CAP3Nh/KWw==}
     engines: {node: '>=16'}
 
   swr-store@0.10.6:
@@ -6775,11 +6775,11 @@ snapshots:
       satori: 0.10.9
       yoga-wasm-web: 0.3.3
 
-  '@vercel/speed-insights@1.0.10(next@14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.16)(vue@3.4.27(typescript@5.4.5))':
+  '@vercel/speed-insights@1.0.10(next@14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)(vue@3.4.27(typescript@5.4.5))':
     optionalDependencies:
       next: 14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
-      svelte: 4.2.16
+      svelte: 4.2.19
       vue: 3.4.27(typescript@5.4.5)
 
   '@vidstack/react@0.6.15(@types/react@18.3.1)(maverick.js@0.37.0)(react@18.3.1)(vidstack@0.6.15)':
@@ -6938,7 +6938,7 @@ snapshots:
 
   acorn@8.11.3: {}
 
-  ai@3.1.5(react@18.3.1)(solid-js@1.8.17)(svelte@4.2.16)(vue@3.4.27(typescript@5.4.5))(zod@3.23.8):
+  ai@3.1.5(react@18.3.1)(solid-js@1.8.17)(svelte@4.2.19)(vue@3.4.27(typescript@5.4.5))(zod@3.23.8):
     dependencies:
       '@ai-sdk/provider': 0.0.3
       '@ai-sdk/provider-utils': 0.0.6(zod@3.23.8)
@@ -6948,7 +6948,7 @@ snapshots:
       nanoid: 3.3.6
       secure-json-parse: 2.7.0
       solid-swr-store: 0.10.7(solid-js@1.8.17)(swr-store@0.10.6)
-      sswr: 2.0.0(svelte@4.2.16)
+      sswr: 2.0.0(svelte@4.2.19)
       swr: 2.2.0(react@18.3.1)
       swr-store: 0.10.6
       swrv: 1.0.4(vue@3.4.27(typescript@5.4.5))
@@ -6956,7 +6956,7 @@ snapshots:
     optionalDependencies:
       react: 18.3.1
       solid-js: 1.8.17
-      svelte: 4.2.16
+      svelte: 4.2.19
       vue: 3.4.27(typescript@5.4.5)
       zod: 3.23.8
 
@@ -10855,9 +10855,9 @@ snapshots:
 
   sprintf-js@1.0.3: {}
 
-  sswr@2.0.0(svelte@4.2.16):
+  sswr@2.0.0(svelte@4.2.19):
     dependencies:
-      svelte: 4.2.16
+      svelte: 4.2.19
       swrev: 4.0.0
 
   streamsearch@1.1.0: {}
@@ -11016,7 +11016,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte@4.2.16:
+  svelte@4.2.19:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.4.15
