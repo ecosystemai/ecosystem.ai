@@ -58,6 +58,20 @@ git pull
 ## Step 3. Run the App
 
 1. **Navigate to the Project Directory**
+ - ARM64
+ ```bash
+ cd ecosystem/docker-arm
+```
+
+ - x86
+ ```bash
+ cd ecosystem/docker-x86
+```
+
+ - Windows
+ ```bash
+ cd ecosystem\docker-windows
+```
 
 2. **Create and Configure .env File**:
  - Copy the contents of `ecosystem_env.txt` to a new file named `.env`.
@@ -83,19 +97,16 @@ INITIAL_PASSWORD=
 Find your correct install folder. Run the following command from within the install directory:
  - ARM64
  ```bash
- cd ecosystem/docker-arm
  ./start.sh
 ```
 
  - x86
  ```bash
- cd ecosystem/docker-x86
  ./start_x86.sh
 ```
 
  - Windows
  ```bash
- cd ecosystem\docker-windows
  start.bat
 ```
 
