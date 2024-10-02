@@ -63,6 +63,11 @@ git pull
  - Copy the contents of `ecosystem_env.txt` to a new file named `.env`.
  - Fill in any necessary values.
 
+<Callout type="tip" title="Note">
+    - The .env file is hidden on unix as it starts with a ".". On Mac use Shift CMD . to list hidden files.
+    - Ensure that there are enough resources assigned to Docker. Use ```ulimit -a``` to check the limits. Assign 128000 to "file descriptors".
+</Callout>
+
 **Add your keys** for **OPENAI_API_KEY** and **ECOSYSTEM_API_KEY**.
 ```
 DATA_PATH=./data
