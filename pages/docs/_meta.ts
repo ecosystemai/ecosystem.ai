@@ -15,6 +15,7 @@ export default {
     type: 'separator',
   },
   modules: 'Modules',
+  frontend: 'UI Frameworks',
   contributing1: {
     type: 'separator',
   },
