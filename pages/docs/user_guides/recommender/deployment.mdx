@@ -3,59 +3,59 @@ title: Deployment
 description: Deployment is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
 ---
 
-# Put your predictions into production 
+# Put your predictions into production
 The Deployment section of the Workbench is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
 
-Now that you have uploaded, ingested and viewed your data, built a feature store and generated and trained models, you will need to put your recommender into production. The deployment is where you will set your recommender to be used in the Production, Quality Assurance or Test environment. 
-<Callout type="warning" title="Default settings are good!"> 
+Now that you have uploaded, ingested and viewed your data, built a feature store and generated and trained models, you will need to put your recommender into production. The deployment is where you will set your recommender to be used in the Production, Quality Assurance or Test environment.
+<Callout type="warning" title="Default settings are good!">
 Most of the settings in this step can be left at their default values.
 </Callout>
 
 ## View Deployments
-In the <u>Deployment</u> section of the Workbench, you will find <u>Projects</u>. 
+In the <u>Deployment</u> section of the Workbench, you will find <u>Projects</u>.
 
-This is where you will be able to configure the parameters of your deployment, and push it to the desired environment. 
-Find your project in the list of projects and click on it to view or create the deployments for it. 
+This is where you will be able to configure the parameters of your deployment, and push it to the desired environment.
+Find your project in the list of projects and click on it to view or create the deployments for it.
 
 ![deployments list](/images/recommender/6_Deployment/0_deployments.png)
 
 ## Add Deployment
-To view and edit a pre-existing deployment configuration, click on the deployment name. In order to create a new deployment, select **+ Add Deployment**. 
+To view and edit a pre-existing deployment configuration, click on the deployment name. In order to create a new deployment, select **+ Add Deployment**.
 A window will open up below where you can specify the details of your new deployment.
 
 ![Add deployment](/images/recommender/6_Deployment/1_deployments_add.png)
 
 ## Configure Deployment
-Set the case configuration for your recommender deployment. 
-- Create a unique *Prediction Case ID* name. 
-- Add a *Description* that is relevant to the specific deployment you are configuring. 
+Set the case configuration for your recommender deployment.
+- Create a unique *Prediction Case ID* name.
+- Add a *Description* that is relevant to the specific deployment you are configuring.
 - Add the *Type* and the *Purpose* of your deployment. You can leave the *Type* and *Purpose* blank if you are unsure of what to put there.
-- Input the properties details and set the *Version* of the deployment step. This *Version* number should be updated every time you make changes to the deployment. 
-- Specify the *Environment Status* in which you will be deploying your configuration. 
+- Input the properties details and set the *Version* of the deployment step. This *Version* number should be updated every time you make changes to the deployment.
+- Specify the *Environment Status* in which you will be deploying your configuration.
 - Then input the *Performance Expectation* and *Complexity* settings for your set up.
 
 ![Configure deployment](/images/recommender/6_Deployment/2_deployments_details.png)
 
 ## Deployment Settings
-Selecting any of the checkboxes on the right, will reveal the <u>Settings</u> sections relevant to that option, at the bottom of the page. 
+Selecting any of the checkboxes on the right, will reveal the <u>Settings</u> sections relevant to that option, at the bottom of the page.
 
 ![Deployment settings dropdowns](/images/recommender/6_Deployment/3_deployments_settings.png)
 
 ### Prediction Model
-Select *Prediction Model* and specify the model that you want to use in your recommender. 
+Select *Prediction Model* and specify the model that you want to use in your recommender.
 Enter the names of the models that you have generated, trained and saved in <u>Predictions</u> for deployment.
 
 ![Prediction model](/images/recommender/6_Deployment/4_deployments_prediction_model.png)
 
 ### Parameters from Data Source
-Select *Parameters from Data Source* to access a database. 
-This is for when you want to get data for making predictions from a database that is accessible to your production environment. The alternative to this, is passing the data through the API. 
+Select *Parameters from Data Source* to access a database.
+This is for when you want to get data for making predictions from a database that is accessible to your production environment. The alternative to this, is passing the data through the API.
 Data uploaded to the platform and ingested, will be available to the recommender in production.
 
 ![Parameters from data source](/images/recommender/6_Deployment/5_deployments_parameters.png)
 
 ## Serving Engine Settings
-There are a range of different Serving Engine Settings that can be selected to enhance the functionality of your deployments. 
+There are a range of different Serving Engine Settings that can be selected to enhance the functionality of your deployments.
 <Callout type="note" title="Prediction Activators further documentation">
 Detailed documentation coming soon
 </Callout>
@@ -68,12 +68,12 @@ Loaded in memory and accessed in the plugins. For the purpose of default pricing
 Supports three primary areas: API definition, pre-score logic and post-score logic. There are a number of post-score templates.
 ### Budget Tracker
 Track offers and other items used through the scoring engine, and alter the behavior of the scoring system. Must include the post-score template for this option to work.
-### Whitelist 
+### Whitelist
 Allows you to test certain options with customers. The results will be obtained from a lookup table. Must include the post-score template for this option to work.
-### New knowledge 
+### New knowledge
 Allows you to add exploration to your recommender. This will happen by specifying the epsilon parameter. Epsilon% (eg. 0.3 = 30%) of the interactions will be selected at random, while the remaining ones will be selected using the model.
-### Pattern selector 
-Allows different patterns when when options are presented, through the scoring engine result.
+### Pattern selector
+Allows different patterns when options are presented, through the scoring engine result.
 
 ## Push Configuration
 Remember to **Update**!
@@ -82,6 +82,6 @@ The **Generate** and **Build** buttons are not needed for now, they are designed
 
 ![Push configuration](/images/recommender/6_Deployment/7_deployments_push.png)
 
-<Callout style="banner" title=""> 
+<Callout style="banner" title="">
 Your predictions are now ready to be used in your desired environment, we suggest you test your APIs in the Workbench before going live!
 </Callout>
