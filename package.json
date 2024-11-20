@@ -58,7 +58,7 @@
     "next-auth": "^4.24.7",
     "next-sitemap": "^4.2.3",
     "nextra": "3.0.0-alpha.22",
-    "nextra-theme-docs": "3.0.0-alpha.22",
+    "nextra-theme-docs": "3.2.4",
     "openai-edge": "^1.2.2",
     "postcss": "^8.4.38",
     "posthog-js": "^1.131.4",
