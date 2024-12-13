@@ -10,4 +10,5 @@ export default {
   environment_variables: "Environment Variables",
   access: 'API Access',
   logging: 'Logging & Reporting',
+  troubleshooting: 'Troubleshooting',
 }

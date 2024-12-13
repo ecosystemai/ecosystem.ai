@@ -9,4 +9,5 @@ export default {
   deployment: 'Deployments',
   generative: 'Generative',
   logging: 'Logging',
+  pythonpackage: 'Python Package'
 }
