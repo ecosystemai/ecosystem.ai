@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 # Access the API
 
-You can access tour deployed runtime API at the runtime URL. The API is a RESTful API that accepts POST requests. The API is secured with an API key that you will need to include in the header of your request.
+You can access tour deployed runtime API at the runtime URL. The API is a RESTfull API that accepts POST requests. The API is secured with an API key that you will need to include in the header of your request.
 
 ```bash
 curl -X POST https://api.ecosystem.ai/invocations \
@@ -41,6 +41,466 @@ Here is another example payload with a in_param set that can later be used in th
     }
 }
 ```
+
+Modules have different endpoints and payloads. The following is an example of the Spend Personality API in [OpenAPI 3.0](https://swagger.io/specification/) standard.
+
+This is the standard return for the Spend Personality API:
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Spend Personality API
+  description: API that obtains spending personality insights and pushes responses once customer values are returned.
+  version: "1.0.0"
+servers:
+  - url: https://bankruntime2.ecosystem.ai
+paths:
+  /invocations:
+    post:
+      summary: Obtain Spend personality
+      operationId: getSpendPersonality
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                campaign:
+                  type: string
+                  description: Campaign identifier
+                  default: spend_personality
+                subcampaign:
+                  type: string
+                  description: Subcampaign identifier
+                  default: spend_personality
+                channel:
+                  type: string
+                  description: Customer interaction channel
+                  default: copilot
+                customer:
+                  type: string
+                  description: Customer identifier
+                  default: 590
+                numberoffers:
+                  type: string
+                  description: Number of offers to display
+                  default: "1"
+                userid:
+                  type: string
+                  description: User ID
+                  default: copilot
+                params:
+                  type: string
+                  description: Additional parameters in JSON format
+                  default: "{}"
+      responses:
+        "200":
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cache:
+                    type: integer
+                    description: Indicates if the response is cached (0 for no, 1 for yes)
+                    example: 0
+                  datetime:
+                    type: string
+                    format: date-time
+                    description: Timestamp of the response
+                    example: "2024-12-20T13:04:43.000774Z"
+                  explore:
+                    type: integer
+                    description: Exploration score (default 0)
+                    example: 0
+                  final_result:
+                    type: array
+                    description: Array of final results for spend personality analysis
+                    items:
+                      type: object
+                      properties:
+                        result:
+                          type: object
+                          properties:
+                            offer:
+                              type: string
+                              description: The recommended offer
+                              example: "Industrious"
+                            score:
+                              type: number
+                              description: Personality trait score associated with the offer
+                              example: 0.4742771310552009
+                            final_score:
+                              type: number
+                              description: Final calculated score
+                              example: 0.4742771310552009
+                            cost:
+                              type: integer
+                              description: Cost associated with the recommendation
+                              example: 1
+                            price:
+                              type: integer
+                              description: Price of the offer
+                              example: 1
+                            offer_value:
+                              type: integer
+                              description: Value of the offer
+                              example: 1
+                            uuid:
+                              type: string
+                              description: Unique ID for the recommendation
+                              example: "fdfbe8f4-7f99-4315-9614-ca68e6c50b4b"
+                            arm_reward:
+                              type: number
+                              description: Reward score associated with the offer
+                              example: 0.4742771310552009
+                            modified_offer_score:
+                              type: number
+                              description: Adjusted score for the offer
+                              example: 0.5204656402553511
+                            offer_name:
+                              type: string
+                              description: Name of the offer
+                              example: "Industrious"
+                        result_full:
+                          type: object
+                          properties:
+                            cost:
+                              type: number
+                              description: Cost metric
+                              example: 1
+                            industrious:
+                              type: number
+                              description: Industrious personality score
+                              example: 0.4742771310552009
+                            offer_name:
+                              type: string
+                              description: Name of the offer
+                              example: "Industrious"
+                            personality:
+                              type: string
+                              description: Detected personality type
+                              example: "Industrious"
+                            score:
+                              type: number
+                              description: Overall personality score
+                              example: 0.4742771310552009
+                            trait:
+                              type: string
+                              description: Prominent personality trait detected
+                              example: "Extrovert"
+                        rank:
+                          type: integer
+                          description: Rank or priority of this result
+                          example: 1
+                  id:
+                    type: string
+                    description: Unique identifier for the analysis type
+                    example: spend_personality
+                  uuid:
+                    type: string
+                    description: UUID for the overall response
+                    example: "fdfbe8f4-7f99-4315-9614-ca68e6c50b4b"
+                  in_params:
+                    type: object
+                    description: Input parameters for the request
+                    example: {}
+  /response:
+    post:
+      summary: Respond to Spend personality when customer lookup happens
+      operationId: customerResponse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                  description: Unique identifier for the request
+                  example: "fdfbe8f4-7f99-4315-9614-ca68e6c50b4b"
+                offers_accepted:
+                  type: array
+                  description: List of offers accepted by the customer
+                  items:
+                    type: string
+                  example: ["offer1"]
+                channel:
+                  type: string
+                  description: Customer channel type
+                  default: chatgpt
+      responses:
+        "200":
+          description: Response confirmation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  final_result:
+                    type: array
+                    description: The final response result from the API
+                    items:
+                      type: object
+
+components:
+  schemas:
+    SpendPersonalityRequest:
+      type: object
+      properties:
+        campaign:
+          type: string
+          description: Campaign identifier
+          default: spend_personality
+        subcampaign:
+          type: string
+          description: Subcampaign identifier
+          default: spend_personality
+        channel:
+          type: string
+          description: Customer interaction channel
+          default: copilot
+        customer:
+          type: string
+          description: Customer identifier
+          default: 590
+        numberoffers:
+          type: string
+          description: Number of offers to display
+          default: "1"
+        userid:
+          type: string
+          description: User ID
+          default: copilot
+        params:
+          type: string
+          description: Additional parameters in JSON format
+          default: "{}"
+    SpendPersonalityResponse:
+      type: object
+      properties:
+        cache:
+          type: integer
+          description: Indicates if the response is cached (0 for no, 1 for yes)
+          example: 0
+        datetime:
+          type: string
+          description: Timestamp of the response
+          example: "2024-12-20T13:04:43.000774Z"
+```
+
+If you do not want the API to return an array or document in document JSON objects then use the flatten option. This is especially useful for UI and other technologies that have difficulty with processing nested JSON objects. The example uses the in_param to force a flattened response: ```{"in_param": {"flatten_json": true}}```
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Spend Personality API
+  description: API that obtains spending personality insights and pushes responses once customer values are returned.
+  version: "1.0.0"
+servers:
+  - url: https://bankruntime2.ecosystem.ai
+paths:
+  /invocations:
+    post:
+      summary: Obtain Spend personality
+      operationId: getSpendPersonality
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                campaign:
+                  type: string
+                  description: Campaign identifier
+                  default: spend_personality
+                subcampaign:
+                  type: string
+                  description: Subcampaign identifier
+                  default: spend_personality
+                channel:
+                  type: string
+                  description: Customer interaction channel
+                  default: copilot
+                customer:
+                  type: string
+                  description: Customer identifier
+                  default: 590
+                numberoffers:
+                  type: string
+                  description: Number of offers to display
+                  default: "1"
+                userid:
+                  type: string
+                  description: User ID
+                  default: copilot
+                params:
+                  type: string
+                  description: Additional parameters in JSON format
+                  default: "{}"
+      responses:
+        "200":
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  final_result_0_result_full_industrious:
+                    type: number
+                    description: Industrious personality score
+                    example: 0.4742771310552009
+                  final_result_0_result_full_transaction_count:
+                    type: integer
+                    description: Total transaction count
+                    example: 2663
+                  final_result_0_result_score:
+                    type: number
+                    description: Personality trait score associated with the offer
+                    example: 0.4742771310552009
+                  final_result_0_result_offer_name:
+                    type: string
+                    description: Name of the offer
+                    example: "Industrious"
+                  final_result_0_result_full_uuid:
+                    type: string
+                    description: Unique ID associated with the personality result
+                    example: "e98aeb34-786d-453f-8798-a03145a34e2f"
+                  uuid:
+                    type: string
+                    description: Primary UUID of the response
+                    example: "e98aeb34-786d-453f-8798-a03145a34e2f"
+                  final_result_0_result_full_offer:
+                    type: string
+                    description: The recommended offer
+                    example: "Industrious"
+                  final_result_0_result_cost:
+                    type: integer
+                    description: Cost associated with the recommendation
+                    example: 1
+                  datetime:
+                    type: string
+                    format: date-time
+                    description: Timestamp of the response
+                    example: "2024-12-20T18:08:52.000565Z"
+                  final_result_0_result_full_modified_offer_score:
+                    type: number
+                    description: Adjusted score for the offer
+                    example: 0.5204656402553511
+                  final_result_0_result_full_personality:
+                    type: string
+                    description: Detected personality type
+                    example: "Industrious"
+                  final_result_0_result_full_extrovert:
+                    type: number
+                    description: Extrovert score for the customer
+                    example: 0.5204656402553511
+                  final_result_0_result_full_offer_details_1:
+                    type: integer
+                    description: Offer detail, key `1`
+                    example: 1
+                  final_result_0_result_full_offer_details_0:
+                    type: integer
+                    description: Offer detail, key `0`
+                    example: 0
+                  final_result_0_result_full_trait:
+                    type: string
+                    description: Prominent personality trait detected
+                    example: "Extrovert"
+                  final_result_0_result_full_offer_id:
+                    type: string
+                    description: Identifier for the offer
+                    example: "Industrious"
+                  final_result_0_result_full_price:
+                    type: integer
+                    description: Price of the offer
+                    example: 1
+                  id:
+                    type: string
+                    description: Unique identifier for the analysis type
+                    example: spend_personality
+                  final_result_0_result_final_score:
+                    type: number
+                    description: Final calculated score
+                    example: 0.4742771310552009
+                  final_result_0_result_full_offer_value:
+                    type: integer
+                    description: Value of the offer
+                    example: 1
+                  final_result_0_result_full_intentional:
+                    type: number
+                    description: Intentional score for the customer
+                    example: 0.09500563274502441
+                  final_result_0_result_price:
+                    type: integer
+                    description: Price of the offer
+                    example: 1
+                  in_params_flatten_json:
+                    type: boolean
+                    description: Indicates if the input parameters were flattened
+                    example: true
+                  cache:
+                    type: integer
+                    description: Indicates if the response is cached (0 for no, 1 for yes)
+                    example: 0
+                  explore:
+                    type: integer
+                    description: Exploration score (default 0)
+                    example: 0
+                  final_result_0_result_full_offer_name:
+                    type: string
+                    description: Name of the offer
+                    example: "Industrious"
+                  final_result_0_result_uuid:
+                    type: string
+                    description: Unique ID for the recommendation
+                    example: "e98aeb34-786d-453f-8798-a03145a34e2f"
+                  final_result_0_result_modified_offer_score:
+                    type: number
+                    description: Adjusted score for the offer
+                    example: 0.5204656402553511
+                  final_result_0_result_full_enthusiastic:
+                    type: number
+                    description: Enthusiastic personality score
+                    example: 0.06759294029290275
+                  final_result_0_result_full_score:
+                    type: number
+                    description: Overall personality score
+                    example: 0.4742771310552009
+                  final_result_0_rank:
+                    type: integer
+                    description: Rank or priority of this result
+                    example: 1
+                  final_result_0_result_full_introvert:
+                    type: number
+                    description: Introvert score for the customer
+                    example: 0.2377018400300413
+                  final_result_0_result_full_experiential:
+                    type: number
+                    description: Experiential personality score
+                    example: 0.12129177619226436
+                  final_result_0_result_full_cost:
+                    type: integer
+                    description: Cost metric
+                    example: 1
+                  final_result_0_result_offer:
+                    type: string
+                    description: The recommended offer
+                    example: "Industrious"
+                  final_result_0_result_offer_value:
+                    type: integer
+                    description: Value of the offer
+                    example: 1
+                  final_result_0_result_arm_reward:
+                    type: number
+                    description: Reward score associated with the offer
+                    example: 0.4742771310552009
+```
+
 
 URL Encoding is required for the in_param field.
 

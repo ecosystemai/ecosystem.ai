@@ -1,0 +1,50 @@
+# Post Install Setup Guide
+
+## Base Install
+
+The ecosystem.Ai platform contain many different options and capabilities. The base install is the starting point from where you can configure other capabilities. The base installation contains the following components:
+- **App Workbench**: The main interface for the ecosystem.Ai platform.
+- **Prediction Server**: A server for running predictions.
+- **Notebooks**: A Jupyter Notebook environment for running Python code.
+- **Grafana**: A data visualization tool for creating dashboards.
+
+### Step 1. Log in to the App Workbench
+
+The default username and password is `admin@ecosystem.ai` and `password`. Please change the password immediately after install.
+
+### Step 2. Log in to Notebooks
+
+You need to create a new user account for the Notebooks. The default username is `admin@ecosystem.ai`. You can assign any password during the registration proces.
+
+### Step 3. Setup key and login to Grafana
+
+The default username and password is `admin@ecosystem.ai` and `password`. Please change the password immediately after install.
+
+to access Grafana, navigate to:
+```web
+http://127.0.0.1:3000
+```
+OR
+```web
+http://localhost:3000
+```
+
+You need to generate a key in your Workbench in order to connect to the ecosystem.Ai server for viewing your data. In the Workbench navigate to the **Management** menu and click on **Generate API Keys**. Click on the **Create New** button, assign a name and description and time duration for valid validation. Copy the key. You can use this key to connect to the ecosystem.Ai server inside Grafana.
+
+In Grafana navigate to the **Connections** menu and click on **Data Sources**. Click on **ecosystem-server** and scroll down to ```HTTP headers```. Click on ```Reset``` and the field to the left will open up. Type the word ```Bearer ` and then paste your key after the space:
+```
+Bearer <your key>
+```
+
+```Save & Test``` might produce an error, but you can ignore this. You can now create dashboards and panels in Grafana. Navigate to the **Dashboards**.
+
+## Additional Components Install
+
+The additional components package can be obtained from the ecosystem.Ai marketplace. The package contains the following components:
+- **Presto**: A distributed SQL query engine for running queries on large datasets.
+- **Superset**: A data visualization tool for creating dashboards.
+- **Postgres**: A database for storing relational data.
+
+### Login to Superset
+
+The default username and password is `admin@ecosystem.ai` and `password`. Please change the password immediately after install.
