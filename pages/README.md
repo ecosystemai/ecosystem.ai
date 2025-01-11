@@ -14,9 +14,9 @@
 ```markdown
 ---
 date: 2024-04-01
-title: ecosystem.Ai v0.6.304
-description: The v0.6.304 release of ecosystem.Ai
-authorid: danny
+title: ecosystem.Ai v0.7.900
+description: The v0.7.900 release of ecosystem.Ai
+authorid: ecosystemai
 ogImage: /images/changelog/2024-04-01-v0.6.304.png
 ---
 
