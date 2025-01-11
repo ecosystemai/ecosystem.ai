@@ -113,10 +113,10 @@ const AuthorProfile: React.FC<AuthorProfileProps> = ({ authorId }) => {
         <div style={{ marginTop: '75px' }}></div>
         <div>
           <Cards num={3}>
-            <Cards.Card title="" href="/blog" icon={<Blog />} image>
+            <Cards.Card title="" href="/blog" icon={<Blog />}>
               {null}
             </Cards.Card>
-            <Cards.Card title="" href="/authors" icon={<OurAuthors />} image>
+            <Cards.Card title="" href="/authors" icon={<OurAuthors />}>
               {null}
             </Cards.Card>
           </Cards>
