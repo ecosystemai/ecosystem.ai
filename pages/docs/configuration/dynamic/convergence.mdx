@@ -1,0 +1,16 @@
+---
+title: Model Convergence
+description: Model Convergence
+---
+
+# Model Convergence
+
+We use online machine learning and allow models to converge in realtime depending on the algorithm and the data. The convergence of the model is the process of the model learning from the data and updating the model parameters to better fit the data. The model will continue to learn and update the parameters until it reaches a point where the model is no longer improving. The model will then be considered converged.
+
+The Ecosystem extended Thompson Sampling effectively balances exploration and exploitation in a dynamic environment. As the posterior distributions update in real time, the system progressively shifts towards actions with higher observed rewards. Initially, due to the high variance of the Beta distribution, exploration dominates, allowing the model to gather sufficient evidence about different options.
+
+Over time, as more data is collected, the variance of the distribution decreases, leading to more confident decisions and a transition towards exploitation. However, in cases where reward distributions change due to concept drift, the model intelligently reintroduces exploration, ensuring adaptability to new patterns. This is particularly beneficial in non-stationary environments where user preferences or contextual factors evolve over time.
+
+By incorporating real-time Probabilistic Bayesian updating, algorithms ensure that decision-making remains dynamic and responsive. This characteristic is further enhanced through techniques such as decay factors and sliding windows, which allow the system to prioritize recent interactions while gradually discounting outdated data. As a result, the model maintains optimal performance even when faced with shifting distributions or unpredictable user behaviors.
+
+Overall, real-time Ecosystem Rewards with Thompson Sampling is a robust approach for sequential decision-making, particularly in online learning and adaptive recommender systems. Future enhancements could explore hybrid strategies that integrate contextual bandits or reinforcement learning techniques to further improve adaptability and convergence speed.

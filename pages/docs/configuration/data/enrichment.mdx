@@ -10,6 +10,56 @@ description: Enrichment Processes
 Enrichment options are used to perform feature engineering related actions.
 ![image](/images/configuration/data/enrichments.png)
 
+## Data Cleaning
+- **Zero Fill**: Fill column with zero if empty, use =force for double convert.
+- **Fill with Values**: Fill column with value based on search criteria.
+- **Flatten Sub Documents**: Specify a key that contains sub document and flatten.
+- **Remove Key**: Delete key from all documents.
+- **Remove Documents**: Delete documents from this collection based on search.
+
+## NLP Transformations
+- **Fragment (NLP) Options**: Tokenize string, stemming, lowercase, uppercase, etc options.
+- **Big 5**: Extract personality from text [ecosystem-worker-nlp] (on request).
+- **MBTI**: Extract MBTI from text [ecosystem-worker-nlp] (on request).
+- **Named Entity Recognition**: Extract named entities from text, add columns with scores [ecosystem-worker-nlp] (on request).
+- **Parts of Speech**: Extract parts of speech from text [ecosystem-worker-nlp] (on request).
+- **Summarize**: Summarize text [ecosystem-worker-nlp] (on request).
+- **Sentiment**: Determine sentiment from text [ecosystem-worker-nlp] (on request).
+- **Toxicity**: Score levels of toxicity in text [ecosystem-worker-nlp] (on request).
+
+## Basic Transformations
+- **Count Enums**: Count the number of enum categories.
+- **Concatenate Features**: Concatenate two columns and create new.
+- **Enumeration Builder**: Enumerate attribute and create Enum Collection.
+- **Normalize**: Normalize column with new value between low and high.
+- **Range to Category**: Use range rules for numeric values and assign category.
+- **Aggregate**: Aggregate fields and return count.
+
+## Advanced Transformations
+- **Location Extractor**: Extract country and city from string and add coordinates.
+- **Prediction**: Execute predictor on selected columns as features and create column.
+- **Basket Analysis**: Analyse and present most popular items in basket array.
+- **Directed Graph**: Generate a graph from meta definition.
+- **Ecogenetic Network**: Calculate core centralities based on network meta-data.
+- **Ecosystem Personality Algorithms**: Determine personality from transactional data behavior.
+- **Ecosystem Sentimental Equilibrium**: Determine sentimental equilibrium from interaction data.
+- **Client Pulse Reliability**: Calculate Client Pulse Reliability scores per grouping of transactions.
+- **Standard Industry Codes**: Add descriptions from SIC code.
+- **Credit Card Codes**: Add descriptions from MCC code.
+
+## Date and Timeseries Transformations
+- **Date Enrich**: Build out day of week, year, month and other features.
+- **Featureset**: Generate flattened time-series features by grouping then date and category.
+- **Time Series Features**: Generate time-series features by date, then group and category.
+- **Forecast**: Forecast next sequence from time-series date and double values.
+
+## Database Operations
+- **Foreign Key N:1**: Perform foreign key lookup to another database.collection and return fields.
+- **Foreign Key 1:N**: Perform foreign key lookup, aggregate fields and return count etc.
+- **Rename Key**: Rename all keys in selected dataset to new value.
+- **Indexes**: Create indexes using JSON definition.
+- **Cassandra Ingest**: Ingest data from Cassandra into local database.
+
 ## Date Enrichment
 
 Enrich data with date related features for example day of week, month, year etc.

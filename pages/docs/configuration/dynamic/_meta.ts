@@ -6,5 +6,6 @@ export default {
   runtime: 'Runtime Settings',
   ecosystemrewards: 'Ecosystem Rewards',
   baysianprobabilistic: 'Bayesian Probabilistic',
-  qlearning: 'Q-Learning'
+  qlearning: 'Q-Learning',
+  convergence: 'Model Convergence'
 };
