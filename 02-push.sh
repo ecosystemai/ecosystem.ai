@@ -1,0 +1,1 @@
+docker push ecosystemai/ecosystem-developer:arm64 
