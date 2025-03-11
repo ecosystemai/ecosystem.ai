@@ -24,7 +24,6 @@ export default {
   contributing2: {
     type: 'separator',
   },
-  development: 'Development',
   documentation: 'Documentation',
   other: {
     // "title": "Other",
