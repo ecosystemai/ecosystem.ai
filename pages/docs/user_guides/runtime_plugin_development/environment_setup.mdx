@@ -1,0 +1,83 @@
+---
+title: Local Environment Setup
+description: Configure your local environment to develop your own pre and post scoring logic plugins for the runtime.
+---
+
+# Set up your development environment
+The Deployment section of the Workbench is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
+
+## Prerequisites
+Before you can configure your pre and post scoring logic, you will need to have the following set up on your local machine:
+- Install IntelliJ or update your current install to the latest version
+- Install Java Corretto 17 
+- Clone the ecosystem-runtime-localbuild repo from GitHub https://github.com/ecosystemai/ecosystem-runtime-localbuild
+
+## IntelliJ Configuration
+We want to open the project in the ecosystem-runtime-localbuild repo in IntelliJ. Start IntelliJ, select Open Project and select the folder created when cloning the repo. Trust the project. Once IntelliJ has finished processing the project you should see the following view. If the pom.xml file is not open in the editor window then open it from the file structure menu on the left of the screen.
+![Open project in IntelliJ](/images/local_dev_setup/01_import-project.png)
+
+Copy the text below from the pom.xml file
+```xml
+<settings>
+   <mirrors>
+     <mirror>
+         <id>ecosystem-repo</id>
+         <name>Maven Repository Manager running on customer.ecosystem.ai</name>
+         <url>http://maven.ecosystem.ai:50000/maven-repository</url>
+         <mirrorOf>ecosystem-repo</mirrorOf>
+     </mirror>
+   </mirrors>
+</settings>
+```
+
+Open Settings and navigate to the Maven section (see screenshot) and take note of the file location in the User settings file box
+![Maven user settings](/images/local_dev_setup/02_maven-settings.png)
+
+Create a settings.xml file in the specified location and copy the text from the pom into the file. 
+
+Go back to the settings menu and select plugins. Install the ecosystem.Ai prediction server plugin.
+![Install the ecosystem.Ai plugin](/images/local_dev_setup/03_ecosystem-plugin.png)
+
+Now in the settings menu go to Tools and select the ecosystem plugin and change the server to http://your-server-url:3001.
+![Configure the ecosystem.Ai plugin](/images/local_dev_setup/04_ecosystem-plugin-configure.png)
+
+You should now be able to open the ecosystem.Ai on the right hand side of the interface and the panel which opens should show the projects loaded in your local environment.
+![ecosystem.Ai plugin](/images/local_dev_setup/05_ecosystem-plugin-menu.png)
+
+Next open the plugin.properties file and specify the project name, deployment name and deployment version of the configuration that you would like to work on in IntelliJ.
+![plugin.properties](/images/local_dev_setup/06_plugin-properties.png)
+
+Open the Tool menu and select Pull Plugin from ecosystem.Ai server.
+![Pull plugin from ecosystem.Ai server](/images/local_dev_setup/07_pull-plugin.png)
+
+Right click on the project root folder and select Refresh from Disk to have the pulled files appear in the tree.
+![Refresh from disk](/images/local_dev_setup/08_refresh-from-disk.png)
+
+Now in the IntelliJ menu go to File -> Project Structure, select SDKs under Platform Settings, click the + to add a new SDK and select corretto-17.
+![Add SDK](/images/local_dev_setup/09_add-sdk.png)
+
+Now go to the Run menu and select Edit Configurations.
+![Create run configuration](/images/local_dev_setup/10_edit-configurations-menu.png)
+
+Add a new configuration and select Application. Then change the three settings highlighted in the image below.
+![Run configuration settings](/images/local_dev_setup/11_edit-configurations.png)
+
+Now select Environment variables create the MASTER_KEY environment variable. MASTER_KEY should be the license key your license key for the ecosystem.Ai environment. There are a number of additional [environment variables](/docs/runtime/environment_variables.mdx) which can be set.
+![Environment variables](/images/local_dev_setup/12_environment-variables.png)
+
+Open the maven menu in IntelliJ and reload the project.
+![Reload Maven project](/images/local_dev_setup/13_reload-project.png)
+
+If you receive errors after running this step there are a couple of troubleshooting steps:
+- Confirm that you can access http://maven.ecosystem.ai:50000/maven-repository/ in your browser. If not you will need to connect to another network where the URL is accessible before proceeding.
+- Navigate to the directory you created the settings.xml file and delete the repository and wrapper folders if they are present. Then in the maven menu in IntelliJ select Execute Maven Goal and run `mvn -U clean install`.
+![Maven clean install](/images/local_dev_setup/14_mvn-clean.png)
+Once you have completed the troubleshooting steps select Reload All Maven Projects from the Maven menu.
+
+We can now run the default project. Click debug.
+![Run project](/images/local_dev_setup/15_run-project.png)
+
+The logs for the runtime should now appear in the console.
+![Runtime logs](/images/local_dev_setup/16_runtime-logs.png
+
+You can now use this environment to develop and debug your pre and post scoring logic for the runtime.
