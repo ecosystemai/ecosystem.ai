@@ -1,0 +1,443 @@
+---
+title: Pre and Post Scoring Logic Structures
+description: The structure of the pre and post scoring logic plugins for the runtime.
+---
+
+# Pre and Post Scoring Logic Structures
+The pre and post scoring logic functionality allows you to define custom logic that is executed before and after the model is scored. There are a number of data structures and functions available to you when developing your pre and post scoring logic. This guide will outline the structures available to you and how to use them as well as guidelines on structuring your logic.
+
+## Pre and Post Scoring Logic Templates
+There are two categories for pre and post scoring logic templates; those for static and dynamic models. The key difference between the two is in how results are looped through in order to apply eligibility and other offer level logic. For static models the offer loop is handled by looping through the Offer Matrix. For dynamic models the loop is handled by looping through the options store.
+
+### Template for dynamic models
+The class `PlatformDynamicEngagement` extends the `PostScoreSuper` class, which provides functionality that can be used across different post-scoring plugins. 
+
+The `getPostPredict()` method accepts a JSONObject with prediction results, parameters for the scoring operation, a session object for a Cassandra database, and an array of preloaded models. The method then processes the results and prediction parameters, including extracting features, evaluating offer eligibility and constructing an array of modified offer scores.
+
+After processing, the results are sorted based on score and the top scores are retrieved. There is also a time tracking operation which logs the time taken to execute the method.
+
+A `Logger` object is initialized for logging purposes. Logging can be done at a variety of levels, including ERROR, WARN, INFO and DEBUG. It is recommended to add detailed logging at the DEBUG level to assist with troubleshooting once the plugin is deployed.
+
+The following is the java implementation of the Platform Dynamic Engagement plugin:
+
+```java
+package com.ecosystem.plugin.customer;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.ecosystem.plugin.DynamicClassLoader;
+import com.ecosystem.plugin.business.BusinessLogic;
+import com.ecosystem.utils.DataTypeConversions;
+import com.ecosystem.utils.JSONArraySort;
+import hex.genmodel.easy.EasyPredictModelWrapper;
+import com.ecosystem.utils.log.LogManager;
+import com.ecosystem.utils.log.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+/**
+ * ECOSYSTEM.AI INTERNAL PLATFORM SCORING
+ * Use this class to score with dynamic sampling configurations. This class is configured to work with no model.
+ */
+public class PlatformDynamicEngagement extends PostScoreSuper {
+	private static final Logger LOGGER = LogManager.getLogger(PlatformDynamicEngagement.class.getName());
+
+	public PlatformDynamicEngagement() {
+	}
+
+	/**
+	 * Pre-post predict logic
+	 */
+	public void getPostPredict () {
+	}
+
+	/**
+	 * getPostPredict
+	 * Example params:
+	 *    {"contextual_variable_one":"Easy Income Gold|Thin|Senior", "contextual_variable_two":"", "batch": true}
+	 *
+	 * @param predictModelMojoResult Result from scoring
+	 * @param params                 Params carried from input
+	 * @param session                Session variable for Cassandra
+	 * @return JSONObject result to further post-scoring logic
+	 */
+	public static JSONObject getPostPredict(JSONObject predictModelMojoResult, JSONObject params, CqlSession session, EasyPredictModelWrapper[] models) {
+		double startTimePost = System.nanoTime();
+		try {
+			/** Setup JSON objects for specific prediction case */
+			JSONObject featuresObj = predictModelMojoResult.getJSONObject("featuresObj");
+			//JSONObject domainsProbabilityObj = predictModelMojoResult.getJSONObject("domainsProbabilityObj");
+
+			JSONObject offerMatrixWithKey = new JSONObject();
+			boolean om = false;
+			if (params.has("offerMatrixWithKey")) {
+				offerMatrixWithKey = params.getJSONObject("offerMatrixWithKey");
+				om = true;
+			} else {
+				LOGGER.info("No Offer Matrix with key configured, using generated defaults.");
+			}
+
+			JSONObject work = params.getJSONObject("in_params");
+
+			/***************************************************************************************************/
+			/** Standardized approach to access dynamic datasets in plugin.
+			 * The options array is the data set/feature_store that's keeping track of the dynamic changes.
+			 * The optionParams is the parameter set that will influence the real-time behavior through param changes.
+			 */
+			/***************************************************************************************************/
+			JSONArray options = getOptions(params);
+			JSONObject optionParams = getOptionsParams(params);
+			JSONObject locations = getLocations(params);
+
+			JSONObject contextual_variables = optionParams.getJSONObject("contextual_variables");
+			JSONObject randomisation = optionParams.getJSONObject("randomisation");
+
+			/***************************************************************************************************/
+			/** Test if contextual variable is coming via api or feature store: API takes preference... */
+			if (!work.has("contextual_variable_one")) {
+				if (featuresObj.has(contextual_variables.getString("contextual_variable_one_name")))
+					work.put("contextual_variable_one", featuresObj.get(contextual_variables.getString("contextual_variable_one_name")));
+				else
+					work.put("contextual_variable_one", "");
+			}
+			if (!work.has("contextual_variable_two")) {
+				if (featuresObj.has(contextual_variables.getString("contextual_variable_two_name")))
+					work.put("contextual_variable_two", featuresObj.get(contextual_variables.getString("contextual_variable_two_name")));
+				else
+					work.put("contextual_variable_two", "");
+			}
+			/***************************************************************************************************/
+
+			JSONArray finalOffers = new JSONArray();
+			int offerIndex = 0;
+			int explore;
+			int[] optionsSequence = generateOptionsSequence(options.length(), options.length());
+			String contextual_variable_one = String.valueOf(work.get("contextual_variable_one"));
+			String contextual_variable_two = String.valueOf(work.get("contextual_variable_two"));
+
+			for(int j : optionsSequence) {
+				if (j > params.getInt("resultcount")) break;
+
+				JSONObject option = options.getJSONObject(j);
+
+				/** Skip the item if offer matrix does not contain option */
+				/*
+				if (!offerMatrixWithKey.has(option.getString("optionKey")))
+					continue;
+				 */
+				/** GENERATE DEFAULT IF OPTION IS NOT IN OFFER MATRIX! */
+				String offer = option.getString("optionKey");
+				if (!offerMatrixWithKey.has(option.getString("optionKey"))) {
+					JSONObject singleOffer = defaultOffer(offer);
+					offerMatrixWithKey.put(option.getString("optionKey"), singleOffer);
+					LOGGER.warn("BEWARE, DEFAULT OFFER GENERATED. IN OPTIONS STORE AND NOT OFFER MATRIX: " + option.getString("optionKey"));
+				}
+
+				/** Test eligibility TODO: CREATE A SEPARATE SUPERCLASS WITH THIS IN IT! */
+				if (locations != null) {
+					try {
+						if (locations.getJSONObject(offer).has("open_times")) {
+							String day = params.getJSONObject("in_params").getString("day");
+							String time = params.getJSONObject("in_params").getString("time");
+
+							if (locations.getJSONObject(offer).getJSONObject("open_times").has(day)) {
+								if (locations.getJSONObject(offer).getJSONObject("open_times").getJSONObject(day).has("opening1") &&
+										locations.getJSONObject(offer).getJSONObject("open_times").getJSONObject(day).has("closing1")) {
+
+									LOGGER.info("It's Open!");
+									if (!locations.getJSONObject(offer).getJSONObject("open_times").getString("operatingStatus").equals("operating"))
+										continue;
+
+									SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+
+									Date opening = sdf.parse(locations.getJSONObject(offer).getJSONObject("open_times").getJSONObject(day).getString("opening1"));
+									Date closing = sdf.parse(locations.getJSONObject(offer).getJSONObject("open_times").getJSONObject(day).getString("closing1"));
+									if (closing.before(opening)) {
+										Calendar cal = Calendar.getInstance();
+										cal.setTime(closing);
+										cal.add(Calendar.DATE, 1);
+										closing = cal.getTime();
+									}
+									Date time_now = sdf.parse(time);
+									if (time_now.after(opening) && time_now.before(closing)) {
+										LOGGER.info("It's Open!");
+									} else {
+										continue;
+									}
+
+								}
+							}
+						}
+					} catch (Exception e) {
+						LOGGER.info("\n\n" + offer + " -> Oh no, there's something wrong with the time range check, and will be ignored! use api params: {day:'monday', 'time': '11.00 AM'} " + e.getMessage() + "\n\n");
+					}
+				}
+
+
+				String contextual_variable_one_Option = "";
+				if (option.has("contextual_variable_one") && !contextual_variable_one.equals(""))
+					contextual_variable_one_Option = String.valueOf(option.get("contextual_variable_one"));
+				String contextual_variable_two_Option = "";
+				if (option.has("contextual_variable_two") && !contextual_variable_two.equals(""))
+					contextual_variable_two_Option = String.valueOf(option.get("contextual_variable_two"));
+
+				if (contextual_variable_one_Option.equals(contextual_variable_one) && contextual_variable_two_Option.equals(contextual_variable_two)) {
+
+					double alpha = (double) DataTypeConversions.getDoubleFromIntLong(option.get("alpha"));
+					double beta = (double) DataTypeConversions.getDoubleFromIntLong(option.get("beta"));
+					double accuracy = 0.001;
+					if (option.has("accuracy"))
+						accuracy = (double) DataTypeConversions.getDoubleFromIntLong(option.get("accuracy"));
+
+					/***************************************************************************************************/
+					/* r IS THE RANDOMIZED SCORE VALUE */
+					double p = 0.0;
+					double arm_reward = 0.001;
+
+					explore = 0;
+					if (option.has("arm_reward")) {
+						p = (double) option.get("arm_reward");
+					} else {
+						p = arm_reward;
+					}
+					arm_reward = p;
+
+					/** Check if values are correct */
+					if (p != p) p = 0.0;
+					if (alpha != alpha) alpha = 0.0;
+					if (beta != beta) beta = 0.0;
+					if (arm_reward != arm_reward) arm_reward = 0.0;
+					/***************************************************************************************************/
+
+					JSONObject singleOffer = new JSONObject();
+					double offer_value = 1.0;
+					double offer_cost = 1.0;
+					double modified_offer_score = p;
+					if (om) {
+						if (offerMatrixWithKey.has(offer)) {
+
+							singleOffer = offerMatrixWithKey.getJSONObject(offer);
+
+							if (singleOffer.has("offer_price"))
+								offer_value = DataTypeConversions.getDouble(singleOffer, "offer_price");
+							if (singleOffer.has("price"))
+								offer_value = DataTypeConversions.getDouble(singleOffer, "price");
+
+							if (singleOffer.has("offer_cost"))
+								offer_cost = singleOffer.getDouble("offer_cost");
+							if (singleOffer.has("cost"))
+								offer_cost = singleOffer.getDouble("cost");
+
+							modified_offer_score = p * ((double) offer_value - offer_cost);
+						}
+					}
+
+					JSONObject finalOffersObject = new JSONObject();
+
+					finalOffersObject.put("offer", offer);
+					finalOffersObject.put("offer_name", offer);
+					finalOffersObject.put("offer_name_desc", option.getString("option"));
+
+					/* process final */
+					finalOffersObject.put("score", p);
+					finalOffersObject.put("final_score", p);
+					finalOffersObject.put("modified_offer_score", modified_offer_score);
+					finalOffersObject.put("offer_value", offer_value);
+					finalOffersObject.put("price", offer_value);
+					finalOffersObject.put("cost", offer_cost);
+
+					finalOffersObject.put("p", p);
+					if (option.has("contextual_variable_one"))
+						finalOffersObject.put("contextual_variable_one", option.getString("contextual_variable_one"));
+					else
+						finalOffersObject.put("contextual_variable_one", "");
+
+					if (option.has("contextual_variable_two"))
+						finalOffersObject.put("contextual_variable_two", option.getString("contextual_variable_two"));
+					else
+						finalOffersObject.put("contextual_variable_two", "");
+
+					finalOffersObject.put("alpha", alpha);
+					finalOffersObject.put("beta", beta);
+					finalOffersObject.put("weighting", (double) DataTypeConversions.getDoubleFromIntLong(option.get("weighting")));
+					finalOffersObject.put("explore", explore);
+					finalOffersObject.put("uuid", params.get("uuid"));
+					finalOffersObject.put("arm_reward", arm_reward);
+
+					/* Debugging variables */
+					if (!option.has("expected_takeup"))
+						finalOffersObject.put("expected_takeup", -1.0);
+					else
+						finalOffersObject.put("expected_takeup", (double) DataTypeConversions.getDoubleFromIntLong(option.get("expected_takeup")));
+
+					if (!option.has("propensity"))
+						finalOffersObject.put("propensity", -1.0);
+					else
+						finalOffersObject.put("propensity", (double) DataTypeConversions.getDoubleFromIntLong(option.get("propensity")));
+
+					if (!option.has("epsilon_nominated"))
+						finalOffersObject.put("epsilon_nominated", -1.0);
+					else
+						finalOffersObject.put("epsilon_nominated", (double) DataTypeConversions.getDoubleFromIntLong(option.get("epsilon_nominated")));
+
+					finalOffers.put(offerIndex, finalOffersObject);
+					offerIndex = offerIndex + 1;
+				}
+			}
+
+			JSONArray sortJsonArray = JSONArraySort.sortArray(finalOffers, "arm_reward", "double", "d");
+			predictModelMojoResult.put("final_result", sortJsonArray);
+
+			predictModelMojoResult = getTopScores(params, predictModelMojoResult);
+
+			double endTimePost = System.nanoTime();
+			LOGGER.info("PlatformDynamicEngagement:I001: time in ms: ".concat( String.valueOf((endTimePost - startTimePost) / 1000000) ));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error(e);
+		}
+
+		return predictModelMojoResult;
+
+	}
+
+}
+```
+
+### Template static models
+
+```java
+package com.ecosystem.plugin.customer;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.ecosystem.utils.DataTypeConversions;
+import com.ecosystem.utils.GlobalSettings;
+import com.ecosystem.utils.JSONArraySort;
+import com.ecosystem.utils.MathRandomizer;
+import hex.genmodel.easy.EasyPredictModelWrapper;
+import com.ecosystem.utils.log.LogManager;
+import com.ecosystem.utils.log.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import static com.ecosystem.EcosystemResponse.obtainBudget;
+
+/**
+ * This the ecosystem/Ai personality series.
+ * Customer plugin for specialized logic to be added to the runtime engine. This class is loaded through the plugin
+ * loader system.
+ */
+public class PostScoreBasicOfferMatrix extends PostScoreSuper {
+	private static final Logger LOGGER = LogManager.getLogger(PlatformDynamicEngagement.class.getName());
+
+	public PostScoreBasicOfferMatrix() {
+	}
+
+	/**
+	 * Pre-post predict logic
+	 */
+	public void getPostPredict () {
+	}
+
+	/**
+	 * getPostPredict
+	 *
+	 * @param predictModelMojoResult Result from scoring
+	 * @param params                 Params carried from input
+	 * @param session                Session variable for Cassandra
+	 * @param models 				 Preloaded H2O Models
+	 * @return JSONObject result to further post-scoring logic
+	 */
+	public static JSONObject getPostPredict(JSONObject predictModelMojoResult, JSONObject params, CqlSession session, EasyPredictModelWrapper[] models) {
+		try {
+			/* Setup JSON objects for specific prediction case */
+			JSONObject featuresObj = predictModelMojoResult.getJSONObject("featuresObj");
+			JSONObject domainsProbabilityObj = predictModelMojoResult.getJSONObject("domainsProbabilityObj");
+			JSONArray offerMatrix = params.getJSONArray("offerMatrix");
+
+			/* If whitelist settings then only allow offers on list */
+			boolean whitelist = false;
+			ArrayList<String> offerWhiteList = new ArrayList<>();
+			if (params.has("whitelist")) {
+				if (!params.getJSONObject("whitelist").isEmpty()) {
+					offerWhiteList = (ArrayList<String>) params.getJSONObject("whitelist").get("whitelist");
+					params.put("resultcount", offerWhiteList.size());
+					whitelist = DataTypeConversions.getBooleanFromString(params.getJSONObject("whitelist").get("logicin"));
+				}
+			}
+
+			JSONArray finalOffers = new JSONArray();
+
+			/* For each offer in offer matrix determine eligibility */
+			int offerIndex = 0;
+			for (int i = 0; i < offerMatrix.length(); i++) {
+				JSONObject singleOffer = offerMatrix.getJSONObject(i);
+
+				/* If whitelist settings then only allow offers on list */
+				if (offerWhiteList.size() > 0) {
+					boolean skip = true;
+					for (int w = 0; w < offerWhiteList.size(); w++) {
+						if ((singleOffer.getString("offer_name_final").equalsIgnoreCase(offerWhiteList.get(w)))) {
+							skip = false;
+							w = offerWhiteList.size() + 1;
+						}
+					}
+					if (skip) continue;
+				}
+
+				/* get selector field from properties: predictor.selector.setup */
+				String s = new JSONObject(settings.getSelectorSetup()).getJSONObject("lookup").getString("fields");
+
+				if (!offerMatrix.getJSONObject(i).has(s)) { LOGGER.error("Not in offerMatrix: ".concat(s)); break; }
+				if (!featuresObj.has(s)) { LOGGER.error("Not in featuresObj: " + s); break; }
+
+				if (offerMatrix.getJSONObject(i).getString(s).equalsIgnoreCase(featuresObj.getString(s))) {
+					// String cop_car = singleOffer.getString("cop_car").toLowerCase();
+
+				JSONObject finalOffersObject = new JSONObject();
+				finalOffersObject.put("offer_name", singleOffer.getString("offer_name_final"));
+				finalOffersObject.put("score", domainsProbabilityObj);
+				finalOffersObject.put("offer_value", 0.0);
+
+				finalOffersObject.put("offer_matrix", singleOffer);
+
+				if (settings.getPredictorOfferBudget() != null) {
+					JSONObject budgetItem = obtainBudget(singleOffer, params.getJSONObject("featuresObj"), 0.0);
+					double budgetSpendLimit = budgetItem.getDouble("spend_limit");
+					finalOffersObject.put("spend_limit", budgetSpendLimit);
+				}
+
+				finalOffers.put(offerIndex, finalOffersObject);
+				offerIndex = offerIndex + 1;
+				}
+			}
+
+			JSONArray sortJsonArray = JSONArraySort.sortArray(finalOffers, "modified_offer_score", "double", "d");
+			predictModelMojoResult.put("final_result", sortJsonArray);
+
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+
+		predictModelMojoResult = getTopScores(params, predictModelMojoResult);
+		return predictModelMojoResult;
+
+	}
+}
+```
+
+### Data structures and functions available for pre and post scoring logic
+The following data structures and functions are available to you when developing your pre and post scoring logic:
+- `JSONObject defaultOffer(String offer)`: Returns a JSONObject with the same structure usually obtained when reading from the offer matrix. This is used when an offer is found in the Option Store but not in the Offer Matrix.
+- `JSONArray getOptions(JSONObject params)`: Returns the scored options from the Options Store in an array that can be looped over when determining eligibility.
+- `JSONObject getOptionsParams(JSONObject params)`: Returns the dynamic interaction configuration parameters.
+- `int[] generateOptionsSequence(int resultCount, int totalOptions)`: Generates a sequence used to loop through the Options Store.
+- `JSONObject getTopScores(JSONObject params, JSONObject predictResult)`: Returns the top scores from the predictResult, taking into account whether exploration or exploitation has been selected for the prediction and taking budget parameters into account if they have been configured.
+- `params`: The `params` JSONObject contains the parameters passed to the plugin from the runtime. This includes the `featuresObj` which contains the features used in the prediction, the `domainsProbabilityObj` which contains the prediction results, and the `offerMatrix` which contains the offer matrix.

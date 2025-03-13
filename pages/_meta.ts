@@ -91,7 +91,6 @@ export default {
       timestamp: false,
     },
   },
-  toolkit: 'ToolKit',
   README: {
     title: 'readme.md',
     type: 'page',
