@@ -8,3 +8,241 @@ import Image from 'next/image'
 # API Configuration Plugin
 
 The API configuration plugin is used to configure the API settings for the runtime. This plugin allows you to customize the API settings for the runtime, such as the API endpoint and default values for the values pass with the API. The API configuration plugin is used to set up the API settings for the runtime before it is deployed.
+- Review the API concepts [here](/docs/configuration/api).
+- To test your API review core concepts [here](/docs/runtime/access)
+
+Note that the runtime environment has a number of default API's that can be used to score models, or just lookup scores or obtain values from data. The primary endpoints include:
+- **/invocations** - This is the primary endpoint for scoring models.
+- **/response** - This endpoint is used to process scoring results for real-time convergence.
+
+These endpoints are used to administer, monitor and update the permanently in production runtime environments.
+- **/health** - Used to indicate the health of the runtime environment.
+- **/refresh** - This endpoint is used to refresh the runtime environment with new models or data.
+- **/config** - Obtain all current configuration settings for the runtime environment.
+- **/updateProperties** - Update the runtime environment with new properties.
+
+## Invocation API
+
+The invocations endpoint take a number of standard inputs that are used by default functionality and dashboards, but the ```params``` structure can accept any other parameters depending on your use-case. All these values will be logged and are also accessible in the plugin system.
+
+Here is an example of an ```/invocations``` payload. Note that the ```params``` key contain a specific format used by the dynamic recommender. Static recommenders, interactions or other cases only need an empty object like ```{}```.
+
+```json
+{
+    "campaign": "mm_messages_budget",
+    "subcampaign": "none",
+    "customer": "none",
+    "channel": "app",
+    "numberoffers": 4,
+    "userid": "myuser",
+    "params": "{\"input\":[\"contextual_variable_one\",\"contextual_variable_two\"],\"value\":[\"Introvert\",\"\"]}"
+}
+```
+
+Once the API is invoked a full response can be expected that provide all the scores and results as configured in the use-case. This example shows that four messages are returned:
+
+```json
+{
+    "cache": 0,
+    "datetime": "2025-03-21T10:40:07.000264Z",
+    "explore": 0,
+    "final_result": [
+        {
+            "result": {
+                "offer": "You think theres not enough, until you start saving :)",
+                "score": 0.7782344364908448,
+                "final_score": 0.7782344364908448,
+                "contextual_variable_two": "SWITCH",
+                "cost": 0,
+                "price": 0,
+                "contextual_variable_one": "Introvert",
+                "offer_value": 0,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "arm_reward": 0.7782344364908448,
+                "modified_offer_score": 0,
+                "offer_name": "You think theres not enough, until you start saving :)"
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "SWITCH",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": 1,
+                "contextual_variable_one": "Introvert",
+                "offer_name_desc": "Recommended offer is You think theres not enough, until you start saving :)",
+                "weighting": 1,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "offer_name": "You think theres not enough, until you start saving :)",
+                "modified_offer_score": 0,
+                "offer": "You think theres not enough, until you start saving :)",
+                "p": 0.7782344364908448,
+                "score": 0.7782344364908448,
+                "final_score": 0.7782344364908448,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 1,
+                "offer_value": 0,
+                "beta": 1.2,
+                "arm_reward": 0.7782344364908448
+            },
+            "rank": 1
+        },
+        {
+            "result": {
+                "offer": "Start your savings fund with the bank today.",
+                "score": 0.7543721046215692,
+                "final_score": 0.7543721046215692,
+                "contextual_variable_two": "STATUS QUO",
+                "cost": 0,
+                "price": 0,
+                "contextual_variable_one": "Introvert",
+                "offer_value": 0,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "arm_reward": 0.7543721046215692,
+                "modified_offer_score": 0,
+                "offer_name": "Start your savings fund with the bank today."
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "STATUS QUO",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": 1,
+                "contextual_variable_one": "Introvert",
+                "offer_name_desc": "Recommended offer is Start your savings fund with the bank today.",
+                "weighting": 1,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "offer_name": "Start your savings fund with the bank today.",
+                "modified_offer_score": 0,
+                "offer": "Start your savings fund with the bank today.",
+                "p": 0.7543721046215692,
+                "score": 0.7543721046215692,
+                "final_score": 0.7543721046215692,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 1,
+                "offer_value": 0,
+                "beta": 1.3,
+                "arm_reward": 0.7543721046215692
+            },
+            "rank": 2
+        },
+        {
+            "result": {
+                "offer": "Setup a savings goal using the tool.",
+                "score": 0.7062030587756783,
+                "final_score": 0.7062030587756783,
+                "contextual_variable_two": "STATUS QUO",
+                "cost": 0,
+                "price": 0,
+                "contextual_variable_one": "Introvert",
+                "offer_value": 0,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "arm_reward": 0.7062030587756783,
+                "modified_offer_score": 0,
+                "offer_name": "Setup a savings goal using the tool."
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "STATUS QUO",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": 1,
+                "contextual_variable_one": "Introvert",
+                "offer_name_desc": "Recommended offer is Setup a savings goal using the tool.",
+                "weighting": 1,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "offer_name": "Setup a savings goal using the tool.",
+                "modified_offer_score": 0,
+                "offer": "Setup a savings goal using the tool.",
+                "p": 0.7062030587756783,
+                "score": 0.7062030587756783,
+                "final_score": 0.7062030587756783,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 1,
+                "offer_value": 0,
+                "beta": 1.1,
+                "arm_reward": 0.7062030587756783
+            },
+            "rank": 3
+        },
+        {
+            "result": {
+                "offer": "Saving is a healthy habit. Why not start today?",
+                "score": 0.6919484413792653,
+                "final_score": 0.6919484413792653,
+                "contextual_variable_two": "SWITCH",
+                "cost": 0,
+                "price": 0,
+                "contextual_variable_one": "Introvert",
+                "offer_value": 0,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "arm_reward": 0.6919484413792653,
+                "modified_offer_score": 0,
+                "offer_name": "Saving is a healthy habit. Why not start today?"
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "SWITCH",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": 1,
+                "contextual_variable_one": "Introvert",
+                "offer_name_desc": "Recommended offer is Saving is a healthy habit. Why not start today?",
+                "weighting": 1,
+                "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+                "offer_name": "Saving is a healthy habit. Why not start today?",
+                "modified_offer_score": 0,
+                "offer": "Saving is a healthy habit. Why not start today?",
+                "p": 0.6919484413792653,
+                "score": 0.6919484413792653,
+                "final_score": 0.6919484413792653,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 1,
+                "offer_value": 0,
+                "beta": 1.2,
+                "arm_reward": 0.6919484413792653
+            },
+            "rank": 4
+        }
+    ],
+    "id": "mm_messages_budget",
+    "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+    "in_params": {
+        "input": [
+            "contextual_variable_one",
+            "contextual_variable_two"
+        ],
+        "contextual_variable_two": "",
+        "contextual_variable_one": "Introvert",
+        "value": [
+            "Introvert",
+            ""
+        ]
+    }
+}
+```
+
+
+## Response API
+
+This endpoint is called once an item has been selected, accepted or used; and you want to track immediate responses. There are basically two formats for this API. The first is a simple response with a single response, and the second is a more complex response with multiple responses.
+
+It's optimal to return the UUID and offer_id using the response.
+
+```json
+{
+{
+    "uuid": "dfcf43bb-cefd-452c-8ed0-c5883d6d2cc3",
+    "offers_accepted": [
+        {
+            "offer_id": "Saving is a healthy habit. Why not start today?"
+        }
+    ],
+    "channel_name": "app"
+}
+```
+
+It is also possible to send the entire response payload to the response API. Only return the item selected though, otherwise if all items are accepted then send the payload as-is.

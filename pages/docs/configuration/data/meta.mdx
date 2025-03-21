@@ -1,0 +1,288 @@
+---
+title: Meta-Data
+description: Meta-Data.
+---
+
+# Meta-Data Management
+
+The ecosystem platform is designed to manage the meta-data of all the configurations related to data formats for algorithms, scoring engine specific functionality and other configurations. The meta-data management is a key feature of the ecosystem platform that allows users to manage the configurations of the data formats and other configurations. Using the Workbench, Python or API's users can manage the meta-data configurations.
+
+## Model Configurations
+
+The ```ecosystem_meta``` database contains all the base configuration definitions. Some core meta-data definitions include:
+**Projects** - The project configuration is used to define the project and its associated configurations.
+**Frames** - Feature Store configurations are defined in the frame configuration.
+**Predictors** - The predictor configuration is used to define model predictors and associated configurations.
+**DynamicEngagements** - The dynamic engagement configuration is used to define the dynamic engagement and interactions configurations.
+
+### Data Formats
+
+The ecosystem platform supports various data formats for the configurations.
+
+**Projects**
+
+Here is a simplified example of the projects meta-data.
+
+```json
+{
+    "project_collections": [
+        {
+            "database": "experimentation_demos",
+            "collection": "ab_testing_messages"
+        },
+        {
+            "database": "experimentation_demos",
+            "collection": "ab_testing_options"
+        }
+    ],
+    "project_files": [
+        {
+            "name": "AB_testing_messages.csv",
+            "absolutePath": "/data/AB_testing_messages.csv",
+            "lastModified": 1654777306884,
+            "canRead": true,
+            "isDirectory": false
+        }
+    ],
+    "purpose": "Demo",
+    "configuration": "",
+    "project_calendars": [
+        {
+            "name": "Monthly Rituals",
+            "date": "NA"
+        }
+    ],
+    "userid": "ecosystem",
+    "uuid": "8162f900-2694-4d59-b41b-e3abaa7b3ff5",
+    "project_end_date": "2022-12-31",
+    "project_id": "AB Testing",
+    "project_owner": "ecosystem",
+    "project_start_date": "2022-06-01",
+    "module_metadata": {
+        "reviewed_by": "",
+        "image_path": "",
+        "icon_path": "",
+        "name": "AB_Testing_0.1",
+        "module_owner": "",
+        "description": "",
+        "categories": "",
+        "created_by": "",
+        "version": "",
+        "fact_sheet_path": "",
+        "contact_email": "",
+        "status": ""
+    },
+    "project_type": "Experimentation",
+    "deployment_step": [
+        {
+            "budget_tracker": {
+                "budget_parameters_database": "",
+                "budget_parameters_datasource": "mongodb",
+                "budget_id": "",
+                "description": "",
+                "budget_parameters_table_collection": "",
+                "x_axis_datasource": "offer_matrix",
+                "x_axis_name": "",
+                "acc_namesource": "",
+                "y_axis_name": "",
+                "y_axis_namesource": "",
+                "acc_name": "",
+                "budget_strategy": "",
+                "x_axis_namesource": "",
+                "acc_datasource": "offer_matrix",
+                "y_axis_datasource": "offer_matrix"
+            },
+            "date": "2022-09-18",
+            "complexity": "Low",
+            "plugins": {
+                "post_score_class_text": "PlatformDynamicEngagement.java",
+                "post_score_class_code": "",
+                "api_endpoint_code": "",
+                "pre_score_class_text": "",
+                "pre_score_class_code": ""
+            },
+            "model_configuration": {},
+            "setup_offer_matrix": {
+                "offer_lookup_id": "",
+                "database": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "project_status": "experiment",
+            "description": "Deployment for AB testing Demo",
+            "multi_armed_bandit": {
+                "epsilon": "0.5",
+                "duration": 0,
+                "pulse_responder_uuid": "53adf85f-0917-4645-a94d-8d9eedf276c2"
+            },
+            "whitelist": {
+                "table_collection": "",
+                "datasource": "mongodb",
+                "database": ""
+            },
+            "version": "001",
+            "model_selector": {
+                "selector_column": "",
+                "lookup": "",
+                "database": "",
+                "selector": "",
+                "table_collection": "",
+                "datasource": "mongodb"
+            },
+            "performance_expectation": "High",
+            "allocator": {
+                "allocator_id": "ecosystem_allocator",
+                "no_interaction_with": [
+                    {
+                        "version": "002",
+                        "deployment_id": "dynamic_experiment_offer"
+                    },
+                    {
+                        "version": "003",
+                        "deployment_id": "dynamic_experiment_offer"
+                    },
+                    {
+                        "version": "004",
+                        "deployment_id": "dynamic_experiment_offer"
+                    },
+                    {
+                        "version": "005",
+                        "deployment_id": "dynamic_experiment_offer"
+                    }
+                ],
+                "interacts_with_experiments": 1,
+                "component": "",
+                "keep_in_experiment": 1,
+                "component_ranking_field": ""
+            },
+            "pattern_selector": {
+                "pattern": "",
+                "duration": ""
+            },
+            "project_id": "AB Testing",
+            "paths": {
+                "logging_collection_response": "ecosystemruntime_response",
+                "logging_collection": "ecosystemruntime",
+                "logging_database": "logging",
+                "mongo_server_port": "ecosystem-server:54445",
+                "scoring_engine_path_prod": "http://ecosystem-runtime2:8091",
+                "models_path": "/data/deployed/",
+                "mongo_connect": ",
+                "data_path": "/data/",
+                "runtime_path": "http://ecosystem-runtime:8091",
+                "build_server_path": "",
+                "scoring_engine_path_dev": "http://ecosystem-runtime:8091",
+                "aws_container_resource": "",
+                "scoring_engine_path_test": "http://ecosystem-runtime1:8091",
+                "git_repo_path_branch": "abtesting",
+                "download_path": "https://hub.docker.com/u/ecosystemai",
+                "mongo_ecosystem_password": "EcoEco321",
+                "mongo_ecosystem_user": "ecosystem_user",
+                "git_repo_path": "https://github.com/ecosystemai/ecosystem-runtime.git"
+            },
+            "updated_by": "admin@ecosystem.ai",
+            "options": {
+                "is_offer_matrix": false,
+                "is_multi_armed_bandit": true,
+                "is_enable_plugins": true,
+                "is_whitelist": false,
+                "is_corpora": false,
+                "is_custom_api": false,
+                "is_budget_tracking": false,
+                "is_params_from_data_source": true,
+                "is_model_selector": false,
+                "is_generate_dashboards": false,
+                "is_pattern_selector": false,
+                "is_prediction_model": false
+            },
+            "corpora": {
+                "corpora": ""
+            },
+            "parameter_access": {
+                "lookup": {
+                    "value": "'123'",
+                    "key": "customer"
+                },
+                "create_virtual_variables": false,
+                "database": "experimentation_demos",
+                "datasource": "mongodb",
+                "lookup_fields": [
+                    "alpha",
+                    "alpha_zero",
+                    "beta",
+                    "beta_zero",
+                    "customer",
+                    "epsilon_nominated",
+                    "id",
+                    "option",
+                    "optionKey",
+                    "propensity",
+                    "uuid",
+                    "weighting"
+                ],
+                "lookup_defaults": "",
+                "virtual_variables": [],
+                "table_collection": "ab_testing_options",
+                "fields": "uuid,id,optionKey,option,alpha,beta,alpha_zero,beta_zero,weighting,epsilon_nominated,propensity,customer"
+            },
+            "updated_date": "2025-03-20T18:01:43.605Z",
+            "deployment_id": "ab_testing_demo"
+        }
+    ],
+    "project_data": "ecosystem",
+    "created_by": "admin@ecosystem.ai",
+    "project_api_configs": [
+        {
+            "name": "AB Test",
+            "date": "2022-09-17"
+        }
+    ],
+    "preview_detail": {
+        "summary": "Traditional AB test",
+        "image": "/assets/images/module_offerrecommender.001.png",
+        "active": true,
+        "detail": "Traditional AB test finding best of two options.",
+        "heading": "AB Testing"
+    },
+    "project_dynamic_interactions": [
+        {
+            "name": "AB Testing Demo",
+            "date": "2022-09-18"
+        }
+    ],
+    "project_description": "Traditional AB test",
+    "updated_by": "admin@ecosystem.ai",
+    "_id": {
+        "date": "Thu Mar 20 18:01:44 UTC 2025",
+        "timestamp": 1742493704
+    },
+    "updated_date": "2025-03-20T18:01:44.000446Z",
+    "created_date": "2024-11-02T14:08:41.516Z",
+    "userid_login": "ecosystem"
+}
+```
+
+## Module Specific Configurations
+
+The ecosystem platform has specific configurations for each module. These configurations are used to define the module specific configurations and are not always stored in the ```ecosystem_meta``` database. Some of the module specific configurations include:
+**Offer Matrix** - This format is used by recommender algorithms to define the offer matrix.
+
+### Data Formats
+
+Note that key values are used by default functionality in various modules.
+
+**Offer Matrix**
+
+This format is used by a number of post scoring plugins that use recommenders. If these keys, ```cost, price, offer_id, offer_name, static_offers``` are used in a product or offer catalog then all the default functionality in configuring a recommender will be available.
+
+```json
+{
+    "cost": 96,
+    "price": 120,
+    "offer_id": "JFU82_DB200MB_P",
+    "offer_name": "200MB Data Option",
+    "static_offers": 1
+}
+```
+
+All these values can be updated based on model results, business logic or data extraction in the plugin system.
