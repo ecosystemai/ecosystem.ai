@@ -1,6 +1,6 @@
 export default {
   index: 'Intro',
-  predictor: 'Predictor',
+  predictor: 'Model Training',
   model_types: 'Model Types',
   models: 'Models',
 }

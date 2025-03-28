@@ -2,12 +2,11 @@ export default {
   index: 'Intro',
   project: 'Project',
   data: 'Data',
-  predictors: 'Predictors',
-  dynamic: 'Dynamic',
+  static_models: 'Static Models',
+  dynamic: 'Dynamic Models',
+  generative: 'Generative Models',
   experiments: 'Experiments',
   api: 'APIs',
   deployment: 'Deployments',
-  generative: 'Generative',
-  logging: 'Logging',
   pythonpackage: 'Python Package'
 }
