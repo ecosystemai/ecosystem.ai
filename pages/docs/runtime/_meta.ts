@@ -9,5 +9,6 @@ export default {
   deployment: 'Deployment',
   environment_variables: "Environment Variables",
   access: 'API Access',
-  logging: 'Logging & Reporting'
+  logging: 'Logging & Reporting',
+  runtimeversion: 'Release Notes'
 }
