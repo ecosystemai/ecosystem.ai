@@ -1,69 +1,34 @@
 ---
-title: Runtime Parameters
-description: Runtime Parameters
+title: Deployment Parameters
+description: Deployment Parameters
 ---
 
-# Runtime Parameters
+# Deployment Parameters
 
-Runtime Parameters are used to configure the basic runtime setup and startup of the application.
+The parameters set when configuring the deployment are pushed to the ecosystem.Ai runtime and, together with the [environment variables](/docs/runtime/environment_variables), set the behaviour of the runtime.
 
-### API Parameters
+## Case Configuration
+Case configuration contains the high level details of the deployment:
+- **Prediction Case Id**: The name of the prediction case. This is the name for the predictor that will be stored in the logs and, together with the version and project name, uniquely identifies a deployment configuration. When creating a deployment for a Dynamic Interaction configuration this should match the name of the Dynamic Interaction configuration.
+- **Description, Type, Purpose**: These fields are used to describe the deployment and the description is pushed to a commented section in the properties file to assist with maintenance.
+- **Version**: The version of the configuration. Together with the project name and deployment_id (Prediction Case Id) this uniquely identifies a deployment configuration. 
+- **Environment Status**: The environment to which the deployment confioguration should be pushed. Different endpoints and database settings can be configured for different environments.
+- **Performance Expectation, Complexity**: These are informational fields used to assist with maintenance.
 
-When using the API to access scores, you will need to provide the following parameters:
+The types of functionality to be used by the endpoint can be set using the available check boxes which will make the relevant parameters available for configuration.
 
-#### Campaign
-This is the same name as provided when configuring project deployment settings. For dynamic recommenders ensure that the names are the same.
+## Build and Generate Settings
+The build and generate settings are used to configure the optional Generate and Build functionality. The Generate functionality is used to create a git branch with the plugin code created for the deployment. The Build functionality is used to build a jar file and image for the deployment.
 
-#### Sub-Campaign
-The sub-campaign can be used to differentiate between different models that are used in the same campaign. This is useful when using multiple models in the same campaign.
+## Path Settings
+The path settings configure the location of the data and models to be used by the runtime.
 
-#### Lookup
-If there is a parameter lookup configured, then this is the value that will be used to lookup the model scoring parameters. If there is no lookup configured, then this value will be ignored.
+## Database and Logging Database Settings
+The database settings are used to configure the MongoDB instance to be used by the runtime. The logging database settings are used to configure the database and collections in which the logs for the runtime should be stored.
 
-#### Channel
-Different channels can be used to access the scores. This is useful when using the same model in different channels.
+## Target Scoring Engine
+The endpoints to push the deployment to for the different environments.
 
-#### Responses
-The number of responses to return. This is useful when using the API to return multiple scores. For data lookup options only one response is returned.
-
-#### The in_param parameter
-With the `Score` API Selected, use the following options for in_params.
-
-Model based recommender:
-```json
-{}
-```
-
-Note that this approach will bypass any parameter lookup settings in the project deployment configuration. Model based configurations that require data lookup replacement use:
-```json
-{
-  "input":["model_param1","model_param2"],
-  "value":["value to score","value to score"]
-}
-```
-
-Dynamic recommenders use:
-```json
-{
-  "input":["contextual_variable_one","contextual_variable_two"],
-  "value":["",""]
-}
-```
-
-Tensorflow or PyTorch models:
-```json
-{
-  "input":["text"],
-  "value":["Place text here"],
-  "type":"dense_1"
-}
-```
-
-Question and answer approaches with deep learning models:
-```json
-{
-  "input":["text","question"],
-  "value":["BBC Japan was a general entertainment Channel. Which operated between December 2004 and April 2006.","When did BBC Japan start broadcasting?"],
-  "type":"qa"
-}
-```
+## Parameter From Data Source
+The configuration for the customer data lookup to be used by the runtime.
+- **Data Source**: The type of data srouce to be used for the lookup.
