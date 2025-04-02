@@ -5,8 +5,7 @@ export default {
   static_models: 'Static Models',
   dynamic: 'Dynamic Models',
   generative: 'Generative Models',
-  experiments: 'Experiments',
-  api: 'APIs',
   deployment: 'Deployments',
+  api: 'API Management',
   pythonpackage: 'Python Package'
 }
