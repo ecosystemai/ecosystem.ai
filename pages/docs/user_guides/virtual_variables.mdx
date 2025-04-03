@@ -1,0 +1,178 @@
+---
+title: Virtual Variables
+description: This lesson outlines the configuration and usage of the Virtual Variable functionality.
+---
+
+# Introduction
+The Virtual Variable functionality allows you to make use of variables derived from values in the customer lookup configured in the deployment without having to hard code the derivation of those variables into the pre scoring logic. This can be used to test new segmentation approaches and model features without first having to add thos features to the production customer feature store.
+
+The configuration and usage of the Virtual Variables requires the following steps:
+1. Configure your Virtual Variables in the [Deployment](/docs/configuration/deployment) settings.
+2. Use your Virtual Variables in a Dynamic Interaction configuration or in your model training.
+
+Below we give more details on implementing each of these steps and how the Virtual Variables are used in the pre and post scoring logic.
+
+## Configuring Virtual Variables
+The first step in using Virtual Variables is to configure them in the deployment settings. To do this using the Workbench follow these steps:
+1. Enable Parameters from Data Source in the [Deployment](/docs/configuration/deployment) settings and configure a customer feature store in the accordion which appears.
+2. Select the Create Virtual Variables checkbox and click the Add Variable button.
+3. Configure the rules for creating your variable. This can either be done by bucketing a field in the customer feature store or by concatenating a number of fields in the customer feature store.
+4. Update the Deployment to save your changes.
+There should now be a `virtual_variables` object saved in the JSON settings of the Deployment.
+```json                
+"virtual_variables": [
+                    {
+                        "name": "segment_one",
+                        "default": "gt-15",
+                        "type": "discretize",
+                        "original_variable": "customer_feature_one",
+                        "fields": [],
+                        "buckets": [
+                            {
+                                "from": 0,
+                                "label": "lt-15",
+                                "to": 15
+                            }
+                        ]
+                    },
+                    {
+                        "name": "segment_two",
+                        "default": "gt500",
+                        "type": "discretize",
+                        "original_variable": "customer_feature_two",
+                        "fields": [],
+                        "buckets": [
+                            {
+                                "from": 0,
+                                "label": "lt-50",
+                                "to": 50
+                            },
+                            {
+                                "from": 50,
+                                "label": "50-250",
+                                "to": 250
+                            },
+                            {
+                                "from": 250,
+                                "label": "250-500",
+                                "to": 500
+                            }
+                        ]
+                    }
+                ]
+```
+
+To use your Virtual Variables you need to add them to your model or to your Dynamic Interaction configuration. To add a virtual variable to your model, add the derived variable to your model training feature store and train the model as usual. To add a virtual variable to your Dynamic Interaction configuration make sure your Dynamic Interaction configuration is linked to the Deployment in the New Knowledge accordion. Then go to the [Variables](/docs/configuration/dynamic/parameters/) tab and select the `Get values from external data store when scoring` checkbox. This will enable a dropdown list from which you can select a variable from the customer feature store configured in your deployment. The names of the Virtual Variables should be available in the list of variables. Select the desired variables and save your configuration. The same `virtual_variables` object that is saved in the Deployment json should now be saved record for the Dynamic Interaction in the `dynamic_engagement` collection in the `ecosystem_meta` database. 
+
+The following truncated example shows how to set the `virtual_variables` object in the python package:
+```python
+from prediction.apis import online_learning_management as ol
+from prediction.apis import deployment_management as dm
+from prediction.apis import ecosystem_generation_engine as ge
+#Configure epsilon
+online_learning_uuid = ol.create_online_learning(
+        auth,
+        name=deployment_id,
+        description=dynamic_interaction_description,
+        feature_store_collection=ol_feature_store_collection,
+        feature_store_database=ol_feature_store_database,
+        options_store_database=options_collection,
+        options_store_collection=options_db,
+        randomisation_success_reward = 0.5,
+        randomisation_fail_reward = 0.05,
+        randomisation_processing_count = 200,
+        randomisation_processing_window = 604800000,
+        randomisation_epsilon = 0.1,
+        contextual_variables_offer_key="offer"
+)
+#Configure the deployment to use the Dynamic Interaction configuration
+new_knowledge = dm.define_deployment_multi_armed_bandit(epsilon=0, dynamic_interaction_uuid=online_learning_uuid)
+#Create a deployment using the configured value of epsilon
+deployment_step = dm.create_deployment(
+    auth,
+    project_id=project_id,
+    deployment_id=deployment_id,
+    version=version,
+    plugin_post_score_class="PlatformDynamicEngagement.java",
+    plugin_pre_score_class="PreScoreDynamic.java",
+    scoring_engine_path_dev=runtime_path,
+    parameter_access=parameter_access,
+    multi_armed_bandit=new_knowledge,
+    setup_offer_matrix=offer_matrix,
+)
+#Push the deployment and print the resulting properties file
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+```
+
+## Virtual Variables and pre and post scoring logic
+
+### Pre scoring logic
+To have Virtual Variables available in the ecosystem.Ai runtime, the `getDynamicSettings` and `getVirtualVariables` methods need to be called in the pre scoring logic. The template for doing so is the `PreScoreDynamic` class which is shown below. If using the Virtual Variables in a Dynamic Interation configuration then the `getPrepopulateContextualVariables` method should also be called. This will result in the values of the virtual variables being calculated from the customer feature store lookup and the resulting values being added to the `featuresObj` and contextual variables objects in the `params` JSONObject that is passed through the runtime.
+```java
+package com.ecosystem.plugin.customer;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.ecosystem.data.mongodb.MongoDBWorkerRead;
+import com.ecosystem.utils.GlobalSettings;
+import com.mongodb.client.MongoClient;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+/**
+ * Add key/value to properties predictor.param.lookup to allow for contextual variable lookup:
+ * dynamic_lookup: 'dynamic_lookup_just4u_v1'
+ */
+public class PreScoreDynamic extends PreScoreSuper {
+
+    public PreScoreDynamic() throws Exception {
+
+    }
+
+    /**
+     * Pre-pre predict
+     */
+    public void getPrePredict() {
+    }
+
+    /**
+     * getPostPredict
+     * example setting in properties file (look for dynamic_lookup: 'dynamic_lookup_just4u'):
+     * predictor.param.lookup={predictor:'justforyou',mojo:1,database:'mongodb',db:'vodacom',table:'fs_score_all_estore_gsm_recommender_rel_1',dynamic_lookup: 'dynamic_lookup_just4u',lookup:{"value":123,"key":"msisdn"},result:{parm1:'field1', parm2:'field2'}}
+     * @param params
+     * @param session
+     * @return
+     */
+    public static JSONObject getPrePredict(MongoClient mongoClient, JSONObject params, CqlSession session) throws IOException {
+
+        if (lookupDatabase == null) return params;
+
+        try {
+
+            /** Get dynamic properties and add virtual variables to the feature store. */
+            params = getDynamicSettings(mongoClient, params);
+            params = getVirtualVariables(params);
+
+            /** Pupulate contextual variables by default based on settings. */
+            params = getPrepopulateContextualVariables(params);
+
+        } catch (Exception e) {
+            LOGGER.error("PreScoreDynamic:E001:UUID: " + params.get("uuid") + " Dynamic parameters failed: " + params.toString());
+            e.printStackTrace();
+        }
+
+        return params;
+    }
+
+}
+```
+
+### Post scoring logic
+No additional configuration is required in the post scoring logic to use the Virtual Variables. The values of the variables can be accessed from `featureObj` like any other feature in the customer feature store and the contextual variable values should be populated as usual if they are required in the configuration.
+
+## Virtual Variable across multiple customer feature stores 
+The functionality to allow multiple customer features stores to be configured in the Parameters from Data Source accordion of the Deployment is currently under development. Once this functionality is available it will be possible to configure virtual variables across all of these feature stores.

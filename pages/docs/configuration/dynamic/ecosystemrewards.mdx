@@ -26,6 +26,7 @@ By default the algorithm will assume initial values of one for both alpha and be
 - **Prior Success Reward**: The size of the increment to the alpha parameter of the beta distributions used in the Thompson Sampling when an interaction is successful in the historical data. Used when historical data is used to train the algorithm before deployment.
 - **Prior Fail Reward**: The size of the increment to the beta parameter of the beta distributions used in the Thompson Sampling when an interaction is not successful in the historical data. Used when historical data is used to train the algorithm before deployment.
 - **Test options across segments**: If there are options that are configured to only be available for specific values of the contextual variables, electing to test options across segments will occasionally predict those options for contextual variable values where they are not available.
+- **epsilon**: The proportion of API calls that will be allocated for exploration. This exploration is done be sampling from a uniform distribution rather than the beta distribution when scoring.
 
 ## Example
 
