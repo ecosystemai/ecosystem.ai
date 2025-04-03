@@ -69,7 +69,29 @@ The following truncated example shows how to set the `virtual_variables` object 
 from prediction.apis import online_learning_management as ol
 from prediction.apis import deployment_management as dm
 from prediction.apis import ecosystem_generation_engine as ge
-#Configure epsilon
+#Configure virtual_variables
+virtual_variables = []
+virt_var = dm.define_deployment_virtual_variable(
+    name="segment_one"
+    ,original_variable="customer_feature_one"
+    ,default="gt-15"
+    ,variable_type="discretize"
+    ,buckets=[{"from": 0,"label": "lt-15","to": 15}]
+)
+virtual_variables.append(virt_var)
+virt_var = dm.define_deployment_virtual_variable(
+    name="segment_two"
+    ,original_variable="customer_feature_two"
+    ,default="gt500"
+    ,variable_type="discretize"
+    ,buckets=[
+              {"from": 0,"label": "lt-50","to": 50},
+              {"from": 50,"label": "50-250","to": 250},
+              {"from": 250,"label": "250-500","to": 500}
+            ]
+)
+virtual_variables.append(virt_var)
+#Configure the Dynamic Interactions to use the Virtual Variable configuration
 online_learning_uuid = ol.create_online_learning(
         auth,
         name=deployment_id,
@@ -82,12 +104,28 @@ online_learning_uuid = ol.create_online_learning(
         randomisation_fail_reward = 0.05,
         randomisation_processing_count = 200,
         randomisation_processing_window = 604800000,
-        randomisation_epsilon = 0.1,
         contextual_variables_offer_key="offer"
+        contextual_variables_contextual_variable_one_name="segment_one",
+        contextual_variables_contextual_variable_one_from_data_source = True,
+        contextual_variables_contextual_variable_one_lookup = "segment_one",
+        contextual_variables_contextual_variable_two_name="segment_two",
+        contextual_variables_contextual_variable_two_from_data_source = True,
+        contextual_variables_contextual_variable_two_lookup = "segment_two",
+        virtual_variables=virtual_variables,
 )
 #Configure the deployment to use the Dynamic Interaction configuration
 new_knowledge = dm.define_deployment_multi_armed_bandit(epsilon=0, dynamic_interaction_uuid=online_learning_uuid)
-#Create a deployment using the configured value of epsilon
+#Configure the lookup to the customer feature store
+parameter_access = dm.define_deployment_parameter_access(
+    auth,
+    lookup_key="customer_number",
+    lookup_type="int",
+    database="feature_store_database",
+    table_collection="customer_feature_store",
+    datasource="mongodb",
+    virtual_variables=virtual_variables
+)
+#Create a deployment using the configured virtual variables
 deployment_step = dm.create_deployment(
     auth,
     project_id=project_id,
