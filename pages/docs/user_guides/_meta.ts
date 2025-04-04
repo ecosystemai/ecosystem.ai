@@ -1,5 +1,9 @@
 export default {
   index: 'Intro',
+  usecases: {
+    "title": "Prediction Uee-Cases",
+    type: 'separator',
+  },
   recommender: 'Recommender',
   dynamic: 'Dynamic Recommender',
   contributing: {
