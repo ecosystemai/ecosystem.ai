@@ -27,8 +27,44 @@ The path settings configure the location of the data and models to be used by th
 The database settings are used to configure the MongoDB instance to be used by the runtime. The logging database settings are used to configure the database and collections in which the logs for the runtime should be stored.
 
 ## Target Scoring Engine
-The endpoints to push the deployment to for the different environments.
+The endpoints to push the deployment to for the different environments. The endpoint that will be used is defined by the Environment Status setting in the Case configuration section.
+
+## Prediction Model
+Specify the models to be used for the Deployment. The models are specified as a comma separated list of model namesin the Models to Load input field. The models should be available to the runtime at the path specified in the Models Path setting.
+
+## Model Selector
+Configure the deployment to different models from the Prediction Model list, based on a lookup from a database.
+- **Data Source**: The type of data source to be used for the lookup.
+- **Database**: The database to be used for the lookup.
+- **Table**: The table to be used for the lookup.
+- **Selector Column**: The name of the field to use to determine which model to select.
+- **Lookup*: A JSON object specifying how the lookup should be performed. The input should have the following form `{"key":"customer_identifier","value":123,"fields":"selector_key"}`. `key` is the name of the field in the customer feature store to be used for the lookup, the `value` is both the default value to be used if the lookup fails and specifies the type of the lookup field and `fields` is a comma separated list of fields to be returned from the lookup.
+- **Selector Setting**: A JSON object specifying which model to use based on the value of the field specified in Selector Column. The input should have the following form `{"key_value_a":[1],"key_value_b":[2]}`. The key is the value of the field specified in the Selector Column and the value is the index of the model in the Models to Load list.
 
 ## Parameter From Data Source
 The configuration for the customer data lookup to be used by the runtime.
-- **Data Source**: The type of data srouce to be used for the lookup.
+- **Data Source**: The type of data source to be used for the lookup.
+- **Database**: The database to be used for the lookup.
+- **Table**: The table to be used for the lookup.
+- **Key Field**: The name of the customer lookup field in the customer feature store.
+- **Key Type and Default**: You can specify a default customer key to use if the lookup fails. This field is also used to specify the type of the the customer lookup field. If the value entered is a string it denotes that the customer lookup field is a string. If the value entered is a number it denotes that the customer lookup field is a number. If you do not want to specify a default value you can use 123 or '123' to sepcify the type.
+- **Lookup Field List**: The fields to be looked up from the customer feature store.
+- **Lookup Defaults**: Default values to be used for the fields if they are missing from the customer feature store when the lookup is performed.
+- **Create Virtual Variables**: Checkbox to indicate whether Virtual Variables should be created based on the lookup from the customer feature store. The User Guide for [Virtual Variables](/docs/user_guides/virtual_variables) contains more information on how to use Virtual Variables.
+
+### Virtual Variable Settings
+Once the `create virtual variables` checkbox is selected and the `Add Variable` button is clicked, the following fields will be available for configuration:
+- **Variable Name**: The name of the virtual variable to be created.
+- **Variable Type**: The type of the virtual variable to be created. The options are:
+  - `Discretize`: Bucket the values of the base variables
+  - `Concatenate`: Combine multiple variables by combining their values
+The remaining fields are dependent on the type of virtual variable selected.
+#### Discretize
+- **Field To Discretize**: The field in the customer feature store to be discretized.
+- **Default Value**: The default value to be used if the field value does not fall into any of the defined buckets.
+- **Label**: The value to assign to the new variable if the feature store variable values falls within the defined bucket
+- **From**: The lower bound of the bucket
+- **To**: The upper bound of the bucket
+To remove a bucket use the delete icon next to the bucket.
+#### Concatenate
+If the Concatenate type is selected, the `Add Field` button will be available to add additional fields to the concatenation. In the Field input dropdown you can select the fields to be concatenated. To remove a field use the delete icon next to the field.
