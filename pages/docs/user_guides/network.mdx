@@ -13,6 +13,11 @@ The Runtime Network Selector offers a comprehensive overview of the network conf
 
 The network selector in ecosystem.ai uses an experiment’s configuration to dynamically route each prediction or interaction request to one of multiple ecosystem runtime configurations (e.g., Configuration A, B, or C). This lets you easily compare different model versions, capture feedback and logs, and adapt to evolving experiments—all managed under a single, unified API.
 
+When setting up a project to support network routing, you will need to configure the network selector. This involves defining the network configuration and specifying the routing criteria. The network selector uses a switch key to determine which network configuration to use for each request. The switch key is a unique identifier that is used to route requests based on specific criteria.
+
+***Note***
+Use ```PostScoreNetwork``` plugin in your project deployment to enable the network selector.
+
 ## Key Features
 
 - **Network Configuration**: The name of the network configuration including type.
