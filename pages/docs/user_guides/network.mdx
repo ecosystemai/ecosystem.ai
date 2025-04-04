@@ -1,0 +1,113 @@
+---
+title: Network
+description: The Runtime Network Selector offers a comprehensive overview of the network configuration for the ecosystem.Ai platform. It provides a detailed view of the network settings, including the network name, type, and other relevant parameters.
+---
+
+import Image from 'next/image'
+
+# Network Selector
+
+The Runtime Network Selector offers a comprehensive overview of the network configuration for the ecosystem.Ai platform. It provides a detailed view of the network settings, including the network name, type, and other relevant parameters. The network selector is a powerful tool that allows you to define and manage the routing of requests based on various criteria. It provides flexibility in configuring the network and allows for easy integration with external services.
+
+![Netowrk Configuration](/images/runtime/network.png)
+
+The network selector in ecosystem.ai uses an experiment’s configuration to dynamically route each prediction or interaction request to one of multiple ecosystem runtime configurations (e.g., Configuration A, B, or C). This lets you easily compare different model versions, capture feedback and logs, and adapt to evolving experiments—all managed under a single, unified API.
+
+## Key Features
+
+- **Network Configuration**: The name of the network configuration including type.
+- **Network Nodes**: The number of nodes and configuration in the network.
+
+## Network Types
+
+Here are the different types of network selectors, that will perform different routing mechanisms based on the network configuration:
+
+- **model_selector**:
+Calls an external model selector to get a sorted list of options based on scores. It then calls other runtimes in sequence based on the model selector's score.
+
+- **no_logging_router**:
+Routes requests without logging. It uses a switch key to determine the network configuration and calls an external service based on this configuration.
+
+- **experiment_selector**:
+Routes requests based on an experiment setup. It uses the experiment assigned in the dynamic corpora network setup to call an external service.
+
+- **lookup_passthrough**:
+Looks up a value with result pass-through. It uses a switch key to determine the network configuration and calls an external service based on this configuration. It also checks for network validity and applies default values if necessary.
+
+- **default**:
+The default routing mechanism. It uses a switch key to determine the network configuration and calls an external service based on this configuration.
+
+## Network Configuration
+
+There are two configuration settings that need to be done for the selector to work. Configure a network of client pulse responders by changing configuration based on lookup, scoring and other criteria. Ensure that the lookup settings coordinate and that default have been set or removed. Example, if there's a customer, or other settings in the __network collection, it will use those. If you want customer to go straight through, then remove that default.
+
+These configurations are used to route requests based on the switch_key and to set up the network of client pulse responders by changing configuration based on lookup, scoring, and other criteria.
+
+Here is an explanation of the configuration files ```network``` and ```network_config```.
+
+## Model Selector
+
+The model selector is a network configuration that calls an external model selector to get a sorted list of options based on scores. It then calls other runtimes in sequence based on the model selector's score.
+
+### **network_config**:
+This configuration file contains settings for the network configuration. It includes a switch_key that determines which key in the feature store to use for routing, and a selector object that specifies the default values for various parameters.
+
+Example:
+```json
+{
+  "switch_key": "marital",
+  "name": "network_config",
+  "type": "model_selector",
+  "selector": {
+    "subcampaign": "recommender_dynamic_bayes",
+    "channel": "app",
+    "campaign": "recommender_dynamic_bayes",
+    "params": "{}",
+    "value": "married",
+    "userid": "ecosystem_network",
+    "url": "http://customer.ecosystem.ai:8091",
+    "customer": "281db655-d667-4671-a715-8402c29d7d11"
+  }
+}
+```
+
+### **network**:
+This configuration file contains the actual network options. Each entry corresponds to a possible value of the switch_key specified in network_config. It includes parameters such as numberoffers, subcampaign, channel, campaign, params, value, userid, url, and customer.
+
+Example:
+```json
+{
+  "numberoffers": 4,
+  "subcampaign": "recommender_dynamic_bayes",
+  "channel": "app",
+  "campaign": "recommender_dynamic_bayes",
+  "params": "{}",
+  "value": "married",
+  "userid": "ecosystem_network",
+  "url": "http://customer.ecosystem.ai:8091",
+  "customer": "281db655-d667-4671-a715-8402c29d7d11"
+}
+```
+
+## Lookup Passthrough
+
+The lookup passthrough is a network configuration that looks up a value with result pass-through. It uses a switch_key to determine the network configuration and calls an external service based on this configuration. It also checks for network validity and applies default values if necessary.
+
+### **network_config**:
+```json
+{
+   "switch_key": "cohort",
+   "name": "network_config",
+   "type": "lookup_passthrough"
+}
+```
+
+### **network**:
+In this example the network configuration is set to route requests based on the cohort value. It includes parameters such as numberoffers, subcampaign, channel, campaign, params, value, userid, url, and customer. If those are not present, then it will pass it through from the calling service.
+```json
+{
+  "campaign": "dynamic-recommender",
+  "value": "1",
+  "url": "http://localhost:8015"
+}
+```
