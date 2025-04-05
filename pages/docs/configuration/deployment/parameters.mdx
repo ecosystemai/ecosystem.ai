@@ -68,3 +68,54 @@ The remaining fields are dependent on the type of virtual variable selected.
 To remove a bucket use the delete icon next to the bucket.
 #### Concatenate
 If the Concatenate type is selected, the `Add Field` button will be available to add additional fields to the concatenation. In the Field input dropdown you can select the fields to be concatenated. To remove a field use the delete icon next to the field.
+
+## Offer Matrix
+The Offer Matrix contains information about the items to be recommended by the Deployment. The Offer Matrix can be used in the post scoring logic when applying eligibility rules.
+- **Data Source**: The type of data source to be used for the lookup.
+- **Database**: The database to be used for the lookup.
+- **Table**: The table to be used for the lookup.
+- **Offer Lookup ID** The name of the field in the Offer Matrix that identifies the offer.
+
+## Plugins
+The pre and post scoring logic and API structure java classes to use in the Deployment.
+
+### API endpoint
+The API endpoint is used to configure the API structure to be used in the Deployment. To use the default API structure leave this section blank. See the [API configuration](/docs/runtime/api_configuration) for more information on how to configure the API structure.
+
+### Pre Scoring logic
+The pre scoring logic is used to configure the pre scoring plugin to be used in the Deployment. The pre scoring plugin is used to perform any pre processing of the input data before it is passed to the model for scoring. For Dynamic Interaction configurations select PreScoreDynamic.java for a pre scoring template. For static model configurations PrePredictCustomer.java is the default template and is the pre scoring logic that will be used by default. If you wish to  customise your pre scoring logic see the [pre scoring logic](/docs/runtime/prepredict) documentation as well as the guide for setting up a [local development environment](/docs/user_guides/runtime_plugin_development).
+
+If using custom pre scoring logic, use the compile button to make the pre scoring class available to the runtime. You can also set up a build pipeline to compile the custom pre scoring logic.
+
+### Post Scoring logic
+The post scoring logic is used to configure the post scoring plugin to be used in the Deployment. The post scoring plugin is used to perform any post processing of the output data after it has been scored by the model. There are a number of template classes available:
+- **PostScoreBasic**: General-purpose post-score handling. Use when there’s no need for specialized post-scoring logic, just general output handling.
+- **PlatformDynamicEngagement**: Post scoring logic for Dynamic Interaction configurations. Iterates through the options store and use the Offer Matrix if one is configured.
+- **PostScoreNetwork**: Post score for a network runtime. This post score should not need to be customised. 
+- **PostScoreRecommender**: Generic recommender scoring. When a model generates recommendations, but no specific offer matrix is required.
+- **PostScoreRecommenderOffers**: Generic recommender scoring with an Offer Matrix. When a model generates recommendations and the post scoring logic should loop through the Offer Matrix.
+- **PostScoreRecommenderMulti**: Recommender scoring using a multi model approach and asynchronous scoring. 
+- **PostScoreSpendingPersonality**: The post score for [spend personality](/docs/modules/spend_personality) scoring.
+- **PostScoreMoneyPersonality**: The post score for [money personality](/docs/modules/spend_personality) scoring.
+- **PostScoreSentimentalEquilibrium**: The post score for sentimental equilibrium scoring.
+If you wish to  customise your post scoring logic see the [post scoring logic](/docs/runtime/postpredict) documentation as well as the guide for setting up a [local development environment](/docs/user_guides/runtime_plugin_development).
+
+If using custom post scoring logic, use the compile button to make the post scoring class available to the runtime. You can also set up a build pipeline to compile the custom post scoring logic.
+
+## Whitelist
+Specify a list of customers who are eligible for specific offers. The whitelist is specified as a table containing two columns; the first is the customer identifier and the second is a list of offers for which that customer is eligible. If a customer does not appear in the table the default offer eligibility rules specified in the post scoring logic will be applied.
+
+## New Knowledge
+In the New Knowledge accordion you can specify three parameters:
+- **Epsilon**: The portion of offers to be allocated to explore in `params` in the post scoring logic. See the [epsilon exploration](/docs/user_guides/epsilon_exploration) user guide for more information.
+- **Cache Duration**: This amount of time for which customers will be shown the same offer.
+- **Pulse Responder Reference**: The name and UUID of the Dynamic Interaction configuration to link to the deployment.
+
+## Additional Corpora
+Add additional data sets to the Deployment, these will be loaded into the runtime. Select `Add Corpus` and complete the following fields:
+- **Corpus Name**: The name to give the loaded corpus in the runtime.
+- **Datasource**: The type of data source to be used for the lookup.
+- **Database**: The database to be used for the lookup.
+- **Table**: The table to be used for the lookup.
+- **Type**: How the corpora should be loaded into the runtime. Static corpora are loaded at start up or after a refresh. Dynamic corpora are loaded each time a prediction is made. Experiment corpora are used to condifure an `experiment_selector` type network runtime.
+- **Key**: If a Key field is specified the corpus will be loaded as a JSONObject with the value of the Key field as the key for the JSONObject. If the Key field is not specified the corpus will be loaded as a JSONArray.
