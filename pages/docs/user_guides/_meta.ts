@@ -1,7 +1,7 @@
 export default {
   index: 'Intro',
   usecases: {
-    "title": "Prediction Uee-Cases",
+    "title": "Prediction Use-Cases",
     type: 'separator',
   },
   recommender: 'Recommender',
