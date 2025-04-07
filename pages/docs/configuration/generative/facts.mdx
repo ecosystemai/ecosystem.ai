@@ -1,8 +1,32 @@
 ---
 title: Fact Injection
-description: Fact Injection RAG
+description: Fact Injection
 ---
 
-# Fact Injection RAG
+# Fact Injection
 
-Fact Injection is a feature that allows you to inject facts into the RAG model. This feature is useful for building chatbots, virtual assistants, and other applications that require users to interact with a database using natural language. Call ecosystem Runtime API's and inject facts into the RAG model.
+Fact Injection is a feature that allows you to inject facts using models. This feature is useful for building chatbots, virtual assistants, and other applications that require users to interact with a database using natural language. Call ecosystem Runtime API's and inject facts into various interfaces using the agent frameworks.
+
+There are a number of default implementation of the fact injection framework. These implementations are used to inject facts into the RAG model. The default implementations are:
+- **Prompt Library Processing**: This process use facts from your data and process a prompt from the library to inject facts into your database.
+- **Retrieval Augmented Generation**: This process uses facts from your data to process a prompt and return the results in a chat window.
+- **Chat to SQL**: This process analyzes your request and extract data from your database. It then returns the results in a chat window.
+
+## Prompt Library Processing
+
+The Prompt Library Processing is a process that uses facts from your data and process a prompt from the library to inject facts into your database. This process is useful for building chatbots, virtual assistants, and other applications that require generated content to be added to your data sets.
+
+![Prompt Library](/images/configuration/generative/prompt_library.png)
+
+Test your prompt by providing sample data in the ```TEXT Sample``` window and clicking **Process Prompt** button. For the prompt processing optuon you don;t need to provide the ```<PROMPT>``` and ```</PROMPT>``` tags. These are needed for the embedded prompt processing for example the MongoDB pipeline generator in Feature Engineering.
+
+![Prompt Library Processing](/images/configuration/generative/prompt_process.png)
+
+In order to use a prompt from the library, navigate to the Utilities option and select the **Process Prompt** option from dropdown. Provide the processing parameters and click **Process** button. The processing parameters are:
+- **Database**: The database to use for processing the prompt.
+- **Collection**: The collection to use for processing the prompt.
+- **Field**: The field/s to use for processing the prompt, read the description on the tooltip.
+- **Pipeline**: The MongoDB pipeline to use for extracting processing data.
+- **Prompt ID**: The prompt id from the prompt library.
+
+The result will be processed into a new collection as provided.
