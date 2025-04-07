@@ -15,6 +15,11 @@ Below we outline the implementation of each of these approaches to highlight to 
 
 ## Project level epsilon
 
+<Callout type="tip" title="Note">
+    - There is a known issue with Project level epsilon when using the Eccosystem Rewards Dynamic Interaction algorithm with runtime versions 0.9.5.0 and earlier. In these past versions of the runtime `explore` in `params` is not set correctly when using the Ecosystem Rewards algorithm.
+    - To work around this issue, `explore` should be set in the the post scoring logic using the project level epsilon value.
+</Callout>
+
 ### Configuring epsilon
 Project level $\epsilon$ is configured in the [Deployment](/docs/configuration/deployment) settings. The $\epsilon$ parameter is a number between 0 and 1 which specifies the proportion of recommendations that should be made at random. For example, if $\epsilon$ is set to 0.1, then 10% of the recommendations will be made at random. In order to set the $\epsilon$ parameter in the workbench enable New Knowledge in the Deployment and set the epsilon value in the accordion that appears at the bottom of the screen. To set the $\epsilon$ parameter in the python package, set the `epsilon` parameter in the `define_deployment_multi_armed_bandit` function. The following truncated example shows how to set the $\epsilon$ parameter in the python package:
 ```python
