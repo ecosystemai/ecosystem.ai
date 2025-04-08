@@ -11,8 +11,8 @@ export default {
     type: 'separator',
   },
   runtime_plugin_development: 'Runtime Plugin Development',
-  epsilon_exploration: 'Runtime Exploration using epsilon',
-  virtual_variables: 'Runtime Virtual Variables',
-  network: 'Runtime Network Selector',
+  epsilon_exploration: 'Exploration Using Epsilon',
+  virtual_variables: 'Virtual Variables',
+  network: 'Network Selector',
   dynamic_interaction_deployments: 'Testing Dynamic Interaction Deployments'
 }
