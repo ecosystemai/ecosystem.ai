@@ -11,6 +11,17 @@ There are a number of settings that relate to dynamic interactions. Certain algo
     Bayesian Probabilistic algorithm will train models in real-time if the customer level tracking is turned on.
 </Callout>
 
+## Configuration
+As part of the configuration of the Dynamic Interaction and the Deployment a number of artifacts will be created that are used by the ecosystem.Ai runtime. 
+
+When the [Dynamic Interaction configuration](/docs/configuration/dynamic/parameters) is created, a document containing the details of the deployment will be created in the `ecosystem_meta.dynamic_engagement` collection. The field in the document which uniquely identifies the document is the `uuid`. Additionally, the [Options Store](/docs/configuration/dynamic/options) should be created as part of the Dynamic Interaction configuration. The Options Store is a MongoDB collection. The collection name and database where the Options Store is stored is specified in the `Settings` tab of the Dynamic Interaction configuration. This information can also be found in the document stored in the `dynamic_engagement` collection; the relevant fields are `options_store_collection` and `options_store_database`.
+
+When the Dynamic Interaction [Deployment](/docs/configuration/deployment) is created, the Dynamic Interaction configuration is linked to the Deployment by selecting the desired Dynamic Interaction configuration in the New Knowledge corpora. When the Deployment is pushed to the runtime, the document in `dynamic_engagement` and the Options Store will be referenced as Additional Corpora in the `ecosystem.properties` file that is created.
+```properties
+predictor.corpora=[{"database":"mongodb","name":"dynamic_engagement","update":true,"type":"dynamic_engagement","uuid":"ef931e11-b504-4c4d-958e-47d97c8361af","db":"ecosystem_meta","table":"dynamic_engagement"},{"database":"mongodb","name":"dynamic_engagement","update":true,"type":"dynamic_engagement_options","uuid":"ef931e11-b504-4c4d-958e-47d97c8361af","db":"recommender_demos","table":"recommender_options"}]
+```
+If the Dynamic Interaction and Deployment configurations have been created correctly there should be no need to manually edit the `ecosystem.properties` file. However, it can be useful to review when troubleshooting.
+
 ## Processing Interval
 All algorithms have a background process that train models and update the options store. This process is controlled by an environmental variable:
 ```text
