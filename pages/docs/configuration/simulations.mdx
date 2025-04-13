@@ -1,0 +1,172 @@
+---
+title: Simulations
+description: Simulate the results of your Deployment configuration
+---
+
+# Introduction
+
+Simulations are an important part of the [Deployment](/docs/configuration/deployment) testing process before moving your Deployment to production. There are two simulation approaches available:
+1. Simulations run using the Workbench
+2. Simulations run using the [Python package](/docs/configuration/pythonpackage)
+
+Workbench based simulations are easier to configure and run while Python simulations allow more flexibility and control over the simulation process.
+
+Two key components need to be configured in order to run a simulation:
+1. Determining when and for whom calls to the `/invocations` API should be made
+2. Determining whether the `/invocations` API call would result in a successful interaction triggerring a call to the `/response` API
+
+## Workbench Simulations
+
+On the Workbench, simulations can be accessed in the Laboratory section of the menu. Note that you will need to have the ecosystem-notebooks container running in order to use the Workbench simulation functionality.
+- Select `Create New` to set up a new simulation. 
+- Configure a Name and Description for your simulation and select the Deployment which you like to simulate
+- A simulation can have multiple Runs linked to it
+- Select `Create New` to set up a new Run of the Simulations
+- Configure a name and description for your simulation Run
+- A UUID for the simulation run will be automatically generated, this is used to uniquely identify the simulation run
+- Number of Iterations: The number of times that the runtime will be called i nhe simulation
+- Default Take Up Rate: The default take up rate for the simulation. This is the probability that a customer will accept an offer. A value of 0.1 means customers will ahve a 10% chance of accepting an offer
+- Server URL: The URL of the server to use during the simulation. If you are running the ecosystem.Ai platform using the default docker-compose file, this will be `http://ecosystem-server:3001/api`
+- Notebooks URL: The URL of the notebooks server to use during the simulation. If you are running the ecosystem.Ai platform using the default docker-compose file, this will be `http://ecosystem-notebooks:8010/process_simulation`
+- Client Pulse Responder: The end point to which you have pushed the Deployment to be simulated
+- Iterations per second: The number of iteractions of the simulation to run per second. Note that this will pause the simulation by 1/(Iterations per second) seconds between each iteration.
+- Generate Output every x Iterations: The simulation will store the state of the system every x iteractions. This is the output of the simulation and will allow you to understand how the state of the system evolved over time.
+- Produce Plot Output: If this is selected, the simulation will produce a plot of the Beta distributions for each item being recommended.
+- Produce Parameter Output: If this is selected, the simulation will produce a table of the Options Store parameters.
+- Segment To Test: Here you can specify a specific set of contectual variable value combinations over which the simulation should be run. By default, all combinations in the Parameters From Data Source configuration of your deployment will be simulated.
+- Use take up from Dynamic Configuration Feature Store: If this is selected, the simulation will use the take up rate from the Set Up Feature Store. This historical take up rate will be used in place of the default take up rate.
+- Set take up field in dynamic configuration feature store: If this field is selected, you can specify a Take Up field in the Set Up Feature Store which is not the same as that configured in the Dynamic Interaction configuration.
+- Take Up Field: The Take Up Field in the set up Feature Store
+- Shift Take Up Rates Over Time: If this is selected, the simulation will shift the take up rate over time. This is useful for simulating a situation where the take up rate is expected to change over time.
+- Standard deviation of shift in take up per iteration: The take up rate is shifted by sampling a shift amount from a normal distribution with a mean of 0 and a standard deviation of the value specified here.
+- Make Take Up Shift Cyclical Instead of Linear: If this is selected, the take up rate will be shifted in a cyclical manner instead of a linear shift.
+- Number of iterations in period of cyclical shift: The cyclical shift will follow a sine wave pattern with the period of the shift specified here.
+
+Once you have specified and saved your Simulation Run configuration, click `Run` to start the simulation. You can track the progress of the simulation in the Logs accordion at the bottom of the screen or using the notifications icon. Once the simulation run has completed you can click `Results` to see the Options Store parameters and Beta Distributions that were produced during the simulation.
+
+## Python Simulations
+
+Simulations can be run in python using `predictor_engine.invocations` and `predictor_engine.response`. The approach for simulating take up can be customised to the use case. An illustrative simulation is provided below using a simple default take up rate of 10%.
+```python
+# Import packages
+from prediction.apis import data_management_engine as dme
+from prediction.apis import prediction_engine as pe
+import getpass
+import random
+
+#Set parameters
+deployment_id = "demo_deployment"
+customer_database = "recommender_demos"
+customer_collection = "offer_feature_store"
+customer_key = "customer_number"
+takeup_rate = 0.1
+delay_seconds = 0.01
+runtime_path_notebook = "http://ecosystem-runtime:8091"
+server_path_notebook = "http://ecosystem-server:3001/api"
+ecosystem_user = "user@ecosystem.ai"
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+
+#Connect to the runtime and server
+auth_runtime = access.Authenticate(runtime_path_notebook)
+auth = jwt_access.Authenticate(server_path_notebook, ecosystem_user, ecosystem_password)
+
+while True:
+    #Get customer
+    customer = dme.post_mongo_db_aggregate_pipeline(
+        auth,
+        {
+        "database":customer_database,"collection":customer_collection
+        ,"pipeline":[
+            {"$sample":{"size":1}}
+            ,{"$project":{customer_key:1,"_id":0}}
+        ]
+        }
+    )[0][customer_key]
+    
+    #Get offer
+    post_invocations_input = {
+                            "campaign": deployment_id
+                          , "subcampaign": "simulation"
+                          , "channel": "notebooks"
+                          , "customer": customer
+                          , "userid": "ecosystem"
+                          , "numberoffers": 1
+                          , "params": "{}"
+                        }
+    offer_response = o.invocations(auth_runtime, post_invocations_input)
+    offer = offer_response["final_result"][0]["result"]["offer"]
+    
+    #Check offer take up
+    take_up = False
+    if random.random() > takeup_rate:
+        take_up = True
+
+    #Register response
+    if take_up:
+        o.response(auth_runtime, offer_response)
+    
+    #pause execution
+    time.sleep(delay_seconds)
+```
+This will run the simulation indefinitely until you stop it. You can restrict the number of iterations and adjust the parameters to fit your use case.
+
+Once the simulation has been completed you can view the results using the following code, as before you can make adjustments to the parameters to fit your use case.
+```python
+# Import packages
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# Set Parameters
+options_store_database = "recommender_demos"
+options_store_collection="demo_recommender_options"
+contextual_variable_one = "lt-15"
+contextual_variable_two = "gt-500"
+uuid = online_learning_uuid
+
+def get_options_store_alpha_beta(options_store_collection,options_store_database,contextual_variable_one=None,contextual_variable_two=None,offer=None):
+    """
+    Get the alpha and beta values from an Ecosystem Rewards options store after applying a range of filters
+    
+    :param options_store_collection: The name of the options store collection in mongo. 
+    :param options_store_database: The name of the options store database in mongo.
+    :param contextual_variable_one: The value of contextual variable one to filter for, by default no filtering is applied. Should be a string.
+    :param contextual_variable_two: The value of contextual variable two to filter for, by default no filtering is applied. Should be a string.
+    :param offer: A list of offers to filter for, by default no filtering is applied. Should be a list of strings.
+    
+    :return A list of dictionaries containing the values of alpha and beta and the offer name for each document match the filters
+    """
+    
+    #Construct the mongo match query for the given filter parameters
+    match_dict = {"$match":{}}
+    if contextual_variable_one is not None:
+        match_dict["$match"]["contextual_variable_one"] = contextual_variable_one
+    if contextual_variable_two is not None:
+        match_dict["$match"]["contextual_variable_two"] = contextual_variable_two
+    if offers:
+        match_dict["$match"]["optionKey"] = {"$in":offers}
+
+    #Get the options store using the filter parameters
+    options_store_alpha_beta = dme.post_mongo_db_aggregate_pipeline(auth,
+                {
+                "database":options_store_database
+                ,"collection":options_store_collection
+                ,"pipeline":[
+                    match_dict
+                    ,{"$project":{"alpha":1,"beta":1,"offer_name":"$optionKey","_id":0}}
+                ]
+                }
+            )
+    return options_store_alpha_beta
+
+
+options_store_alpha_beta = get_options_store_alpha_beta(options_store_collection,options_store_database,contextual_variable_one,contextual_variable_two)
+x = np.linspace(stats.beta.ppf(0.01, 1, 1),stats.beta.ppf(0.99, 1, 1), 100)
+legend_list = []
+for option_iter in options_store_alpha_beta:
+    beta_norm = stats.beta.pdf(x,option_iter["alpha"],option_iter["beta"])
+    plt.plot(x,beta_norm)
+    legend_list.append(option_iter["offer_name"])
+plt.legend(legend_list,bbox_to_anchor=(1.04, 1), loc="upper left")
+plt.show()
+```
