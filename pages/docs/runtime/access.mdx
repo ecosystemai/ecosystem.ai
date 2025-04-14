@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 # Access the API
 
-You can access tour deployed runtime API at the runtime URL. The API is a RESTfull API that accepts POST requests. The API is secured with an API key that you will need to include in the header of your request.
+You can access your deployed runtime at the configured URL using the `/invocations` endpoint. The API is a RESTfull API that accepts POST requests. The API is secured with an API key that you will need to include in the header of your request.
 
 ```bash
 curl -X POST https://api.ecosystem.ai/invocations \
@@ -515,4 +515,4 @@ URL Encoding is required for the in_param field.
     "params": "%22%7B%5C%22airtime_balance%5C%22:%20200,%20%5C%22airtime_advance_limit%5C%22:%2030,%20%5C%22api_payment_method%5C%22:%20%5C%22p%5C%22%7D%22"
 }
 ```
-Use the ```/response``` API to send the selected uuid as return for the model to convergen in real-time if it's configured to do so.
+Use the `/response` API to send the selected uuid as return for the model to convergence in real-time if it's configured to do so.
