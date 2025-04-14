@@ -4,13 +4,13 @@ description: Configure your local environment to develop your own pre and post s
 ---
 
 # Set up your development environment
-The Deployment section of the Workbench is where you deploy machine learning models into production environments, ensuring they are operational, scalable, and integrated seamlessly with existing systems to deliver real-time insights and actions.
+In order to develop your own java classes to use for pre and post scoring and API management, it is recommended that you set up a local development evironment in order to test and debug your code.
 
 ## Prerequisites
 Before you can configure your pre and post scoring logic, you will need to have the following set up on your local machine:
 - Install IntelliJ or update your current install to the latest version
 - Install Java Corretto 17 
-- Clone the ecosystem-runtime-localbuild repo from GitHub https://github.com/ecosystemai/ecosystem-runtime-localbuild
+- Clone the ecosystem-runtime-localbuild repo from GitHub https://github.com/ecosystemai/ecosystem-runtime-localbuild. There are different branches for different versions of the runtime. The default branch is for the latest version of the runtime. If you are working with a specific version of the runtime then check out the branch for that version. 
 
 ## IntelliJ Configuration
 We want to open the project in the ecosystem-runtime-localbuild repo in IntelliJ. Start IntelliJ, select Open Project and select the folder created when cloning the repo. Trust the project. Once IntelliJ has finished processing the project you should see the following view. If the pom.xml file is not open in the editor window then open it from the file structure menu on the left of the screen.
@@ -23,7 +23,7 @@ Copy the text below from the pom.xml file
      <mirror>
          <id>ecosystem-repo</id>
          <name>Maven Repository Manager running on customer.ecosystem.ai</name>
-         <url>http://maven.ecosystem.ai:50000/maven-repository</url>
+         <url>https://maven.ecosystem.ai</url>
          <mirrorOf>ecosystem-repo</mirrorOf>
      </mirror>
    </mirrors>
@@ -69,7 +69,7 @@ Open the maven menu in IntelliJ and reload the project.
 ![Reload Maven project](/images/local_dev_setup/13_reload-project.png)
 
 If you receive errors after running this step there are a couple of troubleshooting steps:
-- Confirm that you can access http://maven.ecosystem.ai:50000/maven-repository/ in your browser. If not you will need to connect to another network where the URL is accessible before proceeding.
+- Confirm that you can access https://maven.ecosystem.ai/ in your browser. If not you will need to connect to another network where the URL is accessible before proceeding.
 - Navigate to the directory you created the settings.xml file and delete the repository and wrapper folders if they are present. Then in the maven menu in IntelliJ select Execute Maven Goal and run `mvn -U clean install`.
 ![Maven clean install](/images/local_dev_setup/14_mvn-clean.png)
 Once you have completed the troubleshooting steps select Reload All Maven Projects from the Maven menu.
