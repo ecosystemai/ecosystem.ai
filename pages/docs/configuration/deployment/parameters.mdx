@@ -74,7 +74,21 @@ The Offer Matrix contains information about the items to be recommended by the D
 - **Data Source**: The type of data source to be used for the lookup.
 - **Database**: The database to be used for the lookup.
 - **Table**: The table to be used for the lookup.
-- **Offer Lookup ID** The name of the field in the Offer Matrix that identifies the offer.
+- **Offer Lookup ID** The name of the field in the Offer Matrix that uniquely identifies the offer.
+
+The Offer Matrix stored in the `params` JSONObject accessible in the post scoring logic. The runtime will attempt to load the Offer Matrix in three different forms:
+ - `offerMatrix`: Loaded as a JSONArray with one element for each row in the Offer Matrix. The rows themselves will be loaded as JSONObjects with the column names as the keys. This structure can be used to efficiently loop through the Offer Matrix.
+ - `offerMatrixWithKey`: Loaded as a JSONObject with the key being the value of the Offer Lookup ID field in the Offer Matrix configuration. The value will the corresponding row of the Offer Matrix represented as a JSONObject with the column names as the keys. This structure can be used to efficiently lookup a specific offer in the Offer Matrix.
+ - `offerMatrixStatic`: Loaded as a JSONArray with one element for each row in the Offer Matrix. The rows themselves will be loaded as JSONObjects with the column names as the keys. Will only load rows in the Offer Matrix which have a column named `static_offers` and the value in that column is greater than 0. `offerMatrixStatic` is returned by the `getOfferMatrix` function in the post scoring logic when a a default value is used when performing the look up configured in Parameters From Data Source. This can allow you to specify offers for new customers where the customer lookup fails.
+If any of these three loads fails the corresponding item in `params` will be empty.
+
+<Callout type="tip" title="Note">
+    Prior to version 0.9.6.0 an error message is displayed if `offerMatrixWithKey` is not loaded successfully, which will generally occur if the `static_offers` column does not exist. Howeverm `offerMatrixWithKey` and `offerMatrix` can still be used even if this error is displayed. From 0.9.6.0 a warning message is displayed instead.
+</Callout>
+
+<Callout type="tip" title="Note">
+    The default functionality in some of the template post scoring logic structures assumes the following columns are present in the Offer Matrix `cost, price, offer_id, offer_name, static_offers`. 
+</Callout>
 
 ## Plugins
 The pre and post scoring logic and API structure java classes to use in the Deployment.
