@@ -22,6 +22,12 @@ predictor.corpora=[{"database":"mongodb","name":"dynamic_engagement","update":tr
 ```
 If the Dynamic Interaction and Deployment configurations have been created correctly there should be no need to manually edit the `ecosystem.properties` file. However, it can be useful to review when troubleshooting.
 
+When a Dynamic Interaction algorithm is scoring or learning it query the [Options Store](/docs/configuration/dynamic/options) and the [logs](/docs/runtime/logging) in order to get the data that is required to complete these processes. For these processes to run correctly requires that these configurations be correctly set up. There are a number of items to check if either the scoring or learning is not proceeding as expected.
+- The generated `ecosystem.properties` file should contain the `dynamic_enagement` items above and the `uuid` should align with the `uuid` for the Dynamic Interaction configuration
+- The `logging` collection should contain the default fields. In particular, the `predictor` and `date_log` fields and a `final_result` object containing; `final_result.result.offer_name`, `final_result.result.contextual_variable_one`, `final_result.result.contextual_variable_two` (if contextual variables are used in the configuration). The `api_params.customer` field should also be present if any sort of customer level processing is being used. These fields should all be present if the default `getTopScores` function is used in the post scoring logic
+- The `predictor` field in the logging collection should be the same as the name of the Dynamic Interaction configuration
+- The post scoring logic may be filtering all the offers out. This can be checked by using the debugging functionality in IntelliJ or by checking the runtime logs to see the number of options passed to the post scoring logic
+
 ## Processing Interval
 All algorithms have a background process that train models and update the options store. This process is controlled by an environmental variable:
 ```text
