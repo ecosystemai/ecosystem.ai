@@ -97,6 +97,7 @@ deployment_step = dm.create_deployment(
 Exploration and exploitation are not split explicitly in Thompson Sampling style algorithms. Instead, exploration occurs automatically when the beta distributions overlap. However, there are situations where it is useful to have a measure of the degree of exploration being performed by the algorithm. Here we outline two approaches for acheiving this:
 1. Popular Offer Comparison: The basis of this approach is the assumption that if the top option selected by the algorithm is not the option with the highest take up rate, then the algorithm is exploring.
 2. Beta Distribution Overlap: In this approach we consider the score produced for each option and determine the probability that it is higher than the scores sampled from the set of options with higher take up rates than the option under consideration. The average of these probabilities will give a measure of the degree of exploration being performed by the algorithm.
+It is important to note that while we can use these approaches to quantify the number of recommendations where exploration is occuring, the exploration is of a different character than when using [$\epsilon$-based exploration](/docs/user_guides/epsilon_exploration/). During an instance of $\epsilon$-based exploration the options will be ranked randomly. In contrast when the Ecosystem Rewards algorithm explores it will still take into account the information it has about the system, making it much more likely to interchange similarly performing offers when exploring rather than ranking completely randomly. In this sense, an instance of $\epsilon$-based exploration is more extreme than an instance of Ecosystem Rewards based exploration.
 
 ### Popular Offer Comparison
 In this approach we determine the proportion of recommendations made where the top option recommended is not the option with the highest take up rate, given any contextual variable values for the recommendation being made. There are two ways to do this:
@@ -161,9 +162,9 @@ While this approach addresses the issue of modified sorting in the post scoring 
 ### Beta Distribution Overlap
 In this approach we consider the score produced for each option and determine the probability that it is higher than the scores sampled from the set of options with higher take up rates than the Option under consideration. The average of these probabilities will give a measure of the degree of exploration being performed by the algorithm.
 
-To illustrate the appraoch followed, consider a single option in the contacts logging collection. Let $r$ be the `arm_reward` for the item. For each option in the Options Store with a higher `propensity` than the option, $\theta$, under consideration, we determine the probability $P_{i}(X < r)$, i.e. the probability that the `arm_reward` generated for $\theta$ is greater then the `arm_reward` generated for option $i$, despite the fact the $i$ has a higher propensity. We then combine the probability $\forall i$ to deteremine the probability that $\theta$ is an exploration option $P_{explore}$. This is done using the following formula:
+To illustrate the appraoch followed, consider a single option in the contacts logging collection. Let $r$ be the `arm_reward` for the item. For each option in the Options Store with a higher `propensity` than the option, $\theta$, under consideration, we determine the probability $P_{i}(X < r)$, i.e. the probability that the `arm_reward` generated for $\theta$ is greater then the `arm_reward` generated for option $i$, despite the fact the $i$ has a higher propensity. To take into account the fact that we may not want to measure exploration between similarly performing offers, we replace $r$ with $r_t=r+t$ where $t>0$. We, combine the probability $P_{i}(X < r_t)$, $\forall i$ to deteremine the probability that $\theta$ is an exploration option $P_{explore}$. This is done using the following formula:
 
-$P_{explore} = P_0(X < r) + P_0(X > r)[P_1(X < r) + P_1(X > r)[P_2(X < r) + ...]]$
+$P_{explore} = P_0(X < r_t) + P_0(X > r_t)[P_1(X < r_t) + P_1(X > r_t)[P_2(X < r_t) + ...]]$
 
 Options where either $\alpha=\alpha_0$ or $\beta=\beta_0$ are allocated avalue of $P_{explore} = 1$. $P_{explore}$ is calculated for each option in the contacts logging collection and the exploration rate of the Ecosystem Rewards algorithm is taken to be the average of the $P_{explore}$ values. 
 
@@ -178,14 +179,15 @@ To access the result of this calculation, make use of the `/postEcosystemRewards
     ,"logging_database": "logging"
     ,"predictor": "offer_recommend_dynamic"
     ,"check_indexes": "true"
+    ,"threshold": "0.001"
 }
 ```
-`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. The response from the API will be a json object with the following structure:
+`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. `threshold` sets the value of $t$ in $r_t=r+t$. 
+
+The response from the API will be a json object with the following structure:
 ```json
-[
-    {
+{
     "exploration_probability": 0.27273470649093373
-    }
-]
+}
 ```
 `exploration_probability` is the average of the $P_{explore}$ values.
