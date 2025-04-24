@@ -91,3 +91,102 @@ deployment_step = dm.create_deployment(
     multi_armed_bandit=online_learning
 )
 ```
+
+## Quantifying exploration
+
+Exploration and exploitation are not split explicitly in Thompson Sampling style algorithms. Instead, exploration occurs automatically when the beta distributions overlap. However, there are situations where it is useful to have a measure of the degree of exploration being performed by the algorithm. Here we outline two approaches for acheiving this:
+1. Popular Offer Comparison: The basis of this approach is the assumption that if the top option selected by the algorithm is not the option with the highest take up rate, then the algorithm is exploring.
+2. Beta Distribution Overlap: In this approach we consider the score produced for each option and determine the probability that it is higher than the scores sampled from the set of options with higher take up rates than the option under consideration. The average of these probabilities will give a measure of the degree of exploration being performed by the algorithm.
+
+### Popular Offer Comparison
+In this approach we determine the proportion of recommendations made where the top option recommended is not the option with the highest take up rate, given any contextual variable values for the recommendation being made. There are two ways to do this:
+1. Using the logging data once recommendations have already been made.
+2. By performing the check in the post scoring logic while the recommendation is being made and logging the results.
+We will outline the both of these approaches here. 
+
+#### Using the logging data
+To use logging data for the popular offer comparison, we make use of the `/postEcosystemRewardsExploration` API on the ecosystem.Ai server. This APi is called with a json payload with the following structure:
+```json
+{
+    "start_time": "2025-04-23T08:24:16"
+    ,"end_time": "2025-04-25T08:24:17"
+    ,"options_store_collection": "dynamic_set_up_feature_store_options"
+    ,"options_store_database": "recommender_demos"
+    ,"logging_collection": "ecosystemruntime"
+    ,"logging_database": "logging"
+    ,"predictor": "offer_recommend_dynamic"
+    ,"check_indexes": "true"
+}
+```
+`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. The response from the API will be a json object with the following structure:
+```json
+[
+  {
+    "number_of_explore_offers": 7954,
+    "_id": "None",
+    "number_of_offers": 13803,
+    "exploration_ratio": 0.5762515395203941
+  }
+]
+```
+`exploration_ratio` is the proportion of recommendations made where the top option recommended is not the option with the highest take up rate, i.e. options where we assume that exploration is taking place. 
+
+In order to produce this result two MongoDB aggregation pipelines are run. The first determines the most popular offer for each combination of contextual variable values. This is done using the `propensity` field contained in the Options Store. The second pipeline then aggregates over the contact logs for the specified time period and determines when the first option with an `arm_reward` field in the response does not match the option with the highest `propensity`. Recommendations where no options are returned, i.e. `final_result` is empty, are ignored. The specific pipelines run and their results can be seen in the logs of the ecosystem.Ai server.
+
+While this is the simplest and most easily interpretable exploration quantification, there are two potential issues to be aware of with this approach:
+- If the sorting of the option is modified in the post scoring logic such that the top option is not necessarily the option with the score from the Ecosystem Rewards algorithm, then the exploration ratio will be artificially inflated.
+- Only the top Option in the logs is considered. This means that exploration could be underestimated if there is less data or separation of propensities for options which have a lower propensity. 
+
+The first issue can be addressed by performing the check in the post scoring logic while the recommendation is being made.
+
+<Callout type="tip" title="Note">
+    The offer popularity is determined using the propensity in the Options Store. This is impacted by the Processing Window and Historical Count parameters in the Ecosystem Rewards algorithm rather than the `start_time` and `end_time` specified in the API call.
+</Callout>
+
+#### Using the post scoring logic
+The popular offer comparison can be performed in the post scoring logic by using the Options Store detail passed to the post score in the `params` object. This can be done using the `getOptions` function.
+```java
+JSONArray options = getOptions(params);
+```
+`options` is a JSONArray of the scored options returned by the Ecosystem Rewards algorithm. Each scored options is represented using a JSONObject. The key fields in the JSONObject for this purpose are `propensity` and `arm_reward`. To determine if the recommendation should be marked as exploration, check whether the options with highest `arm_reward` also has the highest `propensity`. The result can then be added to `predictModelMojoResult` so that it will be stored in the logs. 
+
+<Callout type="tip" title="Note">
+    Do not use the key `explore` when adding the exploration indicator to `predictModelMojoResult` as that is the default key used to indicate epsilon based exploration.
+</Callout>
+
+The contact logs with the exploration indicator can then be counted to determine the exploration rate of the Ecosystem Rewards algorithm.
+
+While this approach addresses the issue of modified sorting in the post scoring logic, it still has the drawback of only considering the highest scored option returned by the Ecosystem Rewards algorithm.
+
+### Beta Distribution Overlap
+In this approach we consider the score produced for each option and determine the probability that it is higher than the scores sampled from the set of options with higher take up rates than the Option under consideration. The average of these probabilities will give a measure of the degree of exploration being performed by the algorithm.
+
+To illustrate the appraoch followed, consider a single option in the contacts logging collection. Let $r$ be the `arm_reward` for the item. For each option in the Options Store with a higher `propensity` than the option, $\theta$, under consideration, we determine the probability $P_{i}(X < r)$, i.e. the probability that the `arm_reward` generated for $\theta$ is greater then the `arm_reward` generated for option $i$, despite the fact the $i$ has a higher propensity. We then combine the probability $\forall i$ to deteremine the probability that $\theta$ is an exploration option $P_{explore}$. This is done using the following formula:
+
+$P_{explore} = P_0(X < r) + P_0(X > r)[P_1(X < r) + P_1(X > r)[P_2(X < r) + ...]]$
+
+$P_{explore}$ is calculated for each option in the contacts logging collection and the exploration rate of the Ecosystem Rewards algorithm is taken to be the average of the $P_{explore}$ values.
+
+To access the result of this calculation, make use of the `/postEcosystemRewardsExplorationApprox` API on the ecosystem.Ai server. This APi is called with a json payload with the following structure:
+```json
+{
+    "start_time": "2025-04-23T08:24:16"
+    ,"end_time": "2025-04-25T08:24:17"
+    ,"options_store_collection": "dynamic_set_up_feature_store_options"
+    ,"options_store_database": "recommender_demos"
+    ,"logging_collection": "ecosystemruntime"
+    ,"logging_database": "logging"
+    ,"predictor": "offer_recommend_dynamic"
+    ,"check_indexes": "true"
+}
+```
+`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. The response from the API will be a json object with the following structure:
+```json
+[
+    {
+    "exploration_probability": 0.27273470649093373
+    }
+]
+```
+`exploration_probability` is the average of the $P_{explore}$ values.
+
