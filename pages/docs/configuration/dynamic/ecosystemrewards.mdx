@@ -165,7 +165,7 @@ To illustrate the appraoch followed, consider a single option in the contacts lo
 
 $P_{explore} = P_0(X < r) + P_0(X > r)[P_1(X < r) + P_1(X > r)[P_2(X < r) + ...]]$
 
-$P_{explore}$ is calculated for each option in the contacts logging collection and the exploration rate of the Ecosystem Rewards algorithm is taken to be the average of the $P_{explore}$ values.
+Options where either $\alpha=\alpha_0$ or $\beta=\beta_0$ are allocated avalue of $P_{explore} = 1$. $P_{explore}$ is calculated for each option in the contacts logging collection and the exploration rate of the Ecosystem Rewards algorithm is taken to be the average of the $P_{explore}$ values. 
 
 To access the result of this calculation, make use of the `/postEcosystemRewardsExplorationApprox` API on the ecosystem.Ai server. This APi is called with a json payload with the following structure:
 ```json
@@ -189,4 +189,3 @@ To access the result of this calculation, make use of the `/postEcosystemRewards
 ]
 ```
 `exploration_probability` is the average of the $P_{explore}$ values.
-
