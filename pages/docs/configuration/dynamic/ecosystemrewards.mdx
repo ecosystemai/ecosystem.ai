@@ -92,6 +92,69 @@ deployment_step = dm.create_deployment(
 )
 ```
 
+## Inspecting Beta distributions
+
+To understand the behaviour of the Ecosystem Rewards algorithm, it is important to inspect the Beta distributions the are produced by the algorithm scoring. There are two ways to do this, using the simulation functionality or by producing box and whisker plots from the information contained in the Options Store. 
+
+Use the [simulation](/docs/configuration/simulations) functionality when setting up your configuration. The simulation results will include plots of the Beta dsitributions which can be used to understand the behaviour of the algorithm in the simulated environment.
+
+Use the `/postEcosystemRewardsBetaDistributionBoxPlots` API on the ecosystem.Ai server to examine the distributions contained in the Options Store. The response to the API call will contain the parameters required to produce box and whisker plots of the Beta Distributions. The API is called with a json payload with the following structure:
+```json
+{
+    "options_store_collection": "demo_options",
+    "options_store_database": "recommender",
+    "contextual_variable_one": "segment_one_value",
+    "contextual_variable_two": "segment_two_value",
+    "outlier_threshold": 0.1,
+    "show_low_data": "false"
+}
+```
+`options_store_collection` and `options_store_database` specify the location of the Options Store in MongoDB. `contextual_variable_one` and `contextual_variable_two` specify the values of the contextual variables for which you want to inspect the beta distributions. `outlier_threshold` specifies the threshold for determining the max and min values for the box and whisker plots, the max is taken to be the value of the $X$ where the CDF is 1 - `outlier_threshold` and the min is taken to be the value of the $X$ where the CDF is `outlier_threshold`. `show_low_data` specifies whether to show the data for options without contacts or responses. The response from the API will be a json object with the following structure:
+```json
+[
+  {
+    "q1": 0.20900000000000016,
+    "q3": 0.2590000000000002,
+    "min": 0.18800000000000014,
+    "median": 0.23419203747072595,
+    "max": 0.2830000000000002,
+    "category": "Bulk Purchase Discount"
+  },
+  {
+    "q1": 0.20900000000000016,
+    "q3": 0.2590000000000002,
+    "min": 0.18800000000000014,
+    "median": 0.23419203747072595,
+    "max": 0.2830000000000002,
+    "category": "Bundle Purchase Discount"
+  },
+  {
+    "q1": 0.23200000000000018,
+    "q3": 0.2840000000000002,
+    "min": 0.21100000000000016,
+    "median": 0.25816249050873197,
+    "max": 0.3080000000000002,
+    "category": "Get 10% Off For The Next Hour"
+  },
+  {
+    "q1": 0.004,
+    "q3": 0.01900000000000001,
+    "min": 0.002,
+    "median": 0.013568521031207597,
+    "max": 0.03200000000000002,
+    "category": "Rewards Booster"
+  },
+  {
+    "q1": 0.17100000000000012,
+    "q3": 0.21900000000000017,
+    "min": 0.1510000000000001,
+    "median": 0.19559902200488996,
+    "max": 0.2430000000000002,
+    "category": "Save 10% By Paying Upfront"
+  }
+]
+```
+
 ## Quantifying exploration
 
 Exploration and exploitation are not split explicitly in Thompson Sampling style algorithms. Instead, exploration occurs automatically when the beta distributions overlap. However, there are situations where it is useful to have a measure of the degree of exploration being performed by the algorithm. Here we outline two approaches for acheiving this:
@@ -117,10 +180,13 @@ To use logging data for the popular offer comparison, we make use of the `/postE
     ,"logging_collection": "ecosystemruntime"
     ,"logging_database": "logging"
     ,"predictor": "offer_recommend_dynamic"
+    ,"sample_size": "1000"
     ,"check_indexes": "true"
 }
 ```
-`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. The response from the API will be a json object with the following structure:
+`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. `sample_size` specifies the number of documents to retrieve from the logs, the items are selected randomly. Set `sample_size` to 0 to retrieve all of the relevant logs.
+
+The response from the API will be a json object with the following structure:
 ```json
 [
   {
@@ -180,10 +246,11 @@ To access the result of this calculation, make use of the `/postEcosystemRewards
     ,"logging_database": "logging"
     ,"predictor": "offer_recommend_dynamic"
     ,"check_indexes": "true"
+    ,"sample_size": "1000"
     ,"threshold": "0.001"
 }
 ```
-`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. `threshold` sets the value of $t$ in $r_t=r+t$. 
+`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. `sample_size` specifies the number of documents to retrieve from the logs, the items are selected randomly. Set `sample_size` to 0 to retrieve all of the relevant logs. `threshold` sets the value of $t$ in $r_t=r+t$. 
 
 The response from the API will be a json object with the following structure:
 ```json
@@ -192,3 +259,27 @@ The response from the API will be a json object with the following structure:
 }
 ```
 `exploration_probability` is the average of the $P_{explore}$ values.
+
+To view the `exploration_probability` split by contextual variable values, use the `/getEcosystemRewardsExploreApproxContext` API. The API is called with the same payload as the `/postEcosystemRewardsExplorationApprox` API. The response from the API will be a json object with the following structure:
+```json
+[
+  {
+    "contextual_variable_two": "All",
+    "contextual_variable_one": "All",
+    "number_of_interactions": 1000,
+    "exploration_probability": 0.07521690966398219
+  },
+  {
+    "contextual_variable_two": "Diploma",
+    "contextual_variable_one": "Intentional",
+    "number_of_interactions": 25,
+    "exploration_probability": 0.034429999360797686
+  },
+  {
+    "contextual_variable_two": "Grade12",
+    "contextual_variable_one": "Intentional",
+    "number_of_interactions": 165,
+    "exploration_probability": 0.1975850836543586
+  }
+]
+```
