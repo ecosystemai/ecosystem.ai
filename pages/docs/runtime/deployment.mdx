@@ -57,8 +57,41 @@ else:
     When using the Workbench push functionality with an endpoint load balancing multiple replica runtimes, only a sinlge runtime will be reloaded to use the new configuration that has been pushed. You will need to call the `/refresh` API for each runtime in order for the update to propogate to each replica. This is handled automatically when using the python functionality.
 </Callout>
 
-## Custom post scoring logic
-When using custom post scoring logic you will need to use the compile functionality in the Workbench to compile the java class before completing the push. In order to create and test your custom post scoring logic we recommend that you follow the [plugin development guide](/docs/user_guides/runtime_plugin_development/). Once you have pushed your custom logic back to the server you can use the Just In Time compilation functionality. To compile the class click the `Compile` button in the Plugins accordion of your Deployment Configuration on the workbench. This will use the `/generateClass` runtime endpoint to compile the java class, as part of this process and unique string will be appended to the name. Once the compile process is completed you will see that the name of the class on the workbench has changed to include this unique string, do not change this string as it is linked to the class that has now been compiled in the runtime. You can now follow the standard push process outlined in the previous section using either the workbench or python.
+## Custom pre and post scoring logic
+When using custom pre and post scoring logic you will need to use the compile functionality in the Workbench to compile the java class before completing the push. In order to create and test your custom pre and post scoring logic we recommend that you follow the [plugin development guide](/docs/user_guides/runtime_plugin_development/). Once you have pushed your custom logic back to the server you can use the Just In Time compilation functionality. To compile the class click the `Compile` button in the Plugins accordion of your Deployment Configuration on the workbench. This will use the `/generateClass` runtime endpoint to compile the java class, as part of this process and unique string will be appended to the name. Once the compile process is completed you will see that the name of the class on the workbench has changed to include this unique string, do not change this string as it is linked to the class that has now been compiled in the runtime. You can now follow the standard push process outlined in the previous section using either the workbench or python.
+
+The compilation step can also be completed using the python package. The code snippet below shows how to compile  and deploy custom post scoring logic.
+```python
+# Import the required packages
+from prediction.apis import ecosystem_generation_engine as ge
+from prediction import jwt_access
+
+# Authenticate
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+auth = jwt_access.Authenticate("http://ecosystem-server:3001/api", "user@ecosystem.ai", ecosystem_password)
+
+# Select the deployment
+project_id = "Demo Project"
+deployment_id = "demo_recommender"
+version = "001"
+
+# Get the deployment step and extract the post scoring logic
+deployment_step = dm.get_deployment_step(auth, project_id, deployment_id, version)
+post_score_code = deployment_step["plugins"]["post_score_class_code"]
+# Compile the post scoring logic file and add the new file name to the deployment step 
+compile_results = o.generate_class(auth_runtime, post_score_code)
+deployment_step["plugins"]["post_score_class_text"] = compile_results["javaFileName"]
+# Save the new deployment step
+dm.update_deployment_step(auth, project_id, deployment_id, version, deployment_step)
+
+#Push deployment and produce properties file
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+```
+
 <Callout type="tip" title="Note">
     In order to preserve the compiled class if the runtime is restarted, you will need to mount the `/app` folder when creating the runtime endpoint. Alternatively you can repeat the compile and push process if the runtime needs to be restarted.
 </Callout>

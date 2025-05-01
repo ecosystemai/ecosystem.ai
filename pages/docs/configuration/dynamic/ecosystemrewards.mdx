@@ -154,6 +154,19 @@ Use the `/postEcosystemRewardsBetaDistributionBoxPlots` API on the ecosystem.Ai 
   }
 ]
 ```
+The same functionality can be use to produce box and whisker plots using the python package, as shown in the following truncated example.
+```python
+from prediction.apis import data_munging_engine as mu
+import matplotlib.pyplot as plt
+
+boxes = mu.ecosystem_rewards_beta_box_plots(auth,options_store_collection,options_store_database,contextual_variable_one,contextual_variable_two)
+
+fig, ax = plt.subplots()  
+ax.bxp(boxes, showfliers=False)
+ax.set_ylabel("PDF")
+plt.xticks(rotation=90)
+plt.show()
+```
 
 ## Quantifying exploration
 
@@ -201,6 +214,8 @@ The response from the API will be a json object with the following structure:
 
 In order to produce this result two MongoDB aggregation pipelines are run. The first determines the most popular offer for each combination of contextual variable values. This is done using the `propensity` field contained in the Options Store. The second pipeline then aggregates over the contact logs for the specified time period and determines when the first option with an `arm_reward` field in the response does not match the option with the highest `propensity`. Recommendations where no options are returned, i.e. `final_result` is empty, are ignored. The specific pipelines run and their results can be seen in the logs of the ecosystem.Ai server.
 
+This functionality can also be access using the `ecosystem_rewards_explore` function in the python package.
+
 While this is the simplest and most easily interpretable exploration quantification, there are two potential issues to be aware of with this approach:
 - If the sorting of the option is modified in the post scoring logic such that the top option is not necessarily the option with the score from the Ecosystem Rewards algorithm, then the exploration ratio will be artificially inflated.
 - Only the top Option in the logs is considered. This means that exploration could be underestimated if there is less data or separation of propensities for options which have a lower propensity. 
@@ -247,10 +262,11 @@ To access the result of this calculation, make use of the `/postEcosystemRewards
     ,"predictor": "offer_recommend_dynamic"
     ,"check_indexes": "true"
     ,"sample_size": "1000"
+    ,"score_filter": "1"
     ,"threshold": "0.001"
 }
 ```
-`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. `sample_size` specifies the number of documents to retrieve from the logs, the items are selected randomly. Set `sample_size` to 0 to retrieve all of the relevant logs. `threshold` sets the value of $t$ in $r_t=r+t$. 
+`start_time` and `end_time` specify the time period over which the logs should be considered. The Options Store and logging parameters specify the location of the Options Store and contacts logging collections in MongoDB. `predictor` specifies the name of the case for which you want to quantify the exploration. `check_indexes` specifies whether the API should check for the required indexes on the Options Store and logging collections. If the indexes are not present, the API will create them. `sample_size` specifies the number of documents to retrieve from the logs, the items are selected randomly. Set `sample_size` to 0 to retrieve all of the relevant logs. `score_filter` will filter out offers with the given score which can be useful if offers are being manually inserted in the post scoring logic, set to `false` to include all scores. `threshold` sets the value of $t$ in $r_t=r+t$. 
 
 The response from the API will be a json object with the following structure:
 ```json
@@ -283,3 +299,5 @@ To view the `exploration_probability` split by contextual variable values, use t
   }
 ]
 ```
+This functionality can also be access using the `ecosystem_rewards_explore_approx` and `ecosystem_rewards_explore_approx_context` functions in the python package.
+
