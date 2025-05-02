@@ -3,4 +3,5 @@ export default {
   prescorebasic: 'Pre-Score Basic',
   prescoredynamic: 'Pre-Score Dynamic',
   prepredictautodate: 'Pre-Predict Auto Date',
+  prescorelookup: 'Pre-Score Lookup'
 }

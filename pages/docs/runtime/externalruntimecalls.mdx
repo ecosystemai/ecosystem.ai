@@ -1,0 +1,27 @@
+---
+title: Calling External Runtimes
+description: Calling one runtime from another runtime
+---
+
+# Calling External Runtimes
+It is often necessary to combine the results of multiple runtimes to produce the desired output. The preferred approach to do this is using the [Network Runtime](/docs/user_guides/network). If the Netwwork Runtime functionality is not suufficient to acheive the desired results, it is possible to call one runtime from another using the `callExternal` method.
+
+## How does it work?
+To use the `callExternal` method your post scoring logic must extend the `PostScoreNetworkSuper` class. `callExternal` takes three arguments; `params`, `api_params`,  and `network`. `params` is the `JSONObject` object that is passed through the runtime process. `api_params` is a `JSONObject` object that contains the parameters to be passed to the external runtime. `network` is a `JSONObject` object that contains the endpoint of the external runtime with the key `url`. This is illustrated in this truncated example:
+```java
+    JSONObject network = new JSONObject();
+    network.put("url", "http://ecosystem-runtime-two:8092");
+
+    JSONObject api_params = new JSONObject();
+    api_params.put("customer", customer_number);
+    api_params.put("campaign", "demo-recommender");
+    api_params.put("subcampaign", "demos");
+    api_params.put("channel", "callExternal");
+    api_params.put("result_count", 2);
+    api_params.put("userid", "runtime_one");
+    api_params.put("in_params", new JSONObject());
+
+    JSONObject response = callExternal(params, api_params, network);
+```
+
+`callExternal` will return the response from the runtime as a `JSONObject` object. The response can then be used in the remainder of the runtime process.

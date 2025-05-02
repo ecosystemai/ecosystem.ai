@@ -1,0 +1,93 @@
+---
+title: Pre-Score Lookup Plugin
+description: Pre-Score Lookup Plugin
+---
+
+import Image from 'next/image'
+
+# Pre-Score Lookup Plugin
+
+The Pre-Score Lookup plugin is a template plugin showing how a lookup to a MongoDB collection can be performed in the Pre Scoring Logic and stored in `params` to be used in the remainder of the runtime structure.
+
+<Callout type="tip" title="Note">
+    The preferred approach to load data into the ecosystem runtime is using either [Parameters From Data Source](/docs/configuration/deployment/parameters) or [Additional Corpora](/docs/configuration/deployment/parameters). Explicit lookups coded in the Pre or Post Scoring logic should be avoided where possible.
+</Callout>
+
+
+## How does it work?
+
+The Pre-Score Lookup plugin is passed the MongoDB connection. An aggregation pipeline can then be used to return the desired data. The result of the aggregation pipeline is then stored in `params`, making available for use in the remainder of the runtime process.
+
+## Java Code
+
+This Java class named `PreScoreLookup` extends `PreScoreSuper`, which provides functionality that can be used across different pre-scoring plugins. 
+
+Then, there is a static method named `getPrePredict(MongoClient mongoClient, JSONObject params, CqlSession session)`. This function takes three parameters: a `MongoClient` object (which is used to interact with a MongoDB database), a `JSONObject` object `params` (which is used the pass data through the runtime process), and a `CqlSession` object `session` (which provides a session for executing CQL commands on a Cassandra database.)
+
+A MongoDB collection and aggregation pipeline are then defined and run and the results are stored in `params` under the key `prescore_data_lookup`. In the example code below we are performing a lookup on the contacts logging collection for the customer number passed in the API call. The MongoDB collection and pipeline can be modified to suit your needs.
+```java
+package com.ecosystem.plugin.customer;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import static com.ecosystem.data.mongodb.MongoDBWorkerFind.getMongoDBAggregatePipelineRuntime;
+
+/**
+ * Perform a mongo lookup and store the results in params for subsequent usage
+ */
+public class PreScoreLookup extends PreScoreSuper {
+
+    public PreScoreLookup() throws Exception {
+
+    }
+
+    /**
+     * Pre-pre predict
+     */
+    public void getPrePredict() {
+    }
+
+    /**
+     * getPrePredict
+     * @param params
+     * @param session
+     * @return
+     */
+    public static JSONObject getPrePredict(MongoClient mongoClient, JSONObject params, CqlSession session) throws IOException {
+
+        try {
+            JSONArray resultArray = new JSONArray();
+            MongoCollection contactsCollection = connectionFactory.connectMongoDB(mongoClient, settings.getLoggingDatabase(), settings.getLoggingCollection());
+            String lookup_pipeline = """
+                    [
+                    {"$match":{"params.value":%s}}
+                    ,{"$limit":2}
+                    ]
+                    """.formatted(params.getJSONObject("lookup").get("value"));
+            resultArray = getMongoDBAggregatePipelineRuntime(
+                    contactsCollection,
+                    lookup_pipeline
+            );
+            params.put("prescore_data_lookup",resultArray);
+
+        } catch (Exception e) {
+            LOGGER.error("PreScoreLookup:E001:UUID: Lookup failed, prescore data lookup not written to params");
+            e.printStackTrace();
+        }
+
+        return params;
+    }
+
+}
+```
+
+<Callout type="tip" title="Note">
+    The name of the class used must include either `PreScoreLookup` or `PreScoreDynamic` in order for `mongoClient` to be passed to the prescore.
+</Callout>
+

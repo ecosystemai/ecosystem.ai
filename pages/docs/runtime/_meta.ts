@@ -9,5 +9,6 @@ export default {
   environment_variables: "Environment Variables",
   access: 'API Access',
   logging: 'Logging & Reporting',
+  externalruntimecalls: 'External Runtime Calls',
   runtimeversion: 'Release Notes'
 }
