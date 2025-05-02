@@ -4,7 +4,7 @@ description: Calling one runtime from another runtime
 ---
 
 # Calling External Runtimes
-It is often necessary to combine the results of multiple runtimes to produce the desired output. The preferred approach to do this is using the [Network Runtime](/docs/user_guides/network). If the Netwwork Runtime functionality is not suufficient to acheive the desired results, it is possible to call one runtime from another using the `callExternal` method.
+It is often necessary to combine the results of multiple runtimes to produce the desired output. The preferred approach to do this is using the [Network Runtime](/docs/user_guides/network). If the Network Runtime functionality is not suufficient to acheive the desired results, it is possible to call one runtime from another using the `callExternal` method.
 
 ## How does it work?
 To use the `callExternal` method your post scoring logic must extend the `PostScoreNetworkSuper` class. `callExternal` takes three arguments; `params`, `api_params`,  and `network`. `params` is the `JSONObject` object that is passed through the runtime process. `api_params` is a `JSONObject` object that contains the parameters to be passed to the external runtime. `network` is a `JSONObject` object that contains the endpoint of the external runtime with the key `url`. This is illustrated in this truncated example:
