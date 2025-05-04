@@ -88,6 +88,6 @@ public class PreScoreLookup extends PreScoreSuper {
 ```
 
 <Callout type="tip" title="Note">
-    The name of the class used must include either `PreScoreLookup` or `PreScoreDynamic` in order for `mongoClient` to be passed to the prescore.
+    The name of the class used must include either `PreScoreLookup` or `PreScoreDynamic` in order for `mongoClient` to be passed to the prescore. For versions prior to `0.9.4.3` for `PreScoreDynamic` and `0.9.6.0` for `PreScoreLookup` a mongo connection will need to be opened manually.
 </Callout>
 

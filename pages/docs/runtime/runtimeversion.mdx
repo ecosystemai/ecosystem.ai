@@ -13,6 +13,8 @@ description: The release notes of the ecosystem runtime from version 0.9.0.0
 - Threading updates to improve performance
 - Further OpenApi updates
 - `callParallelDeployment` method added to PostScoreSuper to enable additional testing of Dynamic Interaction deployments.
+- Allow for pre score classes containing `PreScoreLookup` to be passed the `mongoClient` object argument to allow for arbitrary arggregation pipelines to be run in the pre scoring phase
+- Allow for the specification of lookups from multiple tables to construct `featuresObj` 
 - Localbuild repo changes pending
 - Miscellaneous
   - Fixed issue where Project level epsilon settings would not be reflected in params for the Ecosystem Rewards algorithm
