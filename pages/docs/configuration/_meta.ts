@@ -7,5 +7,6 @@ export default {
   generative: 'Generative Models',
   deployment: 'Deployments',
   api: 'API Management',
+  simulations: 'Simulations',
   pythonpackage: 'Python Package'
 }

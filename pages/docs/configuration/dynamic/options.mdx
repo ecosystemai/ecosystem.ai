@@ -4,10 +4,10 @@ description: Dynamic Interactions Options Store
 ---
 
 # Dynamic Interactions Options Store
-
 The Options Store is generated from data or manually created and updated. Follow the process in [parameters](/docs/configuration/dynamic/parameters) to configure the options store. This store will be updated during the background process cycle. The options are generated from a feature store or data set that contains the appropriate date for your use-case.
 
-Here's an example document from an options collection:
+## Options Store Example
+Below is an example document from an Options Store collection:
 ```json
 {
     "contextual_variable_two": "",
@@ -30,3 +30,54 @@ Here's an example document from an options collection:
     "customer": "none"
 }
 ```
+
+## Updating the Options Store
+If you want to add new Options to your configuration you will need to refresh your Options Store to include these items. This can be done using either the Workbench or the python package. To add these new options they need to be added to your [set up Feature Store](/docs/configuration/dynamic/parameters). There are two approaches you can follow to perform the refresh:
+1. The entire Options Store can be regenerated. This will reset all of the existing Options to the default value, in this process any new options in the Feature Store will be added to the Options Store. This will remove Options no longer present in the set up Feature store from the Options Store
+2. The existing Options Store can be updated. This will only add new options in the Feature Store to the existing Options Store and will not reset the existing options. This will not remove Options no longer present in the set up Feature Store from the Options Store.
+
+<Callout type="tip" title="Note">
+    If the Options Store is regenerated for a running use case the Options Store will continue to be updated by the runtime using the existing logs at the scheduled interval. This means that your regenerated Options Store could largely return to it's prior state once the runtime updates the Options Store.
+</Callout>
+
+### Workbench
+The Options Store is generated in the Variables tab of the Dynamic Interaction configuration.
+
+![image](/images/configuration/dynamic/dynamic-03-variables.png)
+
+Use the `Generate` button to generate a new options store from the settings. Defaults are extracted from defined Feature Store and the Options Store will be generated. Use the `Update` button if you have an existing options store that needs updating. It will not re-generate the options store, but only add or update the options that are out of date. All scores will be retained and defaults will be used for added options only.
+
+### Python
+The Options Store can also be Updated or Generated using the python package. The following example shows how to update the Options Store using the python package. Here we include we give an example of updating the set up Feature Store from an Offer Matrix and then updating the Options Store.
+```python
+# Import packages
+from prediction.apis import data_management_engine as dme
+from prediction.apis import online_learning_management as ol
+from prediction import jwt_access
+import getpass
+
+# Connect to the ecosystem.Ai server
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+auth = jwt_access.Authenticate("http://ecosystem-server:3001/api", "user@ecosystem.ai", ecosystem_password)
+
+# Configure the name of the Dynamic Interaction configuration. The uuid can also be used
+deployment_id = "dynamic-recommender"
+
+# Update your online learning set up feature store
+ol.online_learning_ecosystem_rewards_setup_feature_store(
+    auth,
+    offer_db = "recommender_demos",
+    offer_collection = "offer_matrix",
+    offer_name_column = "offer",
+    contextual_variables = {"segment_one":["lt-15","gt-15"],"segment_two":["lt-50","50-250","250-500","gt-500"]},
+    setup_feature_store_db = "recommender_demos",
+    setup_feature_store_collection = "set_up_offers"
+)
+
+# Generate a new options store
+ol.generate_options_store(auth,deployment_id)
+
+# Update the existing options store
+ol.update_options_store(auth,deployment_id)
+```
+

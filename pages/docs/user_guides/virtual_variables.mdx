@@ -37,7 +37,7 @@ There should now be a `virtual_variables` object saved in the JSON settings of t
                     },
                     {
                         "name": "segment_two",
-                        "default": "gt500",
+                        "default": "gt-500",
                         "type": "discretize",
                         "original_variable": "customer_feature_two",
                         "fields": [],
@@ -163,7 +163,6 @@ import java.io.IOException;
 
 /**
  * Add key/value to properties predictor.param.lookup to allow for contextual variable lookup:
- * dynamic_lookup: 'dynamic_lookup_just4u_v1'
  */
 public class PreScoreDynamic extends PreScoreSuper {
 
@@ -179,8 +178,6 @@ public class PreScoreDynamic extends PreScoreSuper {
 
     /**
      * getPostPredict
-     * example setting in properties file (look for dynamic_lookup: 'dynamic_lookup_just4u'):
-     * predictor.param.lookup={predictor:'justforyou',mojo:1,database:'mongodb',db:'vodacom',table:'fs_score_all_estore_gsm_recommender_rel_1',dynamic_lookup: 'dynamic_lookup_just4u',lookup:{"value":123,"key":"msisdn"},result:{parm1:'field1', parm2:'field2'}}
      * @param params
      * @param session
      * @return
@@ -208,6 +205,69 @@ public class PreScoreDynamic extends PreScoreSuper {
 
 }
 ```
+
+<Callout type="tip" title="Note">
+    Prior to version 0.9.4.3 `getPrePredict` is not passed the Mongo Connection (`mongoClient`). In this case you will need to open a close a Mongo connection in the pre scoring logix, as shown in the code below. Note that this will increase the load on the database.
+    
+```java
+package com.ecosystem.plugin.customer;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.ecosystem.data.mongodb.ConnectionFactory;
+import com.mongodb.client.MongoClient;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+public class PreScoreDynamic extends PreScoreSuper {
+
+    public ConnectionFactory settingsConnection;
+    public MongoClient mongoClient;
+
+    public PreScoreDynamic() throws Exception {
+
+    }
+
+    /**
+     * Pre-pre predict
+     */
+    public void getPrePredict() {
+    }
+
+    /**
+     * getPostPredict
+     * @param params
+     * @param session
+     * @return
+     */
+    public JSONObject getPrePredict(JSONObject params, CqlSession session) throws IOException {
+
+        if (lookupDatabase == null) return params;
+
+        try {
+            settingsConnection = new ConnectionFactory();
+            mongoClient = settingsConnection.getMongoClient();
+            /** Get dynamic properties and add virtual variables to the feature store. */
+            params = getDynamicSettings(mongoClient, params);
+            mongoClient.close();
+            params = getVirtualVariables(params);
+
+            /** Pupulate contextual variables by default based on settings. */
+            params = getPrepopulateContextualVariables(params);
+
+        } catch (Exception e) {
+            LOGGER.error("PreScoreDynamic:E001:UUID: " + params.get("uuid") + " Dynamic parameters failed: " + params.toString());
+            e.printStackTrace();
+        }
+
+        return params;
+    }
+
+}
+
+```
+</Callout>
+
 
 ### Post scoring logic
 No additional configuration is required in the post scoring logic to use the Virtual Variables. The values of the variables can be accessed from `featureObj` like any other feature in the customer feature store and the contextual variable values should be populated as usual if they are required in the configuration.

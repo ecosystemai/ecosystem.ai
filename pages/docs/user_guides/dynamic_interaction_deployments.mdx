@@ -5,9 +5,9 @@ description: This lesson outlines how to run a dynamic deployment in parallel in
 
 # Introduction
 There are a number of ways to test your Dynamic Interaction deployments before putting them live in production. These include:
-1. Simulation using assumed take up rates or historical logs
+1. [Simulation](/docs/configuration/simulations) using assumed take up rates or historical logs
 2. Run the deployment in parallel in production
-3. Use a network runtime to route a portion of the traffic to the new deployment.
+3. Use a [network runtime](/docs/user_guides/network) to route a portion of the traffic to the new deployment.
 
 In this lesson we will outline how to run a deployment in parallel in production.
 
@@ -25,11 +25,19 @@ The invocations API for the Dynamic Deployment will be called from the post scor
         /** Call parallel deployment if specified in in_params or corpora */
         callParallelDeployment(params);
 ```
-`callParallelDeployment` is a method in the `PostScoreSuper` class so your post scoring logic will need to extend `PostScoreSuper` in order to use this method. 
+`callParallelDeployment` is a method in the `PostScoreSuper` class so your post scoring logic will need to extend `PostScoreSuper` in order to use this method.
 
 In order to successfully make the call to the parallel deployment two parameters need to be provided; the URL of the parallel deployment endpoint and the campaign. These parameters can be provided in two ways:
 1. As part of the `params` JSONObject in the `/invocations` API call by adding `parallel_url` and `parallel_campaign` to the `params` JSONObject.
 2. As an [Additional Corpora](/docs/configuration/deployment/parameters/) named parallel_deployment with fields `url` and `campaign`.
+
+An example ```params```:
+```json
+{
+    "parallel_url":"http://ecosystem-runtime:8091",
+    "parallel_campaign":"recommender_dynamic_bayes"
+}
+```
 
 If both methods are used the values in the `params` JSONObject will be used. By default, the remainder of the `/invocations` call will be the same as the existing deployment. These defaults can be overridden using the same structure. For example, to set the `subcampaign` either add `parallel_subcampaign` to `params` or add a field `subcampaign` to the `parallel_deployment` Additional Corpora.
 
@@ -66,8 +74,8 @@ auth_runtime = access.Authenticate("http://ecosystem-runtime:8091")
 
 # Set up the initial schedule interval
 now = datetime.now()
-# Set the difference between the notebook and runtime time zones in minutes 
-time_zone_shift = 120 
+# Set the difference between the notebook and runtime time zones in minutes
+time_zone_shift = 120
 # Set the scheduling interval in minutes
 interval = 1
 # The starting point for the interval
@@ -130,7 +138,7 @@ while True:
         # Call the response API for each offer with simulated take up
         for response_iter in offers_for_response:
             o.put_offer_recommendations(auth_runtime, response_iter, " ")
-    
+
     #Set the starting point for the next interval
     now_less_schedule = datetime.strftime(datetime.now() - timedelta(minutes = time_zone_shift),"%Y-%m-%d %H:%M:%S")
     #Wait for the interval duration before checking again

@@ -1,0 +1,25 @@
+---
+title: Local Environment Update
+description: Updating your local environment
+---
+
+# Update your development environment
+If you update the version of the runtime for which you are developing, you will need to update your local environment to match the new version. This will require:
+- Updating the branch of the ecosystem-runtime-localbuild repo to match the new version of the runtime.
+- Installing the required maven dependencies
+
+## Updating the branch
+Migrate the custom logic that you have written to a new repo based on the branch for the version to which you want to migrate. The [release notes](/docs/runtime/runtimeversion/) for the runtime contain details of the changes in the localbuild repo between versions. However, if you are not overriding any of the built in methods then you should be able to migrate your code without any issues.
+
+## Updating the maven dependencies
+The updated maven dependiencies should ideally be installed automatically when you reload the project. To do this
+open the maven menu in IntelliJ and reload the project.
+![Reload Maven project](/images/local_dev_setup/13_reload-project.png)
+
+Version conflicts can arise when updating the maven dependencies. If you receive errors after running the reload, there are a couple of troubleshooting steps:
+- Navigate to the directory you created the settings.xml file and delete the repository and wrapper folders if they are present. 
+- In the maven menu in IntelliJ select Execute Maven Goal and run `mvn -U clean install`.
+![Maven clean install](/images/local_dev_setup/14_mvn-clean.png)
+Once you have completed the troubleshooting steps select Reload All Maven Projects from the Maven menu.
+
+You can now test your configuration as you normally would in order to confirm that the migration has not introduced any issues.

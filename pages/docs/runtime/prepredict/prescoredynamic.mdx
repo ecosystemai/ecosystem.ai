@@ -17,7 +17,7 @@ The Pre-Score Dynamic plugin loads the Dynamic Interaction configurations. It th
 
 This Java class named `PreScoreDynamic` extends `PreScoreSuper`, which provides functionality that can be used across different pre-scoring plugins. 
 
-Then, there is a static method named `getPrePredict(MongoClient mongoClient, JSONObject params, CqlSession session)`. This function takes three parameters: a `MongoClient` object (which is used to interact with a MongoDB database), a `JSONObject` object `params` (which likely holds the parameter data needed for the method), and a `CqlSession` object `session` (which provides a session for executing CQL commands for DataStax database.)
+Then, there is a static method named `getPrePredict(MongoClient mongoClient, JSONObject params, CqlSession session)`. This function takes three parameters: a `MongoClient` object (which is used to interact with a MongoDB database), a `JSONObject` object `params` (which is used the pass data through the runtime process), and a `CqlSession` object `session` (which provides a session for executing CQL commands on a Cassandra database.)
 
 The function first checks if `lookupDatabase` is null, if it is then it returns the input `params` as is.
 

@@ -1,26 +1,829 @@
 ---
-title: Deployment
-description: Deployment
+title: Push Your Deployment
+description: Pushing a configured deployment to the production environment
 ---
 
-import Image from 'next/image'
+# Push Your Deployment
+Pushing your Deployment is the process of sending your [Deployment](/docs/configuration/deployment) configuration to the runtime endpoint. This requires a [running runtime enpoint](/docs/quick_start). There are a number of approaches to follow, depending on the details of the plugins in your Deployment configuration:
+1. Using template pre and post scoring logic: There is no java compilation required so the basic push functionality can be used.
+2. Custom post scoring logic: Use the built in compilation functionality in the workbench or python before doing the push
+3. Additional custom classes: When using custom pre scoring or API logic or post scoring logic made up of multiple classes, you will need to implement a build pipeline to compile the java classes. These compiled java classes can then be copied to the plugins structure of a runtime before using the push functionality.
 
-# Deployment
+## Template pre and post scoring logic
+If you are using one of the template pre and post scoring logic options, as described in the documentation on the [Deployment parameters](/docs/configuration/deployment/parameters) documentation. Once your Deployment is configured either click the `Push` button in the workbench or use the python functionality. Note that when using python there are two options for pushing the deployment show in the code snippet below. The first shows how to push the deployment to a single runtime endpoint. The second shows how to push the deployment to an endpoint which may have multiple replicas being load balanced behind a single endpoint.
+```python
+# Import the required packages
+from prediction.apis import ecosystem_generation_engine as ge
+from prediction import jwt_access
 
-Deployment is the process of making your predictors available to clients. This section provides an overview of the deployment process and the tools you can use to deploy your predictors.
+# Authenticate
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+auth = jwt_access.Authenticate("http://ecosystem-server:3001/api", "user@ecosystem.ai", ecosystem_password)
 
-## Why do you need deployment?
+# Select the deployment to push
+project_id = "Demo Project"
+deployment_id = "demo_recommender"
+version = "001"
+deployment_step = get_deployment_step(auth, project_id, deployment_id, version)
 
-Deployment is an essential step in the machine learning lifecycle. It allows you to make your predictors available to clients so they can use them to make predictions. The deployment process involves packaging your predictor, uploading it to the runtime, and configuring it to make predictions in real-time.
+# Push deployment and print properties file for single runtime endpoint
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
 
-## What is deployment?
+# Push deployment and print properties file for multiple runtime endpoint in OpenShift
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+    # oc is used to manage the OpenShift environment so we need to configure the connection parameters.
+    # If oc is not available set use_oc to False and manual instructions will be printed
+    openshift_server = "https://api.crc.testing:6443"
+    oc_user = "developer"
+    oc_path = "/home/developer/.crc/oc"
 
-Deployment is the process of making your predictors available to clients. It involves packaging your predictor, uploading it to the runtime, and configuring it to make predictions in real-time. The deployment process is essential for making your predictors accessible to clients so they can use them to make predictions.
+    dm.udate_properties_and_refresh(
+        name=deployment_id
+        ,openshift_server=openshift_server
+        ,oc_user=oc_user
+        ,oc_path=oc_path
+        ,properties=push_result["properties"]
+    )
+```
+<Callout type="tip" title="Note">
+    When using the Workbench push functionality with an endpoint load balancing multiple replica runtimes, only a sinlge runtime will be reloaded to use the new configuration that has been pushed. You will need to call the `/refresh` API for each runtime in order for the update to propogate to each replica. This is handled automatically when using the python functionality.
+</Callout>
 
-## How does deployment work?
+## Custom pre and post scoring logic
+When using custom pre and post scoring logic you will need to use the compile functionality in the Workbench to compile the java class before completing the push. In order to create and test your custom pre and post scoring logic we recommend that you follow the [plugin development guide](/docs/user_guides/runtime_plugin_development/). Once you have pushed your custom logic back to the server you can use the Just In Time compilation functionality. To compile the class click the `Compile` button in the Plugins accordion of your Deployment Configuration on the workbench. This will use the `/generateClass` runtime endpoint to compile the java class, as part of this process and unique string will be appended to the name. Once the compile process is completed you will see that the name of the class on the workbench has changed to include this unique string, do not change this string as it is linked to the class that has now been compiled in the runtime. You can now follow the standard push process outlined in the previous section using either the workbench or python.
 
-The deployment process involves several steps:
-- **Configuration**: Configure your predictor to work with the runtime.
-- **Packaging**: Package your predictor and any required dependencies.
-- **Push**: Push your predictor configuration to the runtime.
-- **Start**: Start your predictor to make it available for predictions.
+The compilation step can also be completed using the python package. The code snippet below shows how to compile  and deploy custom post scoring logic.
+```python
+# Import the required packages
+from prediction.apis import ecosystem_generation_engine as ge
+from prediction import jwt_access
+
+# Authenticate
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+auth = jwt_access.Authenticate("http://ecosystem-server:3001/api", "user@ecosystem.ai", ecosystem_password)
+
+# Select the deployment
+project_id = "Demo Project"
+deployment_id = "demo_recommender"
+version = "001"
+
+# Get the deployment step and extract the post scoring logic
+deployment_step = dm.get_deployment_step(auth, project_id, deployment_id, version)
+post_score_code = deployment_step["plugins"]["post_score_class_code"]
+# Compile the post scoring logic file and add the new file name to the deployment step 
+compile_results = o.generate_class(auth_runtime, post_score_code)
+deployment_step["plugins"]["post_score_class_text"] = compile_results["javaFileName"]
+# Save the new deployment step
+dm.update_deployment_step(auth, project_id, deployment_id, version, deployment_step)
+
+#Push deployment and produce properties file
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+```
+
+<Callout type="tip" title="Note">
+    In order to preserve the compiled class if the runtime is restarted, you will need to mount the `/app` folder when creating the runtime endpoint. Alternatively you can repeat the compile and push process if the runtime needs to be restarted.
+</Callout>
+
+## Additional custom classes
+If you are adding additional custom classes to your Deployment configuration beyond the post scoring logic, you will need to implement a build pipeline to compile the java classes. In order to create and test your custom logic we recommend that you follow the [plugin development guide](/docs/user_guides/runtime_plugin_development/). Here we will illustrate the process using a Tekton pipeline in OpenShift, other pipelining tools can also be used as long as the java classes are compiled and copied to the correct location in the runtime.
+
+The below pipeline will configure a base runtime environment, clone a git repository containing the custom logic, compile the custom java classes, copy the compiled classes to the runtime and then push the Deployment from the server to the runtime.
+```yaml
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: create-base-runtime
+  namespace: ecosystem
+spec:
+  params:
+    - name: project
+      description: The namespace of the case to be deployed
+      type: string
+    - name: port
+      description: The port number of the service
+      type: string
+    - description: The name of the deployment
+      name: deployment-id
+      type: string
+    - description: The name of the project containing the deployment
+      name: ecosystem-project
+      type: string
+    - description: The ecosystem version of the deployment
+      name: ecosystem-version
+      type: string
+    - description: The version of the runtime container
+      name: runtime-version
+      type: string
+    - description: The name of the pvc used by the deployments
+      name: nfs-volume-claim
+      type: string
+    - description: The number of replicas to be created
+      name: replica-number
+      type: string
+    - description: The ecosystem license key
+      name: ecosystem-key
+      type: string
+    - description: The number of seconds between refreshes for the dynamic interaction configurations
+      name: monitoring-delay
+      type: string
+    - description: The mongo connection string
+      name: mongo-connect
+      type: string
+  steps:
+    - name: create-deployment-config
+      image: image-registry.openshift-image-registry.svc:5000/ecosystem/ecosystem-python:0.1.30
+      imagePullPolicy: IfNotPresent
+      workingDir: /workspace/source
+      script: |
+          #!/usr/bin/env python
+          from prediction.apis import deployment_management as dm
+          import yaml
+
+          ecosystem_key = "$(inputs.params.ecosystem-key)"
+          monitoring_delay = $(inputs.params.monitoring-delay)
+          port = $(inputs.params.port)
+          deployment_id = "$(inputs.params.deployment-id)"
+          mongo_connect = "$(inputs.params.mongo-connect)"
+          version = "$(inputs.params.runtime-version)"
+          namespace = "$(inputs.params.project)"
+          volume = "$(inputs.params.nfs-volume-claim)"
+          replicas = $(inputs.params.replica-number)
+          port = $(inputs.params.port)
+          print(mongo_connect)
+
+          environment_variables = [
+              f"MASTER_KEY={ecosystem_key}",
+              f"MONITORING_DELAY={monitoring_delay}",
+              "CASSANDRA_CONFIG=/config/cassandra.conf",
+              "TZ=Africa/Johannesburg",
+              f"PORT={port}",
+              f"MONGO_CONNECT={mongo_connect}"
+          ]
+
+          deployment_config = dm.get_openshift_deployment_config(
+            name=deployment_id
+            , version=version
+            , environment_variables=environment_variables
+            , namespace=namespace
+            , volume=volume
+            , replicas=replicas
+            , port=port
+          )
+
+          deployment_config["spec"]["template"]["spec"]["containers"][0]["image"] = f"image-registry.openshift-image-registry.svc:5000/ecosystem/ecosystem-runtime:{version}"
+
+          print(deployment_config)
+          with open(f'deployment-{deployment_id}.yml', 'w+') as f:
+            yaml.dump(deployment_config, f)
+    - name: create-base-deployment
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      workingDir: /workspace/source
+      script: |
+          #!/bin/bash
+
+          oc patch deployment management --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/volumeMounts/-", "value": {"mountPath": "/$(inputs.params.deployment-id)-data", "name": "tc-ecosystem-disk", "subPath": "$(inputs.params.deployment-id)-data"}}]'
+          sleep 15
+          managementpodname=$(oc get pods -l deployment=management -o jsonpath="{.items[0].metadata.name}")
+          echo $managementpodname
+          oc exec $managementpodname -- /bin/sh -c "cd /$(inputs.params.deployment-id)-data&&mkdir logs"
+
+          echo Create base deployment and test
+          oc project $(inputs.params.project)
+          oc apply -f deployment-$(inputs.params.deployment-id).yml
+          echo "Checking pod for running status"
+          sleep 5
+          pod_status=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0]['status.phase']}")
+          while :
+          do
+            if [[ $pod_status == "Running" ]]; then
+                  echo "Pod is running"
+                  break
+            fi
+            echo $pod_status
+            sleep 30
+            pod_status=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0]['status.phase']}")
+          done
+
+          podname=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0].metadata.name}")
+          echo "Pod Name: "
+          echo $podname
+
+          sleep 10
+          echo "Checking local container ping"
+          wget -qO- --header="accept: */*" http://localhost:8091/ping
+          local_ping=$(oc rsh $podname wget -qO- --header="accept: */*" http://localhost:$(inputs.params.port)/ping)
+          echo $local_ping
+  workspaces:
+    - name: source
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: copy-maven-build-files
+  namespace: ecosystem
+spec:
+  params:
+    - description: The name of the deployment
+      name: deployment-id
+      type: string
+  steps:
+    - name: copy-files
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      imagePullPolicy: IfNotPresent
+      workingDir: /workspace/source
+      script: |
+          #!/bin/bash
+          oc patch deployment management --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/volumeMounts/-", "value": {"mountPath": "/$(inputs.params.deployment-id)-plugins", "name": "tc-ecosystem-disk", "subPath": "$(inputs.params.deployment-id)-plugins"}}]'
+          managementpodname=$(oc get pods -l deployment=management -o jsonpath="{.items[0].metadata.name}")
+          runtimepodname=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0].metadata.name}")
+          echo $managementpodname
+          echo $runtimepodname
+          cd /workspace/source/clone/
+          mkdir base
+          cd base
+          oc cp $runtimepodname:/app/com/ecosystem/. .
+          oc exec $managementpodname -- /bin/sh -c "cd /$(inputs.params.deployment-id)-plugins&&rm -r *"
+          oc cp . $managementpodname:/$(inputs.params.deployment-id)-plugins/
+          echo "Check for plugins folder and copy required files if present"
+          cd ..
+          if [ -d "target" ]; then
+            echo "Plugins folder found, copying to persistent volume claim"
+            cd target
+            oc cp /workspace/source/clone/target/classes/com/ecosystem/plugin/. $managementpodname:/$(inputs.params.deployment-id)-plugins/plugin/
+            oc cp /workspace/source/clone/target/classes/com/ecosystem/runtime/ProductMaster.class $managementpodname:/$(inputs.params.deployment-id)-plugins/runtime/ProductMaster.class
+          fi
+  workspaces:
+    - name: source
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: create-runtime-and-endpoint
+  namespace: ecosystem
+spec:
+  params:
+    - name: project
+      description: The namespace of the case to be deployed
+      type: string
+    - name: server-user
+      description: username for logging into the ecosystem server
+      type: string
+    - name: server-password
+      description: password for logging into the ecosystem server
+      type: string
+    - name: server-url
+      description: ecosystem server url
+      type: string
+    - name: port
+      description: The port number of the service
+      type: string
+    - description: The name of the deployment
+      name: deployment-id
+      type: string
+    - description: The name of the project containing the deployment
+      name: ecosystem-project
+      type: string
+    - description: The ecosystem version of the deployment
+      name: ecosystem-version
+      type: string
+    - description: The version of the runtime container
+      name: runtime-version
+      type: string
+    - description: The name of the pvc used by the deployments
+      name: nfs-volume-claim
+      type: string
+    - description: The number of replicas to be created
+      name: replica-number
+      type: string
+    - description: The ecosystem license key
+      name: ecosystem-key
+      type: string
+    - description: The number of seconds between refreshes for the dynamic interaction configurations
+      name: monitoring-delay
+      type: string
+    - description: The mongo connection string
+      name: mongo-connect
+      type: string
+  steps:
+    - name: create-deployment-config
+      image: image-registry.openshift-image-registry.svc:5000/ecosystem/ecosystem-python:0.1.30
+      imagePullPolicy: IfNotPresent
+      workingDir: /workspace/source
+      script: |
+          #!/usr/bin/env python
+          from prediction.apis import deployment_management as dm
+          import yaml
+
+          ecosystem_key = "$(inputs.params.ecosystem-key)"
+          monitoring_delay = $(inputs.params.monitoring-delay)
+          port = $(inputs.params.port)
+          deployment_id = "$(inputs.params.deployment-id)"
+          mongo_connect = "$(inputs.params.mongo-connect)"
+          version = "$(inputs.params.runtime-version)"
+          namespace = "$(inputs.params.project)"
+          volume = "$(inputs.params.nfs-volume-claim)"
+          replicas = $(inputs.params.replica-number)
+          port = $(inputs.params.port)
+          print(mongo_connect)
+
+          environment_variables = [
+              f"MASTER_KEY={ecosystem_key}",
+              f"MONITORING_DELAY={monitoring_delay}",
+              "CASSANDRA_CONFIG=/config/cassandra.conf",
+              "TZ=Africa/Johannesburg",
+              f"PORT={port}",
+              #f"MONGO_CONNECT={mongo_connect}"
+          ]
+
+          deployment_config = dm.get_openshift_deployment_config(
+            name=deployment_id
+            , version=version
+            , environment_variables=environment_variables
+            , namespace=namespace
+            , volume=volume
+            , replicas=replicas
+            , port=port
+          )
+
+          deployment_config["spec"]["template"]["spec"]["containers"][0]["image"] = f"image-registry.openshift-image-registry.svc:5000/ecosystem/ecosystem-runtime:{version}"
+          deployment_config["spec"]["template"]["spec"]["containers"][0]["volumeMounts"].append(
+            {
+            "mountPath": "/app/com/ecosystem",
+            "name": "tc-ecosystem-disk",
+            "subPath": "$(inputs.params.deployment-id)-plugins"
+            }
+          )
+
+          print(deployment_config)
+          with open(f'deployment-{deployment_id}.yml', 'w+') as f:
+            yaml.dump(deployment_config, f)
+    - name: create-base-deployment
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      workingDir: /workspace/source
+      script: |
+          #!/bin/bash
+          echo Create base deployment and test
+          oc project $(inputs.params.project)
+          oc apply -f deployment-$(inputs.params.deployment-id).yml
+          echo "Checking pod for running status"
+          sleep 5
+          pod_status=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0]['status.phase']}")
+          while :
+          do
+            if [[ $pod_status == "Running" ]]; then
+                  echo "Pod is running"
+                  break
+            fi
+            echo $pod_status
+            sleep 30
+            pod_status=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0]['status.phase']}")
+          done
+
+          podname=$(oc get pods -l deployment=$(inputs.params.deployment-id) -o jsonpath="{.items[0].metadata.name}")
+          echo "Pod Name: "
+          echo $podname
+
+          sleep 10
+          echo "Checking local container ping"
+          local_ping=$(oc rsh $podname wget -qO- --header="accept: */*" http://localhost:$(inputs.params.port)/ping)
+          while :
+          do
+            if [[ $local_ping == *" successful"* ]]; then
+                  echo "Local ping successful"
+                  break
+            fi
+            echo $local_ping
+            sleep 10
+            local_ping=$(oc rsh $podname wget -qO- --header="accept: */*" http://localhost:$(inputs.params.port)/ping)
+          done
+          echo $local_ping
+
+          echo "Creating service"
+          oc expose deployment $(inputs.params.deployment-id) --port=$(inputs.params.port)
+          sleep 10
+          echo "Checking service ping"
+          service_ip=$(oc get service $(inputs.params.deployment-id) -o jsonpath='{.spec.clusterIP}')
+          service_ping=$(wget -qO- --header="accept: */*" http://${service_ip}:$(inputs.params.port)/ping)
+          if [[ $service_ping == *" successful"* ]]; then
+              echo "Service ping successful"
+          else
+              echo "Service ping failed, stopping setup"
+              exit 1
+          fi
+
+          echo "Creating route"
+          oc expose svc $(inputs.params.deployment-id) --port=$(inputs.params.port)
+          oc annotate route $(inputs.params.deployment-id) haproxy.router.openshift.io/balance=roundrobin
+          oc annotate route $(inputs.params.deployment-id) haproxy.router.openshift.io/disable_cookies='true'
+          sleep 15
+          echo "Checking route ping"
+          route_path=$(oc get route $(inputs.params.deployment-id) -o jsonpath='{.spec.host}')
+          route_ping=$(wget -qO- --header="accept: */*" http://${route_path}/ping)
+          if [[ $route_ping == *" successful"* ]]; then
+              echo "Route ping successful"
+          else
+              echo "Route ping failed, stopping setup"
+              exit 1
+          fi
+
+          echo "Route Path:"
+          echo http://${route_path}
+          echo http://${route_path} > route_name.txt
+    - name: update-deployment-and-refresh
+      image: image-registry.openshift-image-registry.svc:5000/ecosystem/ecosystem-python:0.1.30
+      imagePullPolicy: IfNotPresent
+      workingDir: /workspace/source
+      script: |
+          #!/usr/bin/env python
+          from prediction.apis import deployment_management as dm
+          from prediction.apis import ecosystem_generation_engine as ge
+          from prediction import jwt_access
+
+          auth = jwt_access.Authenticate("$(inputs.params.server-url)/api", "$(inputs.params.server-user)", "$(inputs.params.server-password)")
+
+          ecosystem_project = "$(inputs.params.ecosystem-project)"
+          ecosystem_version = "$(inputs.params.ecosystem-version)"
+          deployment_id = "$(inputs.params.deployment-id)"
+
+          deployment_step = dm.get_deployment_step(auth,ecosystem_project,deployment_id,ecosystem_version)
+
+          print(ecosystem_project,deployment_id,ecosystem_version)
+          print(deployment_step)
+
+          with open("route_name.txt", "r") as f:
+            for line in f:
+              route_name = line.strip()
+
+          print(route_name)
+          if deployment_step["project_status"] == "experiment":
+           deployment_step["paths"]["scoring_engine_path_dev"] = route_name
+
+          push_result = ge.process_push(auth,deployment_step)
+          if "ErrorMessage" in push_result:
+            print(push_result["ErrorMessage"])
+          else:
+            print(push_result["properties"])
+  workspaces:
+    - name: source
+
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ecosystem-python
+  namespace: ecosystem
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - name: "0.1.30"
+    from:
+      kind: DockerImage
+      name: docker.io/ecosystemai/ecosystem-algorithms:latest
+    referencePolicy:
+      type: Local
+
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: maven
+  namespace: ecosystem
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - name: '3.9.9-amazoncorretto-17'
+    from:
+      kind: DockerImage
+      name: maven:3.9.9-amazoncorretto-17
+    referencePolicy:
+      type: Local
+
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ecosystem-runtime
+  namespace: ecosystem
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - name: "0.9.5.0"
+    from:
+      kind: DockerImage
+      name: docker.io/ecosystemai/ecosystem-runtime-solo:0.9.5.0
+    referencePolicy:
+      type: Local
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: ecosystem-deployment-pipeline
+  namespace: ecosystem
+spec:
+  params:
+    - description: git repo url
+      name: git-url
+      type: string
+    - description: git repo branch
+      name: git-branch
+      type: string
+      default: main
+    - description: path of folder in git branch
+      name: git-branch-path
+      type: string
+      default: ""
+    - description: The namespace of the case to be deployed
+      name: project
+      type: string
+      default: bdp-rts-dev
+    - description: The name of the deployment
+      name: deployment-id
+      type: string
+    - description: The name of the project containing the deployment
+      name: ecosystem-project
+      type: string
+    - description: The ecosystem version of the deployment
+      name: ecosystem-version
+      type: string
+    - description: The ecosystem version of the deployment
+      name: runtime-version
+      type: string
+    - description: Prefix for the deployment name, should be oc-tc- or oc-fs-
+      name: prefix
+      type: string
+      default: "oc-fs-"
+    - description: Monitoring delayt environment variable
+      name: monitoring-delay
+      type: string
+      default: 600
+    - description: Mongo connection string
+      name: mongo-connect
+      type: string
+    - description: The storage class of the persistent volume claims
+      name: storage-class
+      type: string
+      default: thin
+    - name: nfs-volume-claim
+      type: string
+      default: tc-ecosystem-disk 
+    - name: replica-number
+      type: string
+      default: 1
+    - name: environment-variables
+      description: Environment variables to be passed to the ecosystem.Ai runtime
+      type: array
+    - name: port
+      description: The port number of the service
+      type: string
+      default: 8091
+    - name: server-user
+      description: username for logging into the ecosystem server
+      type: string
+    - name: server-password
+      description: password for logging into the ecosystem server
+      type: string
+    - name: server-url
+      description: ecosystem server url
+      type: string
+    - name: ecosystem-key
+      description: The ecosystem license key
+      type: string
+  tasks:  
+    - name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-branch)
+        - name: refspec
+          value: ''
+        - name: submodules
+          value: 'false'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'false'
+        - name: crtFileName
+          value: ca-bundle.crt
+        - name: subdirectory
+          value: ''
+        - name: sparseCheckoutDirectories
+          value: $(params.git-branch-path)
+        - name: deleteExisting
+          value: 'true'
+        - name: httpProxy
+          value: ''
+        - name: httpsProxy
+          value: ''
+        - name: noProxy
+          value: ''
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.40.2'
+        - name: userHome
+          value: /home/git
+      taskRef:
+        kind: Task
+        name: git-clone
+      workspaces:
+        - name: output
+          subPath: clone
+          workspace: source
+    - name: maven
+      params:
+        - name: MAVEN_IMAGE
+          value: 'image-registry.openshift-image-registry.svc:5000/ecosystem/maven:3.9.9-amazoncorretto-17'
+        - name: GOALS
+          value:
+            - clean
+            - compile
+        - name: MAVEN_MIRROR_URL
+          value: 'file:///workspace/maven-local-repo'
+        - name: SERVER_USER
+          value: ''
+        - name: SERVER_PASSWORD
+          value: ''
+        - name: PROXY_USER
+          value: ''
+        - name: PROXY_PASSWORD
+          value: ''
+        - name: PROXY_PORT
+          value: ''
+        - name: PROXY_HOST
+          value: ''
+        - name: PROXY_NON_PROXY_HOSTS
+          value: ''
+        - name: PROXY_PROTOCOL
+          value: http
+        - name: CONTEXT_DIR
+          value: .
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: Task
+        name: maven
+      workspaces:
+        - name: source
+          subPath: clone
+          workspace: source
+        - name: maven-settings
+          workspace: custom-maven-settings
+        - name: maven-local-repo
+          subPath: m2-repo
+          workspace: maven-local-repo
+    - name: create-base-runtime
+      params:
+        - name: project
+          value: $(params.project)
+        - name: git-branch-path
+          value: $(params.git-branch-path)
+        - name: port
+          value: $(params.port)
+        - name: deployment-id
+          value: $(params.deployment-id)
+        - name: ecosystem-project
+          value: $(params.ecosystem-project)
+        - name: ecosystem-version
+          value: $(params.ecosystem-version)
+        - name: runtime-version
+          value: $(params.runtime-version)
+        - name: nfs-volume-claim
+          value: $(params.nfs-volume-claim)
+        - name: replica-number
+          value: $(params.replica-number)
+        - name: ecosystem-key
+          value: $(params.ecosystem-key)
+        - name: monitoring-delay
+          value: $(params.monitoring-delay)
+        - name: mongo-connect
+          value: $(params.mongo-connect)
+      runAfter:
+        - maven
+      taskRef:
+        kind: Task
+        name: create-base-runtime
+      workspaces:
+        - name: source
+          workspace: source
+    - name: copy-maven-build-files
+      params:
+        - name: deployment-id
+          value: $(params.deployment-id)
+      runAfter:
+        - create-base-runtime
+      taskRef:
+        kind: Task
+        name: copy-maven-build-files
+      workspaces:
+        - name: source
+          workspace: source
+    - name: create-runtime-and-endpoint
+      params:
+        - name: project
+          value: $(params.project)
+        - name: git-branch-path
+          value: $(params.git-branch-path)
+        - name: server-user
+          value: $(params.server-user)
+        - name: server-password
+          value: $(params.server-password)
+        - name: server-url
+          value: $(params.server-url)
+        - name: port
+          value: $(params.port)
+        - name: deployment-id
+          value: $(params.deployment-id)
+        - name: ecosystem-project
+          value: $(params.ecosystem-project)
+        - name: ecosystem-version
+          value: $(params.ecosystem-version)
+        - name: runtime-version
+          value: $(params.runtime-version)
+        - name: nfs-volume-claim
+          value: $(params.nfs-volume-claim)
+        - name: replica-number
+          value: $(params.replica-number)
+        - name: ecosystem-key
+          value: $(params.ecosystem-key)
+        - name: monitoring-delay
+          value: $(params.monitoring-delay)
+        - name: mongo-connect
+          value: $(params.mongo-connect)
+      runAfter:
+        - copy-maven-build-files
+      taskRef:
+        kind: Task
+        name: create-runtime-and-endpoint
+      workspaces:
+        - name: source
+          workspace: source
+  workspaces:
+    - name: source
+    - name: custom-maven-settings
+    - name: maven-local-repo
+
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: maven-test-pipeline-run
+spec:
+  pipelineRef:
+    name: ecosystem-deployment-pipeline
+  params:
+  - name: git-url
+    value: 'https://github.com/ecosystemai/example-dynamic-recommender.git'
+  - name: git-branch
+    value: ""
+  - name: git-branch-path
+    value: ""
+  - name: prefix
+    value: ""
+  - name: environment-variables
+    value:
+    - MASTER_KEY=<Key>
+    - MONITORING_DELAY=120
+    - FEATURE_DELAY=99999
+    - CASSANDRA_CONFIG=/config/cassandra.conf
+    - TZ=Africa/Johannesburg
+    - PORT=8999
+  - name: server-user
+    value: user@ecosystem.ai
+  - name: deployment-id
+    value: example-dynamic-recommender
+  - name: ecosystem-project
+    value: "Example Project"
+  - name: ecosystem-version
+    value: "001"
+  - name: runtime-version
+    value: "0.9.5.0"
+  - name: project
+    value: "ecosystem"
+  workspaces:
+    - name: custom-maven-settings
+      configMap:
+        name: custom-maven-settings
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: maven-local-repo
+      persistentvolumeclaim:
+        claimName: tc-ecosystem-disk 
+```
