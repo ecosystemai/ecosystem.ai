@@ -1,0 +1,187 @@
+---
+title: Custom Rewards
+description: Customer Rewards for Dynamic Interaction algorithms
+---
+
+# Introduction
+It is possible to create custom rewards functions for the Dynamic Interaction algorithms. These custom rewards can impact both the scoring of the options as well as the learning of the model. Custom rewwards are supported in the Ecosystem Rewards, Baysian Probabilistic and Q-Learning algorithms. Custom rewards can be configured using either a template rewards function or by writing a custom java function and are linked to your Dynamic Interaction configuration by configuring the Rewards Function class setting of the [Plugins Deployment accordion](/docs/configuration/deployment/parameters).
+
+## Scoring and Learning Rewards
+The rewards function can return two different types of rewards: `reward` and `learning_reward`. 
+- `reward` impacts the score returned by the Dynamic Interaction algorithm. This score is multiplied by the propensity score produced by the algorithm to give the score for the option. For example, in the Ecosystem Rewards algorithm, a number will be sampled from the relevant Beta distribution for the option and the sampled number will then be multiplied by `reward` to give the value for `arm_reward`.
+ - `learning_reward` impacts the learning of the algorithm. `learning_reward` effectively functions as weighting for each historical interaction which will be taken into account when the algorithm is training. Interactions with a higher `learning_reward` will have a larger impact on the learning than those with a lower `learning_reward`.
+
+## Template Rewards Class
+The template rewards class uses configurable Business Logic functions to calculate the rewards. The template checks for an Additional Corpora named `rewards_business_logic`. This collection should contain the name of the function to be called and the output variable to use - to cater for business logic functions which return multiple values. The `type` should also be indicated for each document, this field can be either `reward` or `learning_reward`, depending on whether the reward should impact the scoring or learning of the algorithm. An example of a `rewards_business_logic` collection is shown below:
+```json
+{
+  "function_name": "doWork",
+  "type": "reward",
+  "output": "reward_value"
+},
+{
+  "function_name": "doWork",
+  "type": "learning_reward",
+  "output": "learning_value"
+}
+```
+When the Additional Corpora is linked to the [Deployment](/docs/configuration/deployment/parameters) it should be configured with `type` as the Key. The BusinessLogicReward class will use the configured Business Logic functions to produce `reward` and `learning_reward` and save the values in `params` for use in the Dynamic Interaction algorithm.
+```java
+package com.ecosystem.plugin.reward;
+
+import com.ecosystem.plugin.business.BusinessLogic;
+import com.ecosystem.utils.log.LogManager;
+import com.ecosystem.utils.log.Logger;
+import org.json.JSONObject;
+
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
+/**
+ * Dynamically loaded class to calculate the reward during algorithm loop.
+ * Each iteration of the algorithm loop will call this class to calculate the reward.
+ * Access to all parameters is available via the params JSONObject.
+ */
+public class BusinessLogicReward extends RewardSuper {
+
+    private static final Logger LOGGER = LogManager.getLogger(BusinessLogicReward.class.getName());
+
+    public BusinessLogicReward() {
+        // Constructor
+    }
+
+    public static void reward() {
+        // Dynamic loader
+    }
+
+    /**
+     * This method is called to calculate the reward.
+     * @param params Runtime json object with all execution path variables.
+     * @return Updated params
+     */
+    public static JSONObject reward(JSONObject params) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+
+        double reward = 1.0;
+        double learning_reward = 1.0;
+
+        JSONObject rewards = new JSONObject();
+        
+        try {
+            /* Check if the business logic configuration is present*/
+            boolean business_Logic_configuration_check = false;
+            if (params.has("preloadCorpora")) {
+                if (params.getJSONObject("preloadCorpora").has("rewards_business_logic")) {
+                    business_Logic_configuration_check = true;
+                }
+            }
+
+            /* Return the default rewards if the business logic configuration is not present*/
+            if (!business_Logic_configuration_check) {
+                LOGGER.error("BusinessLogicReward:E002: rewards_business_logic not found in additional corpora. Returning default rewards.");
+                rewards.put("reward", reward);
+                rewards.put("learning_reward", learning_reward);
+                params.put("rewards", rewards);
+                return params;
+            }
+
+            /* Get the business logic configuration and check if rewards and/or learning reward are configured */
+            JSONObject business_logic_configuration = params.getJSONObject("preloadCorpora").getJSONObject("rewards_business_logic");
+            boolean rewards_configuration_check = false;
+            if (business_logic_configuration.has("reward")) {
+                rewards_configuration_check = true;
+            }
+            boolean learning_reward_configuration_check = false;
+            if (business_logic_configuration.has("learning_reward")) {
+                learning_reward_configuration_check = true;
+            }
+
+            /* If neither rewards nor learning_reward are configured return the default values*/
+            if (!rewards_configuration_check && !learning_reward_configuration_check) {
+                LOGGER.error("BusinessLogicReward:E002: Neither reward nor learning_reward found in rewards_business_logic. Returning default rewards.");
+                rewards.put("reward", reward);
+                rewards.put("learning_reward", learning_reward);
+                params.put("rewards", rewards);
+                return params;
+            }
+
+            /* Get the reward value from the business logic function */
+            if (rewards_configuration_check) {
+                JSONObject rewards_configuration = business_logic_configuration.getJSONObject("reward");
+                String function_name = rewards_configuration.getString("function_name");
+                String output = rewards_configuration.getString("output");
+                params.put("business_logic", function_name);
+                params = BusinessLogic.getValues(params);
+                reward = params.getJSONObject("business_logic_results").optDouble(output);
+            }
+
+            /* Get the learning_reward value from the business logic function */
+            if (learning_reward_configuration_check) {
+                JSONObject learning_reward_configuration = business_logic_configuration.getJSONObject("learning_reward");
+                String function_name = learning_reward_configuration.getString("function_name");
+                String output = learning_reward_configuration.getString("output");
+                params.put("business_logic", function_name);
+                params = BusinessLogic.getValues(params);
+                learning_reward = params.getJSONObject("business_logic_results").optDouble(output);
+            }
+        } catch (Exception e) {
+            LOGGER.error("BusinessLogicReward:E001: Error calculating reward using business logic, using default rewards: "+e.getMessage());
+        }
+
+        rewards.put("reward", reward);
+        rewards.put("learning_reward", learning_reward);
+        params.put("rewards", rewards);
+        return params;
+    }
+
+}
+```
+
+## Custom Rewards Function
+Custom rewards functions can be implemented in Java. The class should extend the `RewardSuper` class and add the `rewards` structure to the returned `params` object. The class can be linked to the deployment and compiled in the runtime using the workbench or python package.
+
+The reward function will be passed the `param` object which contains all of the data being used in the scoring process. The keys in `params` which may be particularly useful for the rewards function are; `optionsDoc` which contains the details of the option currently being scored, `dataArrayFinal` which contains the details of the options which have already been scored in the current invocation, `featuresObj` which contains the data in the customer lookup and `preloadCorpora` which contains the additional corpora linked to the deployment.
+
+The rewards function must add a `rewards` object to `params` and return `params`. The `rewards` object should contain the keys `reward` and `learning_reward` which should both be assigned a positive `double` value.
+```java
+package com.ecosystem.plugin.reward;
+
+import org.json.JSONObject;
+
+/**
+ * Dynamically loaded class to calculate the reward during algorithm loop.
+ * Each iteration of the algorithm loop will call this class to calculate the reward.
+ * Access to all parameters is available via the params JSONObject.
+ */
+public class DefaultReward extends RewardSuper {
+
+    public DefaultReward () {
+        // Constructor
+    }
+
+    public static void reward() {
+        // Dynamic loader
+    }
+
+    /**
+     * This method is called to calculate the reward.
+     * @param params Runtime json object with all execution path variables.
+     * @return Updated params
+     */
+    public static JSONObject reward(JSONObject params) {
+
+        double reward = 1.0;
+        double learning_reward = 1.0;
+
+        JSONObject rewards = params.optJSONObject("rewards");
+        if (rewards == null)
+            rewards = new JSONObject();
+
+        rewards.put("reward", reward);
+        rewards.put("learning_reward", learning_reward);
+        params.put("rewards", rewards);
+        return params;
+    }
+
+}
+```
