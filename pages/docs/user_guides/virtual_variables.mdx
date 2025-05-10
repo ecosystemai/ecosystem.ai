@@ -4,13 +4,17 @@ description: This lesson outlines the configuration and usage of the Virtual Var
 ---
 
 # Introduction
-The Virtual Variable functionality allows you to make use of variables derived from values in the customer lookup configured in the deployment without having to hard code the derivation of those variables into the pre scoring logic. This can be used to test new segmentation approaches and model features without first having to add thos features to the production customer feature store.
+The Virtual Variable functionality allows you to make use of variables derived from values in the customer lookup configured in the deployment without having to hard code the derivation of those variables into the pre scoring logic. This can be used to test new segmentation approaches and model features without first having to add those features to the production customer feature store.
 
 The configuration and usage of the Virtual Variables requires the following steps:
 1. Configure your Virtual Variables in the [Deployment](/docs/configuration/deployment) settings.
 2. Use your Virtual Variables in a Dynamic Interaction configuration or in your model training.
 
 Below we give more details on implementing each of these steps and how the Virtual Variables are used in the pre and post scoring logic.
+
+<Callout type="tip" title="Note">
+    Virtual Variables are currently only supported for Dynamic Interaction configurations. Support for static models will be added in the 0.9.6.1 release.
+</Callout>
 
 ## Configuring Virtual Variables
 The first step in using Virtual Variables is to configure them in the deployment settings. To do this using the Workbench follow these steps:
@@ -270,7 +274,7 @@ public class PreScoreDynamic extends PreScoreSuper {
 
 
 ### Post scoring logic
-No additional configuration is required in the post scoring logic to use the Virtual Variables. The values of the variables can be accessed from `featureObj` like any other feature in the customer feature store and the contextual variable values should be populated as usual if they are required in the configuration.
+No additional configuration is required in the post scoring logic to use the Virtual Variables. The values of the variables can be accessed from `featuresObj` like any other feature in the customer feature store and the contextual variable values should be populated as usual if they are required in the configuration.
 
 ## Virtual Variable across multiple customer feature stores 
-The functionality to allow multiple customer features stores to be configured in the Parameters from Data Source accordion of the Deployment is currently under development. Once this functionality is available it will be possible to configure virtual variables across all of these feature stores.
+When configuring [multiple customer lookups](/docs/configuration/deployment/parameters) you can configure Virtual Variables for each data source. These variables can be processed and used as described above.
