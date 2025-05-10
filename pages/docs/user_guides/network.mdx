@@ -16,7 +16,7 @@ The network selector in ecosystem.ai uses an experiment’s configuration to dyn
 When setting up a project to support network routing, you will need to configure the network selector. This involves defining the network configuration and specifying the routing criteria. The network selector uses a switch key to determine which network configuration to use for each request. The switch key is a unique identifier that is used to route requests based on specific criteria.
 
 ***Note***
-Use ```PostScoreNetwork``` plugin in your project deployment to enable the network selector.
+Use `PostScoreNetwork` plugin in your project deployment to enable the network selector.
 
 ## Key Features
 
@@ -48,7 +48,7 @@ There are two configuration settings that need to be done for the selector to wo
 
 These configurations are used to route requests based on the switch_key and to set up the network of client pulse responders by changing configuration based on lookup, scoring, and other criteria.
 
-Here is an explanation of the configuration files ```network``` and ```network_config```.
+Here is an explanation of the configuration files `network` and `network_config`.
 
 ## Model Selector
 
@@ -77,7 +77,7 @@ Example:
 ```
 
 ### **network**:
-This configuration file contains the actual network options. Each entry corresponds to a possible value of the switch_key specified in network_config. It includes parameters such as numberoffers, subcampaign, channel, campaign, params, value, userid, url, and customer.
+This configuration file contains the actual network options. Each entry corresponds to a possible value of the switch_key specified in network_config. It includes parameters such as numberoffers, subcampaign, channel, campaign, in_params, value, userid, url, and customer.
 
 Example:
 ```json
@@ -94,7 +94,7 @@ Example:
 }
 ```
 
-## Lookup Passthrough
+## Lookup Passthrough, Default and No Logging Router
 
 The lookup passthrough is a network configuration that looks up a value with result pass-through. It uses a switch_key to determine the network configuration and calls an external service based on this configuration. It also checks for network validity and applies default values if necessary.
 
@@ -108,11 +108,46 @@ The lookup passthrough is a network configuration that looks up a value with res
 ```
 
 ### **network**:
-In this example the network configuration is set to route requests based on the cohort value. It includes parameters such as numberoffers, subcampaign, channel, campaign, params, value, userid, url, and customer. If those are not present, then it will pass it through from the calling service.
+In this example the network configuration is set to route requests based on the cohort value. It includes parameters such as numberoffers, subcampaign, channel, campaign, in_params, value, userid, url, and customer. If those are not present, then it will pass it through from the calling service.
 ```json
 {
   "campaign": "dynamic-recommender",
   "value": "1",
+  "url": "http://localhost:8015"
+}
+```
+
+## Experiment Selector
+
+The `experiment_selector` network will randomly assign customers to experiment groups based on proportions defined in the `network_config`. The first time customers interact with a configuration they will be assigned to an experiment group, on subsequent interactions that assigned group will persist. This is done using the contacts logging collection. To enable this:
+- The logging connection and database should be the same for all of the ecosystem.Ai runtimes in the network, including the network runtime itself
+- An index `{"params.value":1,"predictor":1}` should be added to those already present in the logging collection
+
+### **network_config**:
+```json
+{
+  "name": "network_config",
+  "selector": {
+    "random_splits": [
+      0.4
+    ],
+    "groups": [
+      "experiment__group_a",
+      "experiment__group_b"
+    ]
+  },
+  "predictor": "experiment__options",
+  "type": "experiment_selector",
+  "version": "001"
+}
+```
+
+### **network**:
+In this example the network configuration is set to route requests based on assigned experiment group. It includes parameters such as numberoffers, subcampaign, channel, campaign, in_params, value, userid, url, and customer. If those are not present, then it will pass it through from the calling service.
+```json
+{
+  "campaign": "dynamic-recommender",
+  "value": "experiment__group_a",
   "url": "http://localhost:8015"
 }
 ```
