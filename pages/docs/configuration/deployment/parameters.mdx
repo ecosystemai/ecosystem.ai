@@ -94,7 +94,7 @@ predictor.param.lookup.features=customer,age,location,
 predictor.param.lookup.default=customer,age
 ```
 
-You can configure lookups to multiple customer data sources using the `Add Lookup` button. If multiple lookups are configured that will be combined into the single `featuresObj` object in the runtime. The field names looked up from the multiple sources should therefore be unique. When multiple lookups are configured, the format in the `properties` file will be changed to an array
+You can configure lookups to multiple customer data sources using the `Add Lookup` button. If multiple lookups are configured that will be combined into the single `featuresObj` object in the runtime. The field names looked up from the multiple sources should therefore be unique. Up to 10 Parameter Access lookups can be configured. When multiple lookups are configured, the format in the `properties` file will be changed to an array.
 ```properties
 predictor.param.lookup=[{predictor:'dynamic-recommender',mojo:1,database:'mongodb',db:'recommender_demos',table:'feature_store',lookup:{"value":123,"key":"msisdn"},result:{parm1:'field1', parm2:'field2'}},{predictor:'dynamic-recommender',mojo:1,database:'mongodb',db:'recommender_demos',table:'feature_store_two',lookup:{"value":123,"key":"msisdn"},result:{parm1:'field1', parm2:'field2'}}]
 predictor.param.lookup.features=[[customer,age],[customer,location]]
@@ -220,7 +220,7 @@ Add additional data sets to the Deployment, these will be loaded into the runtim
 - **Type**: How the corpora should be loaded into the runtime. Static corpora are loaded at start up or after a refresh. Dynamic corpora are loaded each time a prediction is made. Experiment corpora are used to condifure an `experiment_selector` type network runtime.
 - **Key**: If a Key field is specified the corpus will be loaded as a JSONObject with the value of the Key field as the key for the JSONObject. If the Key field is not specified the corpus will be loaded as a JSONArray.
 
-The details will be visible in the `properties` file with the following format:
+Up to 16 Additional Corpora can be configured. The details will be visible in the `properties` file with the following format:
 ```properties
 ### dynamic pulse responder params (Additional Corpora) ###
 predictor.corpora=[{"database":"mongodb","name":"rewards_business_logic","type":"static","db":"recommender_demos","table":"reward_business_logic","key":"type"},{"database":"mongodb","name":"calc_params","type":"static","db":"telecommunications","table":"default_calc_weighted"}]
