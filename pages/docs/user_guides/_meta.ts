@@ -14,5 +14,6 @@ export default {
   epsilon_exploration: 'Exploration Using Epsilon',
   virtual_variables: 'Virtual Variables',
   network: 'Network Selector',
-  dynamic_interaction_deployments: 'Testing Dynamic Interaction Deployments'
+  dynamic_interaction_deployments: 'Testing Dynamic Interaction Deployments',
+  external_runtime_data: 'Data From Another Runtime'
 }

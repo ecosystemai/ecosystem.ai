@@ -1,0 +1,150 @@
+---
+title: Data From Another Runtime
+description: This lesson outlines how to get data from an external runtime.
+---
+
+# Introduction
+The Parameter Access and Additional Corpora components of a [Deployment](/docs/configuration/deployment/) can be configured to get their data from a different runtime which is configured to get the data from MongoDB, Cassandra or Presto. This enables two use cases:
+1. If multiple runtime cases are configured to connect to the same tables, passing the data requests through a single runtime will reduce the number of connections opened to the database.
+2. Each runtime can connect to a single instance of MongoDB, Cassandra or Presto. If data from multiple runtimes is required in a single runtime, then that data can be accessed through the runtime that is connected to desired instance. 
+
+Below we outline the implementation of each of these approaches to highlight to advantages and disadvantages of each approach.
+
+<Callout type="tip" title="Note">
+    This functionality is currently only available when creating a deployment using the python package. The functionality will be made available in the workbench before the release of 0.9.6.1.
+</Callout>
+
+<Callout type="tip" title="Note">
+    - Only `static` and `dynamic` type Additional Corpora can be configured to use a runtime as a data source. The `dynamic_engagement` and `experiment` types cannot be configured to use a runtime as a data source.
+    - The Additional Corpora types should be the same across the two runtimes.
+    - The `/refresh` endpoint needs to be called on both runtimes for all of the data to be refreshed.
+</Callout>
+
+## Configure a runtime to pass data
+The first step is to configure a runtime to get the data from the data source of interest. Both Parameter Access and Additional Copora can be configured. `PostScoreProvideData` should be configured as the post scoring logic in order to generate an API response containing the data in the expected format. Below we show an example of how the runtime can be configured using the python package:
+```python
+from prediction.apis import deployment_management as dm
+from prediction.apis import ecosystem_generation_engine as ge
+
+# The name of the project and deployment on which you will be working.
+project_id = "Example Project"
+deployment_id_lookup = "external_data_lookup"
+runtime_path_lookup="http://ecosystem-runtime:8091"
+# The database from which the data will be pulled
+db = "recommender_demos"
+#Configure the lookup to the customer feature store
+parameter_access_lookup = dm.define_deployment_parameter_access(
+    auth,
+    lookup_key="customer",
+    lookup_type="int",
+    database=db,
+    table_collection="offer_feature_store",
+    datasource="mongodb"
+)
+#Configure the additional corpora
+additional_corpora = [
+    {"name":"location_details","database":"mongodb","db":"recommender_demos","table":"location_information","type":"dynamic","key":"location"}
+    ,{"name":"device_details","database":"mongodb","db":"recommender_demos","table":"device_info","type":"static","key":"device"}
+]
+#Create a deployment
+version = "001"
+deployment_step = dm.create_deployment(
+    auth,
+    project_id=project_id,
+    deployment_id=deployment_id_lookup,
+    description="External data lookup",
+    version=version,
+    plugin_post_score_class="PostScoreProvideData.java",
+    scoring_engine_path_dev=runtime_path_lookup,
+    mongo_connect=f"mongodb://ecosystem_user:{mongo_password}@ecosystem-server:54445/?authSource=admin",
+    parameter_access=parameter_access_lookup,
+    corpora=additional_corpora,
+)
+#Push deployment and make a test call to validate the results
+deployment_step = dm.get_deployment_step(auth, project_id, deployment_id_lookup, version,project_status="experiment")
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+    raise ValueError("Push failed")
+#Test your deployment
+post_invocations_input = {
+                            "campaign": deployment_id_lookup
+                          , "subcampaign": "none"
+                          , "channel": "notebooks"
+                          , "customer": 793
+                          , "userid": "test"
+                          , "numberoffers": 1
+                          , "params": "{additional_corpora:[location_details,device_details]}"
+                        }
+offer_response = o.invocations(auth_lookup, post_invocations_input)
+print(offer_response)
+```
+
+## Configure a runtime to use to passed data
+To use data from another runtime, Parameter Access and Additional Corpora should be configured to use runtime as a Data Source and the URL of the runtime to get the data from should be configured. Below we show an example of how the runtime can be configured using the python package:
+```python
+from prediction.apis import deployment_management as dm
+from prediction.apis import ecosystem_generation_engine as ge
+from prediction.apis import online_learning_management as ol
+
+#The name of the project and deployment on which you will be working.
+deployment_id = "offer_recommend_dynamic"
+runtime_path="http://ecosystem-runtime2:8092"
+#Get a dynamic interaction configuration to add to the deployment
+dynamic_interaction_uuid = ol.get_dynamic_interaction_uuid(auth,deployment_id)
+dynamic_interaction = dm.define_deployment_multi_armed_bandit(epsilon=0, dynamic_interaction_uuid=dynamic_interaction_uuid)
+#Configure the lookup to the customer feature store
+parameter_access = dm.define_deployment_parameter_access(
+    auth,
+    lookup_key="customer",
+    lookup_type="int",
+    datasource="runtime",
+    url=runtime_path_lookup,
+    lookup_fields=parameter_access_lookup["lookup_fields"]
+)
+#Configure the additional corpora
+additional_corpora = [
+    {"name":"location_details","database":"runtime","url":"http://ecosystem-runtime:8091","type":"dynamic","key":"location"}
+    ,{"name":"device_details","url":"http://ecosystem-runtime:8091","database":"runtime","type":"static","key":"device"}
+]
+#Create your deployment
+version = "001"
+deployment_step = dm.create_deployment(
+    auth,
+    project_id=project_id,
+    deployment_id=deployment_id,
+    description="Ecosystem Rewards algorithm getting data from external source",
+    version=version,
+    plugin_post_score_class="PlatformDynamicEngagement.java",
+    plugin_pre_score_class="PreScoreDynamic.java",
+    scoring_engine_path_dev=runtime_path,
+    mongo_connect=f"mongodb://ecosystem_user:{mongo_password}@ecosystem-server:54445/?authSource=admin",
+    parameter_access=parameter_access,
+    multi_armed_bandit=dynamic_interaction,
+    corpora=additional_corpora
+)
+#Push deployment and make a test call to validate the results
+deployment_step = dm.get_deployment_step(auth, project_id, deployment_id, version,project_status="experiment")
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+    raise ValueError("Push failed")
+#Test your deployment
+post_invocations_input = {
+                            "campaign": deployment_id_lookup
+                          , "subcampaign": "none"
+                          , "channel": "notebooks"
+                          , "customer": 793
+                          , "userid": "test"
+                          , "numberoffers": 1
+                          , "params": "{}"
+                        }
+offer_response = o.invocations(auth_runtime, post_invocations_input)
+pp.pprint(offer_response)
+```
+The properties file that is generated by pushing the configured Deployment will contain the following entries:
+```properties
+predictor.param.lookup={predictor:'offer_recommend_dynamic',mojo:1,database:'runtime',db:'default',table:'default',url:'http://ecosystem-runtime:8091',lookup:{"value":123,"key":"customer"},result:{parm1:'field1', parm2:'field2'}}
+
+predictor.corpora=[{"database":"runtime","name":"location_details","type":"dynamic","url":"http://ecosystem-runtime:8091","key":"location"},{"database":"runtime","name":"device_details","type":"static","url":"http://ecosystem-runtime:8091","key":"device"},{"database":"mongodb","name":"dynamic_engagement","update":true,"type":"dynamic_engagement","uuid":"1db3c3b2-a140-4af5-a26e-91ca2bc59022","db":"ecosystem_meta","table":"dynamic_engagement"},{"database":"mongodb","name":"dynamic_engagement","update":true,"type":"dynamic_engagement_options","uuid":"1db3c3b2-a140-4af5-a26e-91ca2bc59022","db":"recommender_demos","table":"dynamic_set_up_feature_store_options"}]
+```

@@ -84,6 +84,7 @@ The configuration for the customer data lookup to be used by the runtime.
 - **Key Type and Default**: You can specify a default customer key to use if the lookup fails. This field is also used to specify the type of the the customer lookup field. If the value entered is a string it denotes that the customer lookup field is a string. If the value entered is a number it denotes that the customer lookup field is a number. If you do not want to specify a default value you can use 123 or '123' to sepcify the type.
 - **Lookup Field List**: The fields to be looked up from the customer feature store.
 - **Lookup Defaults**: Default values to be used for the fields if they are missing from the customer feature store when the lookup is performed.
+- **URL**: The URL to be used for the lookup. This is only required if the Data Source is Runtime.
 - **Create Virtual Variables**: Checkbox to indicate whether Virtual Variables should be created based on the lookup from the customer feature store. The User Guide for [Virtual Variables](/docs/user_guides/virtual_variables) contains more information on how to use Virtual Variables.
 
 The details will be visible in the `properties` file with the following format:
@@ -219,6 +220,7 @@ Add additional data sets to the Deployment, these will be loaded into the runtim
 - **Table**: The table to be used for the lookup.
 - **Type**: How the corpora should be loaded into the runtime. Static corpora are loaded at start up or after a refresh. Dynamic corpora are loaded each time a prediction is made. Experiment corpora are used to condifure an `experiment_selector` type network runtime.
 - **Key**: If a Key field is specified the corpus will be loaded as a JSONObject with the value of the Key field as the key for the JSONObject. If the Key field is not specified the corpus will be loaded as a JSONArray.
+- **URL**: The URL to be used for the lookup. This is only required if the Datasource is Runtime.
 
 Up to 16 Additional Corpora can be configured. The details will be visible in the `properties` file with the following format:
 ```properties
