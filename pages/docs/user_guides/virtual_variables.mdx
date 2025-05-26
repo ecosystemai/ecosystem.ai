@@ -192,11 +192,11 @@ public class PreScoreDynamic extends PreScoreSuper {
 
         try {
 
-            /** Get dynamic properties and add virtual variables to the feature store. */
+            /* Get dynamic properties and add virtual variables to the feature store. */
             params = getDynamicSettings(mongoClient, params);
             params = getVirtualVariables(params);
 
-            /** Pupulate contextual variables by default based on settings. */
+            /* Populate contextual variables by default based on settings. */
             params = getPrepopulateContextualVariables(params);
 
         } catch (Exception e) {
@@ -211,7 +211,7 @@ public class PreScoreDynamic extends PreScoreSuper {
 ```
 
 <Callout type="tip" title="Note">
-    Prior to version 0.9.4.3 `getPrePredict` is not passed the Mongo Connection (`mongoClient`). In this case you will need to open a close a Mongo connection in the pre scoring logix, as shown in the code below. Note that this will increase the load on the database.
+    Prior to version 0.9.4.3 `getPrePredict` is not passed the Mongo Connection (`mongoClient`). In this case you will need to open a close a Mongo connection in the pre scoring logic, as shown in the code below. Note that this will increase the load on the database.
     
 ```java
 package com.ecosystem.plugin.customer;
@@ -251,12 +251,12 @@ public class PreScoreDynamic extends PreScoreSuper {
         try {
             settingsConnection = new ConnectionFactory();
             mongoClient = settingsConnection.getMongoClient();
-            /** Get dynamic properties and add virtual variables to the feature store. */
+            /* Get dynamic properties and add virtual variables to the feature store. */
             params = getDynamicSettings(mongoClient, params);
             mongoClient.close();
             params = getVirtualVariables(params);
 
-            /** Pupulate contextual variables by default based on settings. */
+            /* Populate contextual variables by default based on settings. */
             params = getPrepopulateContextualVariables(params);
 
         } catch (Exception e) {
