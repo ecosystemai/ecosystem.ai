@@ -118,7 +118,10 @@ The remaining fields are dependent on the type of virtual variable selected.
 - **To**: The upper bound of the bucket
 To remove a bucket use the delete icon next to the bucket.
 
-Virtual Variables are only supported by Dynamic Interaction configurations and the configuration is stored as part of the Dynamic Interaction in the `ecosystem_meta.dynamic_engagement` MongoDB collection.
+Virtual Variables are stored as part of the Dynamic Interaction configration in the `ecosystem_meta.dynamic_engagement` MongoDB collection and will appear as follows in the `properties` file:
+```properties
+predictor.param.lookup={predictor:'dynamic-recommender',mojo:1,database:'mongodb',db:'telecommunications',table:'feature_store',url:'',lookup:{"value":123,"key":"customer"},virtual_variables:[{"default":"gt-15","buckets":[{"from":0,"label":"lt-15","to":15}],"name":"segment_one","type":"discretize","original_variable":"feature_one","fields":[]},{"default":"gt-500","buckets":[{"from":0,"label":"lt-50","to":50},{"from":50,"label":"50-250","to":250},{"from":250,"label":"250-500","to":500}],"name":"segment_two","type":"discretize","original_variable":"feature_one","fields":[]}],result:{parm1:'field1', parm2:'field2'}}
+```
 
 #### Concatenate
 If the Concatenate type is selected, the `Add Field` button will be available to add additional fields to the concatenation. In the Field input dropdown you can select the fields to be concatenated. To remove a field use the delete icon next to the field.

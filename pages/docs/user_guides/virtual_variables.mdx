@@ -13,7 +13,7 @@ The configuration and usage of the Virtual Variables requires the following step
 Below we give more details on implementing each of these steps and how the Virtual Variables are used in the pre and post scoring logic.
 
 <Callout type="tip" title="Note">
-    Virtual Variables are currently only supported for Dynamic Interaction configurations. Support for static models will be added in the 0.9.6.1 release.
+    Prior to version 0.9.6.1 Virtual Variables are only supported for Dynamic Interaction configurations and cannot be configured in the `ecosystem.properties` file.
 </Callout>
 
 ## Configuring Virtual Variables
@@ -149,11 +149,17 @@ if "ErrorMessage" in push_result:
 else:
     print(push_result["properties"])
 ```
+When you push your Deplyoment configuration to the runtime the properties file that is created will
+```properties
+predictor.param.lookup={predictor:'dynamic-recommender',mojo:1,database:'mongodb',db:'telecommunications',table:'feature_store',url:'',lookup:{"value":123,"key":"customer"},virtual_variables:[{"default":"gt-15","buckets":[{"from":0,"label":"lt-15","to":15}],"name":"segment_one","type":"discretize","original_variable":"feature_one","fields":[]},{"default":"gt-500","buckets":[{"from":0,"label":"lt-50","to":50},{"from":50,"label":"50-250","to":250},{"from":250,"label":"250-500","to":500}],"name":"segment_two","type":"discretize","original_variable":"feature_one","fields":[]}],result:{parm1:'field1', parm2:'field2'}}
+```
 
 ## Virtual Variables and pre and post scoring logic
 
 ### Pre scoring logic
-To have Virtual Variables available in the ecosystem.Ai runtime, the `getDynamicSettings` and `getVirtualVariables` methods need to be called in the pre scoring logic. The template for doing so is the `PreScoreDynamic` class which is shown below. If using the Virtual Variables in a Dynamic Interation configuration then the `getPrepopulateContextualVariables` method should also be called. This will result in the values of the virtual variables being calculated from the customer feature store lookup and the resulting values being added to the `featuresObj` and contextual variables objects in the `params` JSONObject that is passed through the runtime.
+If the Virtual Variables are configured in the `properties` file then they will be derived and added to `featuresObj` before the pre-scoring logic is called. Otherwise the `getVirtualVariables` method can be called in the pre-scoring logic to derive the Virtual Variables from the customer feature store lookup. The `getVirtualVariables` method will return `params` with an updated `featuresObj` which contains the values of the Virtual Variables.
+
+To use Virtual Variables for the contextual variables in a Dynamic Interaction configuration, the `getDynamicSettings` and `getPrepopulateContextualVariables` methods need to be called in the pre scoring logic. The template for doing so is the `PreScoreDynamic` class which is shown below. This will result in the values of the virtual variables being  added to the contextual variables objects in the `params` JSONObject that is passed through the runtime.
 ```java
 package com.ecosystem.plugin.customer;
 
@@ -194,7 +200,6 @@ public class PreScoreDynamic extends PreScoreSuper {
 
             /* Get dynamic properties and add virtual variables to the feature store. */
             params = getDynamicSettings(mongoClient, params);
-            params = getVirtualVariables(params);
 
             /* Populate contextual variables by default based on settings. */
             params = getPrepopulateContextualVariables(params);

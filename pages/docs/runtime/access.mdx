@@ -1,16 +1,23 @@
 ---
-title: Access
-description: Access
+title: API Access
+description: API Access
 ---
 
 import Image from 'next/image'
 
-# Access the API
+# Introduction
+The ecosystem.Ai runtime exposes APIs that can be used to access your deployed configuration.
+- The `/invocations` endpoint is used to access the deployment and receive a response based on the configured rules
+- The `/response` endpoint is used to send record successful interactions generated using the information returned by the `/invocations` call. This is used for logging and learning.
+- The `/refresh` endpoint is used to refresh the runtime and reload any data held in memory
+- The `/refreshWithOptions` endpoint is used to regenerate the [Options Store](/docs/configuration/dynamic/options) and then refresh the runtime.
 
-You can access your deployed runtime at the configured URL using the `/invocations` endpoint. The API is a RESTfull API that accepts POST requests. The API is secured with an API key that you will need to include in the header of your request.
+[Custom APIs](/docs/runtime/apiconfiguration/index) can also be exposed.
 
+## `/invocations`
+You can access your deployed runtime at the configured URL using the `/invocations` endpoint. The API is a RESTfull API that accepts POST requests.
 ```bash
-curl -X POST https://api.ecosystem.ai/invocations \
+curl -X POST http://ecosystem-runtime:8091/invocations \
     -H "Content-Type: application/json" \
     -d '{
         "campaign": "spending_personality",
@@ -24,7 +31,6 @@ curl -X POST https://api.ecosystem.ai/invocations \
 ```
 
 Here is another example payload with a in_param set that can later be used in the model.
-
 ```json
 {
     "campaign": "spending_personality",
@@ -41,11 +47,9 @@ Here is another example payload with a in_param set that can later be used in th
     }
 }
 ```
-
-Modules have different endpoints and payloads. The following is an example of the Spend Personality API in [OpenAPI 3.0](https://swagger.io/specification/) standard.
-
+Modules have different endpoints and payloads. The following is an example of the Spend Personality `/invocations` API in [OpenAPI 3.0](https://swagger.io/specification/) standard.
+<Callout type="note" title="Example `/invocations` Response for Spend Personality" emoji='✏️' collapsible>
 This is the standard return for the Spend Personality API:
-
 ```yaml
 openapi: 3.0.0
 info:
@@ -291,9 +295,11 @@ components:
           description: Timestamp of the response
           example: "2024-12-20T13:04:43.000774Z"
 ```
+</Callout>
 
-If you do not want the API to return an array or document in document JSON objects then use the flatten option. This is especially useful for UI and other technologies that have difficulty with processing nested JSON objects. The example uses the in_param to force a flattened response: ```{"in_param": {"flatten_json": true}}```
-
+If you do not want the API to return an array or document in document JSON objects then use the flatten option. This is especially useful for UI and other technologies that have difficulty with processing nested JSON objects. The example uses the in_param to force a flattened response: `{"in_param": {"flatten_json": true}}`
+<Callout type="note" title="Example Flattened `/invocations` Response for Spend Personality" emoji='✏️' collapsible>
+This is the return for the Spend Personality API when called with `{"in_param": {"flatten_json": true}}`:
 ```yaml
 openapi: 3.0.0
 info:
@@ -500,7 +506,7 @@ paths:
                     description: Reward score associated with the offer
                     example: 0.4742771310552009
 ```
-
+</Callout>
 
 URL Encoding is required for the in_param field.
 
@@ -515,4 +521,100 @@ URL Encoding is required for the in_param field.
     "params": "%22%7B%5C%22airtime_balance%5C%22:%20200,%20%5C%22airtime_advance_limit%5C%22:%2030,%20%5C%22api_payment_method%5C%22:%20%5C%22p%5C%22%7D%22"
 }
 ```
-Use the `/response` API to send the selected uuid as return for the model to convergence in real-time if it's configured to do so.
+
+## `/response`
+Use the `/response` API to send the selected uuid from the `/invocations` API in order to record a successful interaction. The `/response` API can be called in two ways. Firstly, as shown in the example, by populating the request body with a JSON objec that contains the `uuid` and `offers_accepted` fields. The `uuid` is the unique identifier returned by the `/invocations` API, and `offers_accepted` is an array of offers that were accepted by the customer. The `channel_name` is also required to indicate the channel through which the interaction occurred. 
+```bash
+curl -X 'POST' \
+  'http://ecosystem-runtime:8091/response' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"uuid": "dcb54a23-0737-4768-845d-48162598c0f7", "offers_accepted": [{"offer_name": "OFFER_A"}], "channel_name": "app"}'
+```
+Secondly, if all offers from the `/invocations` API were accepted, you can use the response from the `/invocations` API as the request body for the `/response` API. This is shown in the example below. 
+```bash
+curl -X 'POST' \
+  'http://localhost:8091/response' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "cache": 0,
+    "datetime": "2025-06-02T11:32:56.000214+02:00",
+    "explore": 0,
+    "final_result": [
+        {
+            "result": {
+                "contextual_variable_two": "Grade12",
+                "cost": 0,
+                "learning_reward": 1,
+                "contextual_variable_one": "Industrious",
+                "uuid": "9fcfc54a-5282-4a1c-a6fc-aabc0b324456",
+                "modified_offer_score": 0,
+                "offer_name": "Rewards Booster",
+                "offer": "Rewards Booster",
+                "score": 0.8550094429534856,
+                "final_score": 0.8550094429534856,
+                "price": 0,
+                "offer_value": 0,
+                "arm_reward": 0.8550094429534856
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "Grade12",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": 1,
+                "learning_reward": 1,
+                "contextual_variable_one": "Industrious",
+                "offer_name_desc": "Recommended offer is Rewards Booster",
+                "weighting": 1,
+                "uuid": "9fcfc54a-5282-4a1c-a6fc-aabc0b324456",
+                "offer_name": "Rewards Booster",
+                "modified_offer_score": 0,
+                "offer": "Rewards Booster",
+                "p": 0.8550094429534856,
+                "score": 0.8550094429534856,
+                "final_score": 0.8550094429534856,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 1,
+                "offer_value": 0,
+                "beta": 1,
+                "arm_reward": 0.8550094429534856
+            },
+            "rank": 1
+        }
+    ],
+    "id": "offer_recommend_dynamic",
+    "uuid": "9fcfc54a-5282-4a1c-a6fc-aabc0b324456",
+    "in_params": {
+        "contextual_variable_two": "Grade12",
+        "contextual_variable_one": "Industrious"
+    }
+}'
+```
+
+## `/refresh`
+The `/refresh` API is called without a request body and will clear and reload the scoring and data structures in the runtimes memory and reconnect to all configured data sources.
+```bash
+curl -X 'GET' \
+  'http://localhost:8091/refresh' \
+  -H 'accept: */*'
+```
+
+## `/refreshWithOptions`
+The `/refreshWithOptions` API can be used when the runtime is configured to use an [Options Store](/docs/configuration/dynamic/options). This API will generate the Options Store  from the setup feature store and then refresh the runtime. In order to do this the runtime calls the `/updateClientPulseResponder` API exposed by the ecosystem.Ai server. You will need to generate a key to connect to the ecosystem.Ai server. This can be done using the [Workbench](/docs/quick_start/post_install). The following example shows how to call the `/refreshWithOptions` API using curl. The `url` and `token` fields are required in the request body. `url` is the URL of the ecosystem.Ai server and `token` is the key generated using the Workbench. You can also include a `campaign` field in the request body to specify the name of the Dynamic Interaction configuration for which the Options Store should be generated. If no `campaign` is specified, the name of the Deployment will be assumed to be same as the name of the Dynamic Interaction configuration.
+```bash
+curl -X 'POST' \
+  'http://localhost:8091/refreshWithOptions' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+"url":"http://ecosystem-server:3001/api"
+"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29zeXN0ZW0uYWkiLCJ0eXBlIjoiQVBJX0tFWSIsInNlcnZlcklkIjoiaHR0cDovLzEyNy4wLjAuMSIsImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjEiLCJpYXQiOjE3NDUxNjM4NDEsImV4cCI6MTc0NTI1MDI0MX0.hvb7N0UeEjINAf1nGyCQviug-bC-SVf1LzwFMZk0oIY"
+}'
+```
+
+<Callout type="tip" title="Note">
+    The `/refreshWithOptions` API will reset the entire Options Store to its default values, i.e. until the Options Store is next updated by the ecosytem.Ai runtime, the history contained in the logging collections will be ignored.
+</Callout>
