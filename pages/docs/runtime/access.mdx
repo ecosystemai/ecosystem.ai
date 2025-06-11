@@ -614,7 +614,23 @@ curl -X 'POST' \
 "token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29zeXN0ZW0uYWkiLCJ0eXBlIjoiQVBJX0tFWSIsInNlcnZlcklkIjoiaHR0cDovLzEyNy4wLjAuMSIsImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjEiLCJpYXQiOjE3NDUxNjM4NDEsImV4cCI6MTc0NTI1MDI0MX0.hvb7N0UeEjINAf1nGyCQviug-bC-SVf1LzwFMZk0oIY"
 }'
 ```
+There are a number of additional optional fields the can be included in the request body that will change the behavior of the `/refreshWithOptions` API:
+- `type`: This field can be set to `generateDefaultOptions`, which will generate the Options Store from scratch, or `generateUpdatedOptions`, which will keep existing options in the Options Store and check the setup feature store for any new options that should be added
+- `cassandra_offer_query`: This field specifies a Cassandra query that will be run to retrieve a table of offers to be used to update the Set Up Feature Store, this would generally be the Offer Matrix. The response from the query will be written to `mongo_offer_database.mongo_offer_collection` in the MongoDB database.
+- `mongo_offer_database`: This field specifies the name of the MongoDB database that contains the offers
+- `mongo_offer_collection`: This field specifies the name of the MongoDB collection that contains the offers
+- `mongo_setup_database`: This field specifies the name of the MongoDB database that contains the Set Up Feature Store
+- `mongo_setup_collection`: This field specifies the name of the MongoDB collection that contains the Set Up Feature Store
+- `contextual_variable_one_name`: This field specifies the name of the first contextual variable 
+- `contextual_variable_one_values`: This field specifies the values for the first contextual variable 
+- `contextual_variable_two_name`: This field specifies the name of the second contextual variable
+- `contextual_variable_two_values`: This field specifies the values for the second contextual variable
+- `offer_name_column`: This field specifies the name of the column in `mongo_offer_database.mongo_offer_collection` that contains the offer names
+
+If `mongo_offer_database`, `mongo_offer_collection`, `mongo_setup_database`, `mongo_setup_collection`, `contextual_variable_one_name`, `contextual_variable_one_values`, `contextual_variable_two_name`, `contextual_variable_two_values` and `offer_name_column` are specified then the Set Up Feature Store will be updated before the Options Store is generated. 
+
+If `cassandra_offer_query` is specified then `mongo_offer_database.mongo_offer_collection` will be updated from Cassandra before the Set Up Feature Store is updated.
 
 <Callout type="tip" title="Note">
-    The `/refreshWithOptions` API will reset the entire Options Store to its default values, i.e. until the Options Store is next updated by the ecosytem.Ai runtime, the history contained in the logging collections will be ignored.
+    The `/refreshWithOptions` API will reset the entire Options Store to its default values if `type` is set to the default value, i.e. until the Options Store is next updated by the ecosytem.Ai runtime, the history contained in the logging collections will be ignored.
 </Callout>
