@@ -215,10 +215,6 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.23.8
-    optionalDependencies:
-      crisp-sdk-web:
-        specifier: ^1.0.21
-        version: 1.0.25
     devDependencies:
       '@next/bundle-analyzer':
         specifier: ^14.2.1
@@ -265,6 +261,10 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
+    optionalDependencies:
+      crisp-sdk-web:
+        specifier: ^1.0.21
+        version: 1.0.25
 
 packages:
 
