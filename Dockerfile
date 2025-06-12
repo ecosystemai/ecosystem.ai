@@ -38,4 +38,3 @@ EXPOSE 3333
 
 # Start the Next.js application
 CMD ["pnpm", "next", "start", "-p", "3333", "--hostname", "0.0.0.0"]
-# CMD ["node", "node_modules/.bin/next", "start", "-p", "3333"]
