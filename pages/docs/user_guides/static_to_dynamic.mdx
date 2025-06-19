@@ -416,10 +416,13 @@ for con_var_one in contextual_variable_values[list(contextual_variable_values.ke
 </Callout>
 
 ## Run your Dynamic Interaction configuration in parallel
+To run initial tests of your Dynamic Interaction configuration in production you can run the Dynamic Interaction deployment in parallel to the existing static model deployment. This can be done by following the [Testing Dynamic Interaction Deployments guide](/docs/user_guides/dynamic_interaction_deployments).
 
 ## Route some traffic to your Dynamic Interaction configuration
+Once you have completed the testing of your Dynamic Interaction deployment you can route a portion of the traffic currently going to the static model deployment to the Dynamic Interaction deployment. This can be done using the [Network Runtime](/docs/user_guides/network) functionality. The Network Runtime allows you to route traffic in a variety of ways. The `experiment_selector` network type is likely to be a good option for this but the type to use can be evaluated based on the requirements of your use case.
 
 ## Test multiple Dynamic Interaction configurations
+Once you have a Dynamic Interaction configuration running in production, it is good practice to test multiple Dynamic Interaction configurations. This can be done using the [Network Runtime](/docs/user_guides/network) functionality. The Network Runtime allows you to route traffic to multiple Dynamic Interaction configurations and compare the results. The `experiment_selector` network type is likely to be a good option for this but the type to use can be evaluated based on the requirements of your use case.
 
 <Callout type="note" title="Creating, deploying and testing an Ecosystem Rewards configuration" emoji='✏️' collapsible>
 The example shows the creation, deployment and testing of an Ecosystem Rewards configuration using the python package.
