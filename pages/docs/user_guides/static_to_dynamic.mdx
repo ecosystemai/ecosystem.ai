@@ -109,7 +109,15 @@ In your new Deployment Configuration, select the `New Knowledge` option and dese
 You will also need to update the pre and post scoring logic in the Plugins accordion. This is discussed in more detail in the next section.
 
 <Callout type="tip" title="Note">
-    Deployment and the properties file.
+    Once you have created the Deployment Configuration and updated the pre and post scoring logic, you can deploy the configuration by following the [deployment guide](/docs/runtime/deployment). If you need access to the `properties` file for the Deployment Configuration, it is produced as an output by the `process_push` function in the python package. The code snippet below shows how to do this:
+```python
+#Push deployment and produce properties file
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+```
 </Callout>
 
 
@@ -320,8 +328,92 @@ If you want to add a check to confirm that any contextual variables are being co
 ```
 </Callout>
 
-
 ## Testing your Dynamic Interaction configuration
+Once you have deployed your Dynamic Interaction configuration deployment configuration, you can run tests by making individual API calls or by running a simulation. This can be done in python or using the workbench. In the workbench use the [API Management](/docs/configuration/api) functionality for individual calls or the [Simulation](/docs/configuration/simulations) functionality for running a simulation. In python these test can be run as per the example below.
+
+<Callout type="note" title="Pushing and Testing a Deployment Configuration using python" emoji='✏️' collapsible>
+The example shows the pushing and testing of a Dynamic Interaction deployment configuration.
+```python
+# Deploy your configuration and call the endpoint to check the results
+
+#Push deployment and produce properties file
+deployment_step = dm.get_deployment_step(auth, project_id, deployment_id, version, project_status="experiment")
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+#Test your deployment
+post_invocations_input = {
+                            "campaign": deployment_id
+                          , "subcampaign": "none"
+                          , "channel": "notebooks"
+                          , "customer": 793
+                          , "userid": "test"
+                          , "numberoffers": 1
+                          , "params": "{}"
+                        }
+offer_response = o.invocations(auth_runtime, post_invocations_input)
+pp.pprint(offer_response)
+
+# Run a simulation
+
+number_of_iterations = 10000
+#Set take up rates
+simulated_take_up = {}
+for i in list_of_messages:
+    simulated_take_up[i] = random()
+#Define API parameters
+post_invocations_input = {
+                            "campaign": deployment_id
+                          , "subcampaign": "none"
+                          , "channel": "notebooks"
+                          , "userid": "test"
+                          , "numberoffers": 1
+                          , "params": "{}"
+                        }
+#Run simulation
+for i in range(number_of_iterations):
+    #Get customer
+    dme.create_document_collection_index(auth, parameter_access["database"], parameter_access["table_collection"], {"education":1})
+    dme.create_document_collection_index(auth, parameter_access["database"], parameter_access["table_collection"], {parameter_access["lookup"]["key"]:1})
+    customer = dme.post_mongo_db_aggregate_pipeline(
+        auth,
+        {
+        "database":parameter_access["database"],"collection":parameter_access["table_collection"]
+        ,"pipeline":[
+            {"$match":{"education":{"$ne":"temp_user"}}}
+            ,{"$sample":{"size":1}}
+            ,{"$project":{parameter_access["lookup"]["key"]:1,"_id":0}}
+        ]
+        }
+    )[0][parameter_access["lookup"]["key"]]
+    post_invocations_input["customer"] = customer
+    #Get offer
+    offer_response = o.invocations(auth_runtime, post_invocations_input)
+    if len(offer_response["final_result"]) == 0:
+        print(f"Empty response returned during simulation, simulation halted after {i} iterations.\n\nResponse:\n{offer_response}\n\nLogs:")
+        print(u.get_container_log(auth,20,"pulse_responder_8091")["log"][0][1:-1].replace("\n, ","\n"))
+        break
+    offer = offer_response["final_result"][0]["result"]["offer"]
+    #Check take up
+    if simulated_take_up[offer] <= random():
+        o.put_offer_recommendations(auth_runtime, offer_response, " ")
+o.refresh(auth_runtime,"")
+
+# Plot the Beta Distributions after the simulation has been run
+for con_var_one in contextual_variable_values[list(contextual_variable_values.keys())[0]]:
+    for con_var_two in contextual_variable_values[list(contextual_variable_values.keys())[1]]:
+        #Plot the resulting Beta distributions
+        boxes = mu.ecosystem_rewards_beta_box_plots(auth,options_store_collection,db,con_var_one,con_var_two)
+        fig, ax = plt.subplots()  
+        ax.bxp(boxes, showfliers=False)
+        ax.set_ylabel("PDF")
+        ax.set_title(f"{con_var_one} and {con_var_two}")
+        plt.xticks(rotation=90)
+        plt.show() 
+```
+</Callout>
 
 ## Run your Dynamic Interaction configuration in parallel
 
