@@ -1,0 +1,525 @@
+---
+title: Converting Static Model Cases to Dynamic Interactions
+description: This lesson outlines how to convert a static model configuration to a Dynamic Interaction.
+---
+
+# Introduction
+[Static model configurations](/docs/configuration/static_models/) use traditional machine learning techniques to predict outcomes based on a set of features, using models that are updated by offline retraining. In situations where the behaviour being predicted is varaible over time, [Dynamic Interaction](/docs/configuration/dynamic/) configurations can prove to be more effective. In this lesson we outline the approach to migrate a static model configuration to a Dynamic Interaction configuration.
+
+The migration consists of the following steps:
+1. Selecting a Dynamic Interaction algorithm
+2. Creating your Dynamic Interaction configuration
+3. Duplicating the static model Deployment Configuration and updating it to use the Dynamic Interaction configuration.
+4. Adjusting your pre and post scoring logic to use the Dynamic Interaction configuration
+5. Testing your Dynamic Interaction configuration
+6. Run your [Dynamic Interaction configuration in parallel](/docs/user_guides/dynamic_interaction_deployments) to the static model in production
+7. Use a [Network Runtime](/docs/user_guides/network) to route a portion of the traffic to the new Dynamic Interaction configuration
+8. Use the Network Runtime to test multiple Dynamic Interaction configurations
+
+Below we give more details on implementing each of these steps.
+
+## Selecting a Dynamic Interaction algorithm
+There are a number of different [Dynamic Interaction algorithms](/docs/configuration/dynamic) available, which are described in detail in the Dynamic Models section of the documentation. Here we give a brief overview of the algorithms:
+1. **$\epsilon$-greedy**: This is the simplest algorithm. A portion ($\epsilon$) of the recommendations are made at random, with the remainder being the best performing offer, given the values of the contextual variables. This is a good algorithm to use when you want to explore your prediction space and have a clean set of data to use for further modelling or when you want the behaviour of the algorithm to be as explainable as possible.
+2. **[Ecosystem Rewards](/docs/configuration/dynamic/ecosystemrewards)**: This algorithm uses a Thompson Sampling approach to rank offers. A Beta distribution is generated and updated for each option and combination of contextual variable values and options are scored by sampling from the Beta distributions. The Ecosystem Rewards algorithm provides a good balance between learning and explainability, and it has more optionality in how historical data is used in the learning process than the other algorithms.
+3. **[Bayesian Probabilistic](/docs/configuration/dynamic/baysianprobabilistic)**: This algorithm uses a Naive Bayes model to score options, with a number of approaches available to impact how missing data in the Naive Bayes training is handled. This algorithm has less focus on balancing exploration and exploitation and instead uses a larger number of features to aim to improve the prediction accuracy. While still explainable, this algorithm is less interpretable than the Ecosystem Rewards and $\epsilon$-greedy algorithms.
+4. **[Q-learning](/docs/configuration/dynamic/qlearning)**: The Q-learning algorithm allows for specific rewards and policies to be taken into account. However, it is the most complex algorithm to implement as the reward function must be implemented using the java plugin system. 
+
+While one of these algorithms should be selected initially, it is possible to test multiple algorithms in parallel using the [Network Runtime](/docs/user_guides/network) and then select the best performing algorithm based on the results of the tests. This is described in more detail in the last section of this lesson.
+
+## Creating your Dynamic Interaction configuration
+Once you have selected a Dynamic Interaction algorithm, you will need to create the Dynamic Interaction configuration. Here we will discuss the Ecosystem Rewards algorithm as an example, but the same approaches apply to the other algorithms. 
+
+The first step is to select the contextual variables or features that you want to use to inform the Dynamic Interaction learning process. One option for this when converting from a static model is to use the features with the highest variable importance from the static model. If you want to create new variables to use or combine existing variables you can set up [Virtual Variables](/docs/user_guides/virtual_variables) to do this.
+
+To implement your configuration you can follow the [configuration documentation](/docs/configuration/dynamic/parameters) or follow the [Dynamic Interaction user guide](/docs/user_guides/dynamic).
+
+<Callout type="note" title="Creating an Ecosystem Rewards configuration using python" emoji='✏️' collapsible>
+The example shows the creation of an Ecosystem Rewards configuration using the python package, a full example including deployment and testing of the simulation is included at the end of the lesson.
+```python
+# Import packages
+
+from prediction.apis import online_learning_management as ol
+from prediction import jwt_access
+import getpass
+
+# Connect to the ecosystem.Ai environment
+
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+mongo_password = getpass.getpass("Enter your MongoDB password")
+auth = jwt_access.Authenticate("http://ecosystem-server:3001/api", "user@ecosystem.ai", ecosystem_password)
+
+# Set the parameters for the configuration
+
+# The name of the project and deployment on which you will be working.
+project_id = "Demo Project"
+deployment_id = "interaction_science_messages_eco_rewards"
+db = "interaction_science" # The name of the MongoDB database to use for the set up feature store and options store
+
+# Set up your Dynamic Interaction configuration
+
+# Set the list of options to be recommended, a table of options can also be used.
+list_of_messages = [
+    "Get 10 percent off your next purchase"
+    ,"We are excited to offer you a 10 percent discount"
+    ,"Thanks for everything, get 10 percent off your next purchase"
+]
+# Create the set up feature store collection
+setup_feature_store_collection = "messaging_set_up_feature_store"
+contextual_variable_values = {"personality_type":["Enthusiastic","Industrious","Intentional","Experiential"],"education":["Graduate","Grade10","Grade12","Honours","PhD","Diploma"]}
+ol.online_learning_ecosystem_rewards_setup_feature_store(
+    auth,
+    contextual_variable_values,
+    db,
+    setup_feature_store_collection,
+    "message",
+    list_of_offers=list_of_messages
+)
+#Create your online learing configuration
+options_store_collection="messaging_options"
+dynamic_interaction_uuid = ol.create_online_learning(
+        auth,
+        name=deployment_id,
+        description="Interaction Science messages using Ecosystem Rewards template",
+        feature_store_collection=setup_feature_store_collection,
+        feature_store_database=db,
+        options_store_database=db,
+        options_store_collection=options_store_collection,
+        randomisation_success_reward = 0.5,
+        randomisation_fail_reward = 0.05,
+        randomisation_processing_count = 200,
+        randomisation_processing_window = 604800000,
+        contextual_variables_offer_key="message",
+        contextual_variables_contextual_variable_one_name="personality_type",
+        contextual_variables_contextual_variable_one_from_data_source=True,
+        contextual_variables_contextual_variable_one_lookup="personality_type",
+        contextual_variables_contextual_variable_two_name="education",
+        contextual_variables_contextual_variable_two_from_data_source=True,
+        contextual_variables_contextual_variable_two_lookup="education",
+        #update=True
+)
+```
+</Callout>
+
+## Set up the Deployment Configuration
+When migrating from a static model configuration to a Dynamic Interaction configuration, the easiest way to create the Deployment Configuration is by duplicating the existing static model Deployment Configuration and updating it to use the Dynamic Interaction configuration. Changing the version of the static Deployment Configuration and clicking `Update` will create a copt that you can use for this purpose. At the same time you will probably want to change the name of the Deployment Configuration to be the same of the name of the Dynamic Interaction configuration you created in the previous step.
+
+In your new Deployment Configuration, select the `New Knowledge` option and deselect the `Prediction Model` and `Model Selector` options. Scroll down to the `New Knowledge` accordion, expand it and select the Dynamic Interaction configuration that you created in the previous step.
+
+You will also need to update the pre and post scoring logic in the Plugins accordion. This is discussed in more detail in the next section.
+
+<Callout type="tip" title="Note">
+    Deployment and the properties file.
+</Callout>
+
+
+## Adjusting your pre and post scoring logic
+You will need to adjust your pre and post scoring logic to use the Dynamic Interaction configuration. If you do not have custom pre and post scoring logic, this is as simple as switch templates in your Deployment Interaction Configuration. Alternatively, you will need to make some minor changes to your existing pre and post scoring logic.
+
+<Callout type="tip" title="Note">
+    If you are editing custom pre and post scoring logic the recommended approach is to [test and debug the code locally using IntelliJ](/docs/user_guides/runtime_plugin_development) before building the code in the Workbench.
+</Callout>
+
+### Pre scoring logic
+The pre scoring logic will need to be updated if you are using contextual variables and the contextual variable values are being looked up from a data source. In this case you should either use the `PreScoreDynamic.java` [template](/docs/runtime/prepredict/prescoredynamic) prescore or if you have existing custom prescoring logic you will need to ensure that the pre scoring class extends `PreScoreSuper` and then call the `getDynamicSettings` and `getPrepopulateContextualVariables` methods, as per the code snippet below:
+```java
+    params = getDynamicSettings(mongoClient, params);        
+    params = getPrepopulateContextualVariables(params);
+```
+
+<Callout type="tip" title="Note">
+    `getDynamicSettings` requires the `mongoClient` to be passed in as a parameter, in order for `mongoClient` to be passed to the pre score, the name of the pre score class must contain the string `PreScoreDynamic` or `PreScoreLookup`.
+</Callout>
+
+### Post scoring logic
+If you are not using custom post scoring logic, you can use the `PlatformDynamicEngagement.java` [template](/docs/runtime/postpredict/platformdynamicengagement) post score. If you have existing custom post scoring logic, you will need to make two key changes, which are illustrated in `PlatformDynamicEngagement.java`:
+1. Extract the results of the Dynamic Interaction scoring from `params`
+2. Loop through the Options Store when processing options rather than the Offer Matrix or Model Scoring results
+3. Decide how to handle options which are in the Options Store but not in the Offer Matrix
+4. Get the offer score by getting the `arm_reward` from the `option` in the Options Store
+5. Add the Dynamic Interaction specific outputs to the API response for logging, explainability and to enable the online learning process
+
+To extract the results of the Dynamic Interaction scoring from `params`, check that your post scoring logic extends `PostScoreSuper` and use the following code snippet:
+```java
+	/***************************************************************************************************/
+	/** Standardized approach to access dynamic datasets in plugin.
+	 * The options array is the data set/feature_store that's keeping track of the dynamic changes.
+	 * The optionParams is the parameter set that will influence the real-time behavior through param changes.
+	 */
+	/***************************************************************************************************/
+	JSONArray options = getOptions(params);
+	JSONObject optionParams = getOptionsParams(params);
+	JSONObject locations = getLocations(params);
+
+	JSONObject contextual_variables = optionParams.getJSONObject("contextual_variables");
+	JSONObject randomisation = optionParams.getJSONObject("randomisation");
+
+	/***************************************************************************************************/
+	/** Test if contextual variable is coming via api or feature store: API takes preference... */
+	if (!work.has("contextual_variable_one")) {
+		if (featuresObj.has(contextual_variables.getString("contextual_variable_one_name")))
+			work.put("contextual_variable_one", featuresObj.get(contextual_variables.getString("contextual_variable_one_name")));
+		else
+			work.put("contextual_variable_one", "");
+	}
+	if (!work.has("contextual_variable_two")) {
+		if (featuresObj.has(contextual_variables.getString("contextual_variable_two_name")))
+			work.put("contextual_variable_two", featuresObj.get(contextual_variables.getString("contextual_variable_two_name")));
+		else
+			work.put("contextual_variable_two", "");
+	}
+	/***************************************************************************************************/
+```
+These variables will be used rather than `domainsProbabilityObj` to get the scoring results. You can look at `PlatformDynamicEngagement.java` for an example of how this, and subsequent, snippets can be used.
+
+To loop through the Options Store when processing options, you can use the following code snippet:
+```java
+	int[] optionsSequence = generateOptionsSequence(options.length(), options.length());
+	String contextual_variable_one = String.valueOf(work.get("contextual_variable_one"));
+	String contextual_variable_two = String.valueOf(work.get("contextual_variable_two"));
+
+	for(int j : optionsSequence) {
+		JSONObject option = options.getJSONObject(j);
+```
+
+If an option is in the Options Store but not in the Offer Matrix you can either ignore that option or generate a default Offer Matrix entry for that option and generate a warning in the logs
+```java
+	/** Skip the item if offer matrix does not contain option */
+	/*
+	if (!offerMatrixWithKey.has(option.getString("optionKey")))
+		continue;
+	 */
+	/** Generate default offer matrix entry if offer is not in the Offer Matrix */
+	String offer = option.getString("optionKey");
+	if (!offerMatrixWithKey.has(option.getString("optionKey"))) {
+		JSONObject singleOffer = defaultOffer(offer);
+		offerMatrixWithKey.put(option.getString("optionKey"), singleOffer);
+		LOGGER.warn("BEWARE, DEFAULT OFFER GENERATED. IN OPTIONS STORE AND NOT OFFER MATRIX: " + option.getString("optionKey"));
+	}
+```
+
+To get the score for the offer from the current option in the loop, you can use the following code snippet:
+```java
+	double p = 0.0;
+	double arm_reward = 0.001;
+	double learning_reward = 1.0;
+
+	if (option.has("arm_reward")) {
+		p = (double) option.get("arm_reward");
+	} else {
+		p = arm_reward;
+	}
+	arm_reward = p;
+```
+
+To add the Dynamic Interaction specific outputs to the API response, you can use the following code snippet:
+```java
+    /** Add dynamic interaction specific outputs to the API response */
+	finalOffersObject.put("p", p);
+	if (option.has("contextual_variable_one"))
+		finalOffersObject.put("contextual_variable_one", option.getString("contextual_variable_one"));
+	else
+		finalOffersObject.put("contextual_variable_one", "");
+
+	if (option.has("contextual_variable_two"))
+		finalOffersObject.put("contextual_variable_two", option.getString("contextual_variable_two"));
+	else
+		finalOffersObject.put("contextual_variable_two", "");
+
+	double alpha = (double) DataTypeConversions.getDoubleFromIntLong(option.get("alpha"));
+	double beta = (double) DataTypeConversions.getDoubleFromIntLong(option.get("beta"));
+	finalOffersObject.put("alpha", alpha);
+	finalOffersObject.put("beta", beta);
+	if (!option.has("weighting"))
+		finalOffersObject.put("weighting", -1.0);
+	else
+		finalOffersObject.put("weighting", (double) DataTypeConversions.getDoubleFromIntLong(option.get("weighting")));
+	finalOffersObject.put("arm_reward", arm_reward);
+	finalOffersObject.put("learning_reward", learning_reward);
+
+	/* Debugging variables */
+	if (!option.has("expected_takeup"))
+		finalOffersObject.put("expected_takeup", -1.0);
+	else
+		finalOffersObject.put("expected_takeup", (double) DataTypeConversions.getDoubleFromIntLong(option.get("expected_takeup")));
+
+	if (!option.has("propensity"))
+		finalOffersObject.put("propensity", -1.0);
+	else
+		finalOffersObject.put("propensity", (double) DataTypeConversions.getDoubleFromIntLong(option.get("propensity")));
+
+	if (!option.has("epsilon_nominated"))
+		finalOffersObject.put("epsilon_nominated", -1.0);
+	else
+		finalOffersObject.put("epsilon_nominated", (double) DataTypeConversions.getDoubleFromIntLong(option.get("epsilon_nominated")));
+```
+
+If you want to add a check to confirm that any contextual variables are being correctly processed, you can use the following code snippet in the loop through the Options Store:
+```java
+	String contextual_variable_one_Option = "";
+	if (option.has("contextual_variable_one") && !contextual_variable_one.equals(""))
+		contextual_variable_one_Option = String.valueOf(option.get("contextual_variable_one"));
+	String contextual_variable_two_Option = "";
+	if (option.has("contextual_variable_two") && !contextual_variable_two.equals(""))
+		contextual_variable_two_Option = String.valueOf(option.get("contextual_variable_two"));
+
+	if (contextual_variable_one_Option.equals(contextual_variable_one) && contextual_variable_two_Option.equals(contextual_variable_two)) {
+```
+
+<Callout type="tip" title="Note">
+    The online learning process for the Dynamic Interaction configuration expects specific structures to be present in the logging collections and API responses. If you are following the templates provided and using the `getTopScores` structure in your post scoring logic then these structures will be automatically generated. If not using the `getTopScores` method you will need to ensure the the logging collections contain a `final_offers` array with the following structure:
+```json
+    "final_result": [
+        {
+            "result": {
+                "contextual_variable_two": "Grade12",
+                "cost": 0,
+                "learning_reward": 100,
+                "contextual_variable_one": "Industrious",
+                "uuid": "f396e071-7890-432c-894c-f400f0e0bc89",
+                "modified_offer_score": 0,
+                "offer_name": "Bulk Purchase Discount",
+                "offer": "Bulk Purchase Discount",
+                "score": 0.5948571746701846,
+                "final_score": 0.5948571746701846,
+                "price": 0,
+                "offer_value": 0,
+                "arm_reward": 0.5948571746701846
+            },
+            "result_full": {
+                "expected_takeup": -1,
+                "contextual_variable_two": "Grade12",
+                "cost": 0,
+                "explore": 0,
+                "epsilon_nominated": 1,
+                "learning_reward": 100,
+                "contextual_variable_one": "Industrious",
+                "offer_name_desc": "Recommended offer is Bulk Purchase Discount",
+                "weighting": 1,
+                "uuid": "f396e071-7890-432c-894c-f400f0e0bc89",
+                "offer_name": "Bulk Purchase Discount",
+                "modified_offer_score": 0,
+                "offer": "Bulk Purchase Discount",
+                "p": 0.5948571746701846,
+                "score": 0.5948571746701846,
+                "final_score": 0.5948571746701846,
+                "propensity": 0,
+                "price": 0,
+                "alpha": 1,
+                "offer_value": 0,
+                "beta": 1.1,
+                "arm_reward": 0.5948571746701846
+            },
+            "rank": 1
+        }
+    ]
+```
+    Additionally, the predictor in the logs should be the same as the name of the Dynamic Interaction configuration and the name of the Deployment Configuration:
+```json
+    "predictor": "offer_recommend_dynamic"
+```
+</Callout>
+
+
+## Testing your Dynamic Interaction configuration
+
+## Run your Dynamic Interaction configuration in parallel
+
+## Route some traffic to your Dynamic Interaction configuration
+
+## Test multiple Dynamic Interaction configurations
+
+<Callout type="note" title="Creating, deploying and testing an Ecosystem Rewards configuration" emoji='✏️' collapsible>
+The example shows the creation, deployment and testing of an Ecosystem Rewards configuration using the python package.
+```python
+# Import packages
+
+from prediction.apis import deployment_management as dm
+from prediction.apis import ecosystem_generation_engine as ge
+from prediction.apis import data_management_engine as dme
+from prediction.apis import data_munging_engine as mu
+from prediction.apis import online_learning_management as ol
+from prediction.apis import prediction_engine as pe
+from prediction.apis import worker_file_service as fs
+from prediction.apis import utilities as u
+from prediction import jwt_access
+from runtime.apis import predictor_engine as o
+from runtime import access
+import pprint
+pp = pprint.PrettyPrinter(indent=1)
+import yaml
+import time
+import getpass
+from random import random
+import matplotlib.pyplot as plt
+
+# Connect to the ecosystem.Ai environment
+
+ecosystem_password = getpass.getpass("Enter your ecosystem password")
+mongo_password = getpass.getpass("Enter your MongoDB password")
+auth = jwt_access.Authenticate("http://ecosystem-server:3001/api", "user@ecosystem.ai", ecosystem_password)
+
+# Set the parameters for the configuration
+
+# The name of the project and deployment on which you will be working.
+project_id = "Demo Project"
+deployment_id = "interaction_science_messages_eco_rewards"
+version = "001" # deployment version
+db = "interaction_science" # The name of the MongoDB database to use for the set up feature store and options store
+# The url of the ecosystem.Ai runtime
+runtime_path="http://ecosystem-runtime:8091"
+auth_runtime = access.Authenticate(runtime_path)
+
+# Set up your Dynamic Interaction configuration
+
+# Set the list of options to be recommended, a table of options can also be used.
+list_of_messages = [
+    "Get 10 percent off your next purchase"
+    ,"We are excited to offer you a 10 percent discount"
+    ,"Thanks for everything, get 10 percent off your next purchase"
+]
+# Create the set up feature store collection
+setup_feature_store_collection = "messaging_set_up_feature_store"
+contextual_variable_values = {"personality_type":["Enthusiastic","Industrious","Intentional","Experiential"],"education":["Graduate","Grade10","Grade12","Honours","PhD","Diploma"]}
+ol.online_learning_ecosystem_rewards_setup_feature_store(
+    auth,
+    contextual_variable_values,
+    db,
+    setup_feature_store_collection,
+    "message",
+    list_of_offers=list_of_messages
+)
+#Create your online learing configuration
+options_store_collection="messaging_options"
+dynamic_interaction_uuid = ol.create_online_learning(
+        auth,
+        name=deployment_id,
+        description="Interaction Science messages using Ecosystem Rewards template",
+        feature_store_collection=setup_feature_store_collection,
+        feature_store_database=db,
+        options_store_database=db,
+        options_store_collection=options_store_collection,
+        randomisation_success_reward = 0.5,
+        randomisation_fail_reward = 0.05,
+        randomisation_processing_count = 200,
+        randomisation_processing_window = 604800000,
+        contextual_variables_offer_key="message",
+        contextual_variables_contextual_variable_one_name="personality_type",
+        contextual_variables_contextual_variable_one_from_data_source=True,
+        contextual_variables_contextual_variable_one_lookup="personality_type",
+        contextual_variables_contextual_variable_two_name="education",
+        contextual_variables_contextual_variable_two_from_data_source=True,
+        contextual_variables_contextual_variable_two_lookup="education",
+        #update=True
+)
+
+# Configure your deployment
+
+#Get your online learing configuration
+dynamic_interaction_uuid = ol.get_dynamic_interaction_uuid(auth,deployment_id)
+dynamic_interaction = dm.define_deployment_multi_armed_bandit(epsilon=0, dynamic_interaction_uuid=dynamic_interaction_uuid)
+#Configure the lookup to the customer feature store
+parameter_access = dm.define_deployment_parameter_access(
+    auth,
+    lookup_key="customer",
+    lookup_type="int",
+    database=db,
+    table_collection="customer_feature_store",
+    datasource="mongodb"
+)
+#Create your deployment
+deployment_step = dm.create_deployment(
+    auth,
+    project_id=project_id,
+    deployment_id=deployment_id,
+    description="Messaging deployment (http://ecosystem-runtime:8091)",
+    version=version,
+    plugin_post_score_class="PlatformDynamicEngagement.java",
+    plugin_pre_score_class="PreScoreDynamic.java",
+    scoring_engine_path_dev=runtime_path,
+    mongo_connect=f"mongodb://ecosystem_user:{mongo_password}@ecosystem-server:54445/?authSource=admin",
+    parameter_access=parameter_access,
+    multi_armed_bandit=dynamic_interaction,
+)
+
+# Deploy your configuration and call the endpoint to check the results
+
+#Push deployment and produce properties file
+deployment_step = dm.get_deployment_step(auth, project_id, deployment_id, version, project_status="experiment")
+push_result = ge.process_push(auth,deployment_step)
+if "ErrorMessage" in push_result:
+    print(push_result["ErrorMessage"])
+else:
+    print(push_result["properties"])
+#Test your deployment
+post_invocations_input = {
+                            "campaign": deployment_id
+                          , "subcampaign": "none"
+                          , "channel": "notebooks"
+                          , "customer": 793
+                          , "userid": "test"
+                          , "numberoffers": 1
+                          , "params": "{}"
+                        }
+offer_response = o.invocations(auth_runtime, post_invocations_input)
+pp.pprint(offer_response)
+
+# Run a simulation
+
+number_of_iterations = 10000
+#Set take up rates
+simulated_take_up = {}
+for i in list_of_messages:
+    simulated_take_up[i] = random()
+#Define API parameters
+post_invocations_input = {
+                            "campaign": deployment_id
+                          , "subcampaign": "none"
+                          , "channel": "notebooks"
+                          , "userid": "test"
+                          , "numberoffers": 1
+                          , "params": "{}"
+                        }
+#Run simulation
+for i in range(number_of_iterations):
+    #Get customer
+    dme.create_document_collection_index(auth, parameter_access["database"], parameter_access["table_collection"], {"education":1})
+    dme.create_document_collection_index(auth, parameter_access["database"], parameter_access["table_collection"], {parameter_access["lookup"]["key"]:1})
+    customer = dme.post_mongo_db_aggregate_pipeline(
+        auth,
+        {
+        "database":parameter_access["database"],"collection":parameter_access["table_collection"]
+        ,"pipeline":[
+            {"$match":{"education":{"$ne":"temp_user"}}}
+            ,{"$sample":{"size":1}}
+            ,{"$project":{parameter_access["lookup"]["key"]:1,"_id":0}}
+        ]
+        }
+    )[0][parameter_access["lookup"]["key"]]
+    post_invocations_input["customer"] = customer
+    #Get offer
+    offer_response = o.invocations(auth_runtime, post_invocations_input)
+    if len(offer_response["final_result"]) == 0:
+        print(f"Empty response returned during simulation, simulation halted after {i} iterations.\n\nResponse:\n{offer_response}\n\nLogs:")
+        print(u.get_container_log(auth,20,"pulse_responder_8091")["log"][0][1:-1].replace("\n, ","\n"))
+        break
+    offer = offer_response["final_result"][0]["result"]["offer"]
+    #Check take up
+    if simulated_take_up[offer] <= random():
+        o.put_offer_recommendations(auth_runtime, offer_response, " ")
+o.refresh(auth_runtime,"")
+
+# Plot the Beta Distributions after the simulation has been run
+for con_var_one in contextual_variable_values[list(contextual_variable_values.keys())[0]]:
+    for con_var_two in contextual_variable_values[list(contextual_variable_values.keys())[1]]:
+        #Plot the resulting Beta distributions
+        boxes = mu.ecosystem_rewards_beta_box_plots(auth,options_store_collection,db,con_var_one,con_var_two)
+        fig, ax = plt.subplots()  
+        ax.bxp(boxes, showfliers=False)
+        ax.set_ylabel("PDF")
+        ax.set_title(f"{con_var_one} and {con_var_two}")
+        plt.xticks(rotation=90)
+        plt.show() 
+```
+</Callout>
+

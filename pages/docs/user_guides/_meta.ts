@@ -15,5 +15,6 @@ export default {
   virtual_variables: 'Virtual Variables',
   network: 'Network Selector',
   dynamic_interaction_deployments: 'Testing Dynamic Interaction Deployments',
-  external_runtime_data: 'Data From Another Runtime'
+  external_runtime_data: 'Data From Another Runtime',
+  static_to_dynamic: 'Converting Static Model Cases to Dynamic Interactions',
 }
