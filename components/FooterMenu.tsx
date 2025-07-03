@@ -24,7 +24,7 @@ const menuItems: {
       },
       {
         name: 'Roadmap',
-        href: '/blog/2024-06-30_2024_roadmap',
+        href: '/blog/2025-07-03_2026_roadmap',
       },
       {
         name: 'Demo',
