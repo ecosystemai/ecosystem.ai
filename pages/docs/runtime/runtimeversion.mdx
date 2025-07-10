@@ -14,6 +14,7 @@ description: The release notes of the ecosystem runtime from version 0.9.0.0
 - `/refreshWithOptions` API call which updates the Options Store.
 - MCP server functionality
 - Custom API configuration in python.
+- MLFlow integration
 
 ## 0.9.6.0
 
@@ -24,7 +25,8 @@ description: The release notes of the ecosystem runtime from version 0.9.0.0
 - Further OpenApi updates
 - `callParallelDeployment` method added to PostScoreSuper to enable additional testing of Dynamic Interaction deployments.
 - Allow for pre score classes containing `PreScoreLookup` to be passed the `mongoClient` object argument to allow for arbitrary arggregation pipelines to be run in the pre scoring phase
-- Allow for the specification of lookups from multiple tables to construct `featuresObj` 
+- Allow for the specification of lookups from multiple tables to construct `featuresObj`
+- Custom rewards functions for Dynamic Interaction algorithms
 - Localbuild repo changes updates
   - RuntimeApplication
     - Renamed rollingMaster to rollingEcosystemRewards
